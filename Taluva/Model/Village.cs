@@ -29,15 +29,7 @@ public class Village
 
     public bool CheckVillageIntegrity()
     {
-        int count = 0;
-        for (int i = 0; i < neighbors.Length; i++)
-        {
-            if (neighbors[i] != null)
-            {
-                count++;
-            }
-        }
-        return count >= 2;
+        return neighbors.Count(t => t != null) >= 2;
     }
 
     public bool CheckTempleExist()

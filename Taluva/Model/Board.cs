@@ -4,18 +4,25 @@ namespace Taluva.Model;
 
 public class Board
 {
-    private Cell[,] worldMap;
+    private readonly Cell?[,] worldMap;
 
     public Board()
     {
         worldMap = new Cell[2, 2];
     }
 
+    public Cell this[Point coord]
+    {
+        set => worldMap[coord.X, coord.Y] = value;
+    }
+
+    [Obsolete("Use the indexer this[Point coord] instead")]
     public void AddCell(Point coord, Cell cell)
     {
         worldMap[coord.X, coord.Y] = cell;
     }
 
+    [Obsolete("Use the indexer this[Point coord] instead")]
     private void RemoveCell(Point coord)
     {
         worldMap[coord.X, coord.Y] = null;
