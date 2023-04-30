@@ -16,7 +16,6 @@ public class GameManagment
 	{
 		this.players = new Player[nbPlayers];
 		this.actualTurn = actualTurn;
-
 	}
 
 	private Player GetWinner()
@@ -29,18 +28,27 @@ public class GameManagment
 		throw new NotImplementedException();
 	}
 
-	public void SetNumbersOfPlayers(int nbPlayers)
+	public int NumberOfPlayers
 	{
-		throw new NotImplementedException();
+		set
+		{
+			throw new NotImplementedException();
+		}
 	}
 
-	public void SetNumbersOfAI(int nbAI)
+	public int NumberOfAI
 	{
-		throw new NotImplementedException();
+		set
+		{
+			throw new NotImplementedException();
+		}
 	}
 
-	public void SetAIDifficulty(Difficulty d)
+	public Difficulty AIDifficulty
 	{
-		throw new NotImplementedException();
+		set
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

@@ -23,8 +23,6 @@ public class Cell
 
     public bool IsBuildable()
     {
-        if (actualBiome == Biomes.Volcano || ActualBuildings != Building.None)
-            return false;
-        return true;
+        return actualBiome != Biomes.Volcano && ActualBuildings == Building.None;
     }
 }
