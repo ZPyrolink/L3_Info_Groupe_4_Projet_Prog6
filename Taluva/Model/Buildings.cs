@@ -1,3 +1,5 @@
+namespace Taluva.Model;
+
 public enum Building
 {
     None,

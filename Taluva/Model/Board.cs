@@ -1,5 +1,7 @@
 ﻿using System.Drawing;
 
+namespace Taluva.Model;
+
 public class Board
 {
     private Cell[,] worldMap;

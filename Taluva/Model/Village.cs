@@ -1,4 +1,6 @@
-﻿public class Village
+﻿namespace Taluva.Model;
+
+public class Village
 {
     private Cell[] Neighbors;
 

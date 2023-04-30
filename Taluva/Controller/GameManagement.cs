@@ -1,4 +1,8 @@
-﻿public class GameManagment
+﻿using Taluva.Model;
+
+namespace Taluva.Controller;
+
+public class GameManagment
 {
 	private Player[] players;
 	private Player actualPlayer;

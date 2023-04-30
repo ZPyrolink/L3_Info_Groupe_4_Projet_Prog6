@@ -1,8 +1,10 @@
+namespace Taluva.Model;
+
 public class Player
 {
 	private Chunk lastChunk;
 	private bool bPlayed;
-    private PlayerColor ID;
+	private PlayerColor ID;
 	private int nbTowers = 2;
 	private int nbTemple = 3;
 	private int nbBarrack = 20;

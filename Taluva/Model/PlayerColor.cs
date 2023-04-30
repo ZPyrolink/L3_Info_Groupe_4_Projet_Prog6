@@ -1,5 +1,7 @@
 using System.Drawing;
 
+namespace Taluva.Model;
+
 public enum PlayerColor
 {
     Red = unchecked((int) 0xFFD20F28),
