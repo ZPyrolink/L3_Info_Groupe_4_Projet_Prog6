@@ -10,9 +10,16 @@ public class Village
         Neighbors = new Cell[5];
     }
 
-    public void AddNeighbor(Cell c, int index)
+    public void AddNeighbor(Cell c)
     {
-        Neighbors[index] = c;
+        for (int i = 0; i < Neighbors.Length; i++)
+        {
+            if (Neighbors[i] == null)
+            {
+                Neighbors[i] = c;
+                break;
+            }
+        }
     }
 
     public void SelfRemove()
@@ -23,11 +30,15 @@ public class Village
 
     public bool CheckVillageIntegrity()
     {
-        foreach (Cell c in Neighbors) {
-            if(c != null)
-                return false;
+        int count = 0;
+        for (int i = 0; i < Neighbors.Length; i++)
+        {
+            if (Neighbors[i] != null)
+            {
+                count++;
+            }
         }
-        return true;
+        return count >= 2;
     }
 
     public bool CheckTempleExist()

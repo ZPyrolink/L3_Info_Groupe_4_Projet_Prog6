@@ -1,5 +1,4 @@
-Public enum Difficulty
-{
+public enum Difficulty{
     BadPlayer,
     Normal,
     SkillIssue

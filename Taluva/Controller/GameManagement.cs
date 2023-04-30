@@ -1,47 +1,70 @@
 ﻿using System;
-
-
+using static Board;
 public class GameManagment
 {
-	Player[] players;
-	Player ActualPlayer;
-	int nbPlayers;
-	int ActualTurn;
-	int MaxTurn;
-	Board GameBoard;
-	TurnPhase ActualPhase;
+    Player[] players;
+    Player ActualPlayer;
+    int nbPlayers;
+    int ActualTurn;
+    int MaxTurn;
+    Board GameBoard;
+    TurnPhase ActualPhase;
 
-	public GameManagment(int nbPlayers , int ActualTurn)
-	{
-		this.Players = new Player[nbPlayers];
-		this.ActualTurn = ActualTurn;
+    public GameManagment(int nbPlayers, int maxTurn)
+    {
+        this.players = new Player[nbPlayers];
+        this.ActualTurn = 1;
+        this.GameBoard = new Board();
+        this.nbPlayers = nbPlayers;
+        this.MaxTurn = maxTurn;
+        for (int i = 0; i < this.nbPlayers; i++)
+            players[i] = new Player((PlayerColor)i);
+    }
 
-	}
+    private Player GetWinner()
+    {
+        foreach (Player p in players)
+        {
+            int completedBuildingTypes = 0;
 
-	private Player GetWinner()
-	{
+            if (GameBoard.GetTempleSlots(p).Length> 0)
+                completedBuildingTypes++;
 
-	}
+            if (GameBoard.GetBarracksSlots(p).Length > 0)
+                completedBuildingTypes++;
 
-	public void InitPlay()
-	{
+            if (GameBoard.GetTowerSlots(p).Length > 0)
+                completedBuildingTypes++;
 
-	}
+            if (completedBuildingTypes >= 2)
+                return p;
+        }
 
-	public void SetNumbersOfPlayers(int nbPlayers)
-	{
+        return null;
+    }
 
-	}
+    public void InitPlay()
+    {
+        ActualPhase = TurnPhase.PlaceBuilding;
+        ActualPhase = TurnPhase.RotateCell;
+        ActualPhase = TurnPhase.SelectCells;
+        ActualTurn++;
+        if (ActualTurn > MaxTurn)
+            ActualTurn = 1;
+    }
 
-	public void SetNumbersOfAI(int nbAI)
-	{
+    public void SetNumbersOfPlayers(int nbPlayers)
+    {
+        this.nbPlayers = nbPlayers;
+    }
 
-	}
+    public void SetNumbersOfAI(int nbAI)
+    {
 
-	public void SetAIDifficulty(Difficulty d)
-	{
-		
-	}
+    }
 
+    public void SetAIDifficulty(Difficulty d)
+    {
 
+    }
 }
