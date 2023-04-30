@@ -1,19 +1,21 @@
-using System;
 using System.Drawing;
+
+namespace Taluva.Model;
 
 public class Player
 {
-	Chunk lastChunk;
-	bool b_played;
-    public PlayerColor ID { get; private set; }
-	int nbTowers = 2;
-	int nbTemple = 3;
-	int nbBarrack = 20;
+	private Chunk lastChunk;
+	private bool bPlayed;
+	public PlayerColor ID { get; private set; }
+	private int nbTowers = 2;
+	private int nbTemple = 3;
+	private int nbBarrack = 20;
 
 	public Player(PlayerColor ID)
 	{
 		this.ID = ID;
 	}
+	
 	public void Play(TurnPhase Phase, Board GameBoard,Point p,Building b)
 	{
 		switch (Phase)

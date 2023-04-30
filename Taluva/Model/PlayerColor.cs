@@ -1,14 +1,16 @@
 using System.Drawing;
 
-public enum PlayerColor : int
+namespace Taluva.Model;
+
+public enum PlayerColor
 {
-    Red = 0xD20F28,
-    Green = 0x6C935E,
-    Blue = 0x4855B7,
-    Yellow = 0xFFD700
+    Red = unchecked((int) 0xFFD20F28),
+    Green = unchecked((int) 0xFF6C935E),
+    Blue = unchecked((int) 0xFF4855B7),
+    Yellow = unchecked((int) 0xFFFFD700)
 }
 
 public static class PlayerColorExt
 {
-    public static Color getColor(this PlayerColor pc) => Color.FromArgb((int)pc);
+    public static Color GetColor(this PlayerColor pc) => Color.FromArgb((int) pc);
 }

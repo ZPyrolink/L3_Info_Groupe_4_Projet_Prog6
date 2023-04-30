@@ -1,13 +1,14 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
+
+namespace Taluva.Model;
 
 public class Cell
 {
     public Biomes ActualBiome;
     public Building ActualBuildings;
-    int Level;
+    private int Level;
     public PlayerColor Owner { get;  set; }
-    Village ActualVillage;
+    private Village ActualVillage;
     public Point coord { get; private set; }
 
     public Cell(Biomes biome, int level, Point coord)
@@ -26,9 +27,6 @@ public class Cell
 
     public bool IsBuildable()
     {
-        if (ActualBiome == Biomes.Volcano || ActualBuildings != Building.None)
-            return false;
-        return true;
+        return ActualBiome != Biomes.Volcano && ActualBuildings == Building.None;
     }
-    
 }

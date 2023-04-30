@@ -1,22 +1,21 @@
-﻿using System;
-
+﻿namespace Taluva.Model;
 
 public class Village
 {
-    Cell[] Neighbors;
+    private Cell?[] neighbors;
 
     public Village()
     {
-        Neighbors = new Cell[5];
+        neighbors = new Cell[5];
     }
 
     public void AddNeighbor(Cell c)
     {
-        for (int i = 0; i < Neighbors.Length; i++)
+        for (int i = 0; i < neighbors.Length; i++)
         {
-            if (Neighbors[i] == null)
+            if (neighbors[i] == null)
             {
-                Neighbors[i] = c;
+                neighbors[i] = c;
                 break;
             }
         }
@@ -31,9 +30,9 @@ public class Village
     public bool CheckVillageIntegrity()
     {
         int count = 0;
-        for (int i = 0; i < Neighbors.Length; i++)
+        for (int i = 0; i < neighbors.Length; i++)
         {
-            if (Neighbors[i] != null)
+            if (neighbors[i] != null)
             {
                 count++;
             }
@@ -43,19 +42,11 @@ public class Village
 
     public bool CheckTempleExist()
     {
-        foreach (Cell c in Neighbors) {
-            if(c.ActualBuildings == Building.Temple)
-                return true;
-        }
-        return false;
+        return neighbors.Any(c => c?.ActualBuildings == Building.Temple);
     }
 
     public bool CheckTowerExist()
     {
-        foreach (Cell c in Neighbors) {
-            if(c.ActualBuildings == Building.Tower)
-                return true;
-        }
-        return false;
+        return neighbors.Any(c => c?.ActualBuildings == Building.Tower);
     }
 }

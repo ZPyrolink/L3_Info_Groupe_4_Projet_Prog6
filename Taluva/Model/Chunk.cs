@@ -1,11 +1,15 @@
-﻿using System;
+﻿using System.Drawing;
 using System.Drawing;
 
+namespace Taluva.Model;
 
 public class Chunk
 {
-	public Point[] coords = new Point[3];
-	int rotation;
-	
-	
+	public Point[] Coords { get; private set; }
+	private int rotation;
+
+	public Chunk()
+	{
+		this.Coords = new Point[3];
+	}
 }
