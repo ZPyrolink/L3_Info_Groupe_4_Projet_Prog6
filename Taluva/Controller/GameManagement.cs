@@ -1,47 +1,42 @@
-﻿using System;
-
-
-public class GameManagment
+﻿public class GameManagment
 {
-	Player[] players;
-	Player ActualPlayer;
-	int nbPlayers;
-	int ActualTurn;
-	int MaxTurn;
-	Board GameBoard;
-	TurnPhase ActualPhase;
+	private Player[] players;
+	private Player actualPlayer;
+	private int nbPlayers;
+	private int actualTurn;
+	private int maxTurn;
+	private Board gameBoard;
+	private TurnPhase actualPhase;
 
-	public GameManagment(int nbPlayers , int ActualTurn)
+	public GameManagment(int nbPlayers , int actualTurn)
 	{
-		this.Players = new Player[nbPlayers];
-		this.ActualTurn = ActualTurn;
+		this.players = new Player[nbPlayers];
+		this.actualTurn = actualTurn;
 
 	}
 
 	private Player GetWinner()
 	{
-
+		throw new NotImplementedException();
 	}
 
 	public void InitPlay()
 	{
-
+		throw new NotImplementedException();
 	}
 
 	public void SetNumbersOfPlayers(int nbPlayers)
 	{
-
+		throw new NotImplementedException();
 	}
 
 	public void SetNumbersOfAI(int nbAI)
 	{
-
+		throw new NotImplementedException();
 	}
 
 	public void SetAIDifficulty(Difficulty d)
 	{
-		
+		throw new NotImplementedException();
 	}
-
-
 }

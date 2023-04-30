@@ -1,13 +1,11 @@
-using System;
-
 public class Player
 {
-	Chunk lastChunk;
-	bool b_played;
-    PlayerColor ID;
-	int nbTowers = 2;
-	int nbTemple = 3;
-	int nbBarrack = 20;
+	private Chunk lastChunk;
+	private bool bPlayed;
+    private PlayerColor ID;
+	private int nbTowers = 2;
+	private int nbTemple = 3;
+	private int nbBarrack = 20;
 
 	public Player(PlayerColor ID)
 	{

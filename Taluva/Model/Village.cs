@@ -1,9 +1,6 @@
-﻿using System;
-
-
-public class Village
+﻿public class Village
 {
-    Cell[] Neighbors;
+    private Cell[] Neighbors;
 
     public Village()
     {

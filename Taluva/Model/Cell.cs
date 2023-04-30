@@ -3,28 +3,28 @@ using System.Drawing;
 
 public class Cell
 {
-    Biomes ActualBiome;
-    public Building ActualBuildings;
-    int Level;
-    PlayerColor Owner;
+    private Biomes actualBiome;
+    public Building ActualBuildings { get; private set; }
+    private int level;
+    private PlayerColor owner;
     //Texture BinomeVisual;
-    Village ActualVillage;
+    private Village actualVillage;
 
     public Cell(Biomes biome, int level)
     {
-        this.ActualBiome = biome;
-        this.Level = level;
-        this.ActualVillage = new Village();
+        this.actualBiome = biome;
+        this.level = level;
+        this.actualVillage = new Village();
     }
 
     public bool IsPlayable()
     {
-
+        throw new NotImplementedException();
     }
 
     public bool IsBuildable()
     {
-        if (ActualBiome == Biomes.Volcano || ActualBuildings != Building.None)
+        if (actualBiome == Biomes.Volcano || ActualBuildings != Building.None)
             return false;
         return true;
     }

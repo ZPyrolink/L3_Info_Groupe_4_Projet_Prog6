@@ -1,8 +1,12 @@
-﻿using System;
-
+﻿using System.Drawing;
 
 public class Chunk
 {
-	Point[3] coords;
-	int rotation;
+	private Point[] coords;
+	private int rotation;
+
+	public Chunk()
+	{
+		this.coords = new Point[3];
+	}
 }
