@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{031FD0C5-EC4B-A798-BE02-DA3E1E7DEF93}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{031fd0c5-ec4b-a798-be02-da3e1e7def93}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taluva", "Projects\Taluva\Taluva.csproj", "{A382B61C-A4EA-4515-BC82-4F473EF7B5CD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-firstpass", "Assembly-CSharp-firstpass.csproj", "{2ad9e3cf-3043-8838-bd19-da2b9f2b2cc4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,8 +12,8 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{031fd0c5-ec4b-a798-be02-da3e1e7def93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{031fd0c5-ec4b-a798-be02-da3e1e7def93}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A382B61C-A4EA-4515-BC82-4F473EF7B5CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A382B61C-A4EA-4515-BC82-4F473EF7B5CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2ad9e3cf-3043-8838-bd19-da2b9f2b2cc4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2ad9e3cf-3043-8838-bd19-da2b9f2b2cc4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
