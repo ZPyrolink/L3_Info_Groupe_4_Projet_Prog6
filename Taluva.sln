@@ -1,25 +1,21 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.5.33530.505
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taluva", "Taluva\Taluva.csproj", "{0F63E8F2-889A-4D9E-881A-F9BE71290B12}"
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{031FD0C5-EC4B-A798-BE02-DA3E1E7DEF93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taluva", "Projects\Taluva\Taluva.csproj", "{A382B61C-A4EA-4515-BC82-4F473EF7B5CD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0F63E8F2-889A-4D9E-881A-F9BE71290B12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0F63E8F2-889A-4D9E-881A-F9BE71290B12}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0F63E8F2-889A-4D9E-881A-F9BE71290B12}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0F63E8F2-889A-4D9E-881A-F9BE71290B12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{031fd0c5-ec4b-a798-be02-da3e1e7def93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{031fd0c5-ec4b-a798-be02-da3e1e7def93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A382B61C-A4EA-4515-BC82-4F473EF7B5CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A382B61C-A4EA-4515-BC82-4F473EF7B5CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {67F49F2E-213B-4944-971B-DD56C29D98AB}
 	EndGlobalSection
 EndGlobal
