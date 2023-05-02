@@ -31,13 +31,13 @@ public class GameManagment
             {
                 int completedBuildingTypes = 0;
 
-                if (gameBoard.GetTempleSlots(p).Length> 0)
+                if (gameBoard.GetTempleSlots(p).Length ==  p.nbTemple)
                     completedBuildingTypes++;
 
-                if (gameBoard.GetBarracksSlots(p).Length > 0)
+                if (gameBoard.GetBarracksSlots(p).Length == p.nbBarrack)
                     completedBuildingTypes++;
 
-                if (gameBoard.GetTowerSlots(p).Length > 0)
+                if (gameBoard.GetTowerSlots(p).Length == p.nbTowers)
                     completedBuildingTypes++;
 
                 if (completedBuildingTypes >= 2)
@@ -55,13 +55,13 @@ public class GameManagment
         {
             int completedBuildingTypes = 0;
 
-            if (gameBoard.GetTempleSlots(p).Length> 0)
+            if (gameBoard.GetTempleSlots(p).Length ==  p.nbTemple)
                 completedBuildingTypes++;
 
-            if (gameBoard.GetBarracksSlots(p).Length > 0)
+            if (gameBoard.GetBarracksSlots(p).Length == p.nbBarrack)
                 completedBuildingTypes++;
 
-            if (gameBoard.GetTowerSlots(p).Length > 0)
+            if (gameBoard.GetTowerSlots(p).Length == p.nbTowers)
                 completedBuildingTypes++;
 
             if (completedBuildingTypes >= 2)
@@ -73,20 +73,22 @@ public class GameManagment
 
     public void InitPlay()
     {
-        actualPhase = TurnPhase.PlaceBuilding;
-        actualPhase = TurnPhase.RotateCell;
-        actualPhase = TurnPhase.SelectCells;
-        actualTurn++;
-        if (actualTurn > maxTurn)
-            actualTurn = 1;
+        while (actualTurn <= maxTurn)
+        {
+            actualPhase = TurnPhase.PlaceBuilding;
+            actualPhase = TurnPhase.RotateCell;
+            actualPhase = TurnPhase.SelectCells;
+
+            actualTurn++;
+            if (actualTurn > NbPlayers)
+            {
+                actualTurn = 1;
+            }
+
+            actualPlayer = players[actualTurn - 1];
+        }
     }
     
-    [Obsolete($"Use the {nameof(nbPlayers)} auto-property instead")]
-    public void SetNumbersOfPlayers(int nbPlayers)
-    {
-        this.NbPlayers = nbPlayers;
-    }
-
 	public int NumberOfAI
 	{
 		set

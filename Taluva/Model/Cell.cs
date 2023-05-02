@@ -12,7 +12,7 @@ public class Cell
     public Cell(Biomes biome, int level)
     {
         this.ActualBiome = biome;
-        this.actualVillage = new Village();
+        this.actualVillage = new();
         this.ActualBuildings = Building.None;
     }
 
@@ -35,5 +35,7 @@ public class Cell
     {
         return ActualBiome != Biomes.Volcano && ActualBuildings == Building.None;
     }
+    
+    
     
 }

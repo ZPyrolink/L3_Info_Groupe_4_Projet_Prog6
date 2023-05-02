@@ -6,20 +6,23 @@ public class Chunk
 {
 	public Cell[] Coords { get; private set; }
 	private int rotation;
-	private int level;
+	private int Level=1;
 
-	public Chunk()
+	public Chunk(int l)
 	{
 		this.Coords = new Cell[3];
-		
+		this.Level = l;
+
 	}
-	public bool CanRotate()
+
+	void RotateChunk()
 	{
 		throw new NotImplementedException();
 	}
 
-	public void RotateChunk()
+	private bool CanRotate()
 	{
 		throw new NotImplementedException();
 	}
+	
 }
