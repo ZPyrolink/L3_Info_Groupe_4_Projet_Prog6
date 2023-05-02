@@ -1,15 +1,15 @@
+using System;
 using System.Drawing;
-
-namespace Taluva.Model;
+using Taluva.Model;
 
 public class Player
 {
-    private Chunk lastChunk;
-    private bool bPlayed;
+	Chunk lastChunk;
+	bool b_played;
     public PlayerColor ID { get; private set; }
-    private int nbTowers = 2;
-    private int nbTemple = 3;
-    private int nbBarrack = 20;
+	int nbTowers = 2;
+	int nbTemple = 3;
+	int nbBarrack = 20;
 
     public Player(PlayerColor id)
     {
@@ -24,7 +24,6 @@ public class Player
                 gameBoard.PlaceBuilding(p, b, this);
                 break;
             case TurnPhase.RotateCell:
-                gameBoard.RotateChunk(null);
                 break;
             case TurnPhase.SelectCells:
                 break;

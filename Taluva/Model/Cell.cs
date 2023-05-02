@@ -6,7 +6,6 @@ public class Cell
 {
     public Biomes ActualBiome { get; }
     public Building ActualBuildings { get; set; }
-    private int level;
     public PlayerColor Owner { get; set; }
     private Village actualVillage;
     public Point Coord { get; private set; }
@@ -14,7 +13,6 @@ public class Cell
     public Cell(Biomes biome, int level, Point coord)
     {
         this.ActualBiome = biome;
-        this.level = level;
         this.Coord = coord;
         this.actualVillage = new Village();
         this.ActualBuildings = Building.None;

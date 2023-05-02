@@ -11,15 +11,15 @@ public class Board
         worldMap = new Cell[2, 2];
     }
 
-    public Cell this[Point coord]
+    public Cell this[Cell c]
     {
-        set => worldMap[coord.X, coord.Y] = value;
+        set => worldMap[c.Coord.X, c.Coord.Y] = value;
     }
 
     [Obsolete("Use the indexer this[Point coord] instead")]
-    public void AddCell(Point coord, Cell cell)
+    public void AddCell(Cell cell)
     {
-        worldMap[coord.X, coord.Y] = cell;
+        worldMap[cell.Coord.X, cell.Coord.Y] = cell;
     }
 
     [Obsolete("Use the indexer this[Point coord] instead")]
@@ -35,7 +35,7 @@ public class Board
         {
             for (int y = 0; y < worldMap.GetLength(1); y++)
             {
-                if (worldMap[x, y] != null && worldMap[x, y].ActualBiome != Biomes.None)
+                if (worldMap[x, y] != null && worldMap[x, y]!.ActualBiome != Biomes.None)
                 {
                     chunkSlots.Add(new Point(x, y));
                 }
@@ -52,7 +52,7 @@ public class Board
         {
             for (int y = 0; y < worldMap.GetLength(1); y++)
             {
-                if (worldMap[x, y] != null && worldMap[x, y].ActualBuildings == Building.None)
+                if (worldMap[x, y] != null && worldMap[x, y]!.ActualBuildings == Building.None)
                 {
                     barrackSlots.Add(new Point(x, y));
                 }
@@ -69,31 +69,18 @@ public class Board
 
     public void PlaceBuilding(Point coord, Building building, Player player)
     {
-        if (worldMap[coord.X, coord.Y] != null && worldMap[coord.X, coord.Y].IsBuildable())
+        if (worldMap[coord.X, coord.Y] != null && worldMap[coord.X, coord.Y]!.IsBuildable())
         {
-            worldMap[coord.X, coord.Y].ActualBuildings = building;
-            worldMap[coord.X, coord.Y].Owner = player.ID;
+            worldMap[coord.X, coord.Y]!.ActualBuildings = building;
+            worldMap[coord.X, coord.Y]!.Owner = player.ID;
         }
     }
 
     public void RemoveChunk(Chunk c)
     {
-        foreach (Point coord in c.Coords)
-        {
-            RemoveCell(coord);
-        }
-    }
-
-    public bool CanRotate(Chunk target)
-    {
         throw new NotImplementedException();
     }
-
-    public void RotateChunk(Chunk target)
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public Point[] GetTowerSlots(Player actualPlayer)
     {
         List<Point> towerSlots = new List<Point>();
@@ -101,8 +88,8 @@ public class Board
         {
             for (int y = 0; y < worldMap.GetLength(1); y++)
             {
-                if (worldMap[x, y] != null && worldMap[x, y].ActualBuildings == Building.Tower &&
-                    worldMap[x, y].Owner == actualPlayer.ID)
+                if (worldMap[x, y] != null && worldMap[x, y]!.ActualBuildings == Building.Tower &&
+                    worldMap[x, y]!.Owner == actualPlayer.ID)
                 {
                     towerSlots.Add(new Point(x, y));
                 }
@@ -119,8 +106,8 @@ public class Board
         {
             for (int y = 0; y < worldMap.GetLength(1); y++)
             {
-                if (worldMap[x, y] != null && worldMap[x, y].ActualBuildings == Building.Temple &&
-                    worldMap[x, y].Owner == actualPlayer.ID)
+                if (worldMap[x, y] != null && worldMap[x, y]!.ActualBuildings == Building.Temple &&
+                    worldMap[x, y]!.Owner == actualPlayer.ID)
                 {
                     templeSlots.Add(new Point(x, y));
                 }
@@ -137,8 +124,8 @@ public class Board
         {
             for (int y = 0; y < worldMap.GetLength(1); y++)
             {
-                if (worldMap[x, y] != null && worldMap[x, y].ActualBuildings == Building.Barrack &&
-                    worldMap[x, y].Owner == actualPlayer.ID)
+                if (worldMap[x, y] != null && worldMap[x, y]!.ActualBuildings == Building.Barrack &&
+                    worldMap[x, y]!.Owner == actualPlayer.ID)
                 {
                     templeSlots.Add(new Point(x, y));
                 }
