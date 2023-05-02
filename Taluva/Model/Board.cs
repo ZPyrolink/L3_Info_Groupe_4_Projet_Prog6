@@ -11,21 +11,16 @@ public class Board
         worldMap = new Cell[2, 2];
     }
 
-    public Cell this[Cell c]
+    private void AddCell(Cell c)
     {
-        set => worldMap[c.Coord.X, c.Coord.Y] = value;
+        Point p = GetCellCoord(c);
+        worldMap[p.X, p.Y] = c;
     }
 
-    [Obsolete("Use the indexer this[Point coord] instead")]
-    public void AddCell(Cell cell)
+    private void RemoveCell(Cell c)
     {
-        worldMap[cell.Coord.X, cell.Coord.Y] = cell;
-    }
-
-    [Obsolete("Use the indexer this[Point coord] instead")]
-    private void RemoveCell(Point coord)
-    {
-        worldMap[coord.X, coord.Y] = null;
+        Point p = GetCellCoord(c);
+        worldMap[p.X, p.Y] = null;
     }
 
     public Point[] GetChunkSlots()
@@ -62,9 +57,15 @@ public class Board
         return barrackSlots.ToArray();
     }
 
-    public void AddChunk(Chunk coord, Player player)
+    public void AddChunk(Chunk c, Player player)
     {
-        throw new NotImplementedException();
+        foreach (Cell tmp in c.Coords)
+        {
+            Point p = GetCellCoord(tmp);
+            AddCell(tmp);
+            worldMap[p.X, p.Y]!.Owner = player.ID;
+
+        }
     }
 
     public void PlaceBuilding(Point coord, Building building, Player player)
@@ -133,5 +134,19 @@ public class Board
         }
 
         return templeSlots.ToArray();
+    }
+
+    private Point GetCellCoord(Cell c)
+    {
+        for (int i = 0; i < worldMap.GetLength(0); i++)
+        {
+            for (int j = 0; j < worldMap.GetLength(1); j++)
+            {
+                if (worldMap[i,j] == c)
+                    return new(i, j);
+            }
+        }
+
+        throw new($"Cell {c} not found!");
     }
 }

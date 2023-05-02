@@ -11,6 +11,7 @@ public class Chunk
 	public Chunk()
 	{
 		this.Coords = new Cell[3];
+		
 	}
 	public bool CanRotate()
 	{
