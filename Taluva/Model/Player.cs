@@ -18,20 +18,7 @@ public class Player
 
     public void Play(TurnPhase phase, Board gameBoard, Point p, Building b, Chunk chunk)
     {
-        switch (phase)
-        {
-            case TurnPhase.PlaceBuilding:
-                gameBoard.PlaceBuilding(p, b, this);
-                break;
-            case TurnPhase.RotateCell:
-                 //chunk.RotateChunk();
-                break;
-            case TurnPhase.SelectCells:
-                //SelectCell(p);
-                break;
-            default:
-                throw new ArgumentException($"no phase: {phase}");
-        }
+        throw new NotImplementedException();
     }
 
 }
