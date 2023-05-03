@@ -4,11 +4,11 @@ namespace Taluva.Model;
 
 public class Chunk
 {
-	public Point[] Coords { get; private set; }
+	public Cell[] Coords { get; private set; }
 	private int rotation;
 
 	public Chunk()
 	{
-		this.Coords = new Point[3];
+		this.Coords = new Cell[3];
 	}
 }

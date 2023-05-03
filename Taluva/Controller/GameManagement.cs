@@ -16,9 +16,10 @@ public class GameManagment
     {
         this.players = new Player[nbPlayers];
         this.actualTurn = 1;
-        this.gameBoard = new Board();
+        this.gameBoard = new();
         this.NbPlayers = nbPlayers;
         this.maxTurn = maxTurn;
+        actualPlayer = players[0];
         for (int i = 0; i < this.NbPlayers; i++)
             players[i] = new Player((PlayerColor)i);
     }

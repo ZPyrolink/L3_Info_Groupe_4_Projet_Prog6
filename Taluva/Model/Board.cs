@@ -11,7 +11,7 @@ public class Board
         worldMap = new Cell[2, 2];
     }
 
-    public Cell this[Point coord]
+    public Cell? this[Point coord]
     {
         set => worldMap[coord.X, coord.Y] = value;
     }
@@ -35,7 +35,7 @@ public class Board
         {
             for (int y = 0; y < worldMap.GetLength(1); y++)
             {
-                if (worldMap[x, y] != null && worldMap[x, y].ActualBiome != Biomes.None)
+                if (worldMap[x, y] != null && worldMap[x, y]!.ActualBiome != Biomes.None)
                 {
                     chunkSlots.Add(new Point(x, y));
                 }
@@ -62,7 +62,7 @@ public class Board
         return barrackSlots.ToArray();
     }
 
-    public void AddChunk(Chunk coord, Player player)
+    public void AddChunk(Chunk c, Player player)
     {
         throw new NotImplementedException();
     }
