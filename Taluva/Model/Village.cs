@@ -41,4 +41,9 @@ public class Village
     {
         return neighbors.Any(c => c?.ActualBuildings == Building.Tower);
     }
+    
+    public bool CheckBarrackExist()
+    {
+        return neighbors.Any(c => c?.ActualBuildings == Building.Barrack);
+    }
 }

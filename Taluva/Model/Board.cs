@@ -11,21 +11,16 @@ public class Board
         worldMap = new Cell[2, 2];
     }
 
-    public Cell? this[Point coord]
+    private void AddCell(Cell c)
     {
-        set => worldMap[coord.X, coord.Y] = value;
+        Point p = GetCellCoord(c);
+        worldMap[p.X, p.Y] = c;
     }
 
-    [Obsolete("Use the indexer this[Point coord] instead")]
-    public void AddCell(Point coord, Cell cell)
+    private void RemoveCell(Cell c)
     {
-        worldMap[coord.X, coord.Y] = cell;
-    }
-
-    [Obsolete("Use the indexer this[Point coord] instead")]
-    private void RemoveCell(Point coord)
-    {
-        worldMap[coord.X, coord.Y] = null;
+        Point p = GetCellCoord(c);
+        worldMap[p.X, p.Y] = null;
     }
 
     public Point[] GetChunkSlots()
@@ -52,7 +47,7 @@ public class Board
         {
             for (int y = 0; y < worldMap.GetLength(1); y++)
             {
-                if (worldMap[x, y] != null && worldMap[x, y].ActualBuildings == Building.None)
+                if (worldMap[x, y] != null && worldMap[x, y]!.ActualBuildings == Building.None)
                 {
                     barrackSlots.Add(new Point(x, y));
                 }
@@ -64,36 +59,29 @@ public class Board
 
     public void AddChunk(Chunk c, Player player)
     {
-        throw new NotImplementedException();
+        foreach (Cell tmp in c.Coords)
+        {
+            Point p = GetCellCoord(tmp);
+            AddCell(tmp);
+            worldMap[p.X, p.Y]!.Owner = player.ID;
+
+        }
     }
 
     public void PlaceBuilding(Point coord, Building building, Player player)
     {
-        if (worldMap[coord.X, coord.Y] != null && worldMap[coord.X, coord.Y].IsBuildable())
+        if (worldMap[coord.X, coord.Y] != null && worldMap[coord.X, coord.Y]!.IsBuildable())
         {
-            worldMap[coord.X, coord.Y].ActualBuildings = building;
-            worldMap[coord.X, coord.Y].Owner = player.ID;
+            worldMap[coord.X, coord.Y]!.ActualBuildings = building;
+            worldMap[coord.X, coord.Y]!.Owner = player.ID;
         }
     }
 
     public void RemoveChunk(Chunk c)
     {
-        foreach (Point coord in c.Coords)
-        {
-            RemoveCell(coord);
-        }
-    }
-
-    public bool CanRotate(Chunk target)
-    {
         throw new NotImplementedException();
     }
-
-    public void RotateChunk(Chunk target)
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public Point[] GetTowerSlots(Player actualPlayer)
     {
         List<Point> towerSlots = new List<Point>();
@@ -101,8 +89,8 @@ public class Board
         {
             for (int y = 0; y < worldMap.GetLength(1); y++)
             {
-                if (worldMap[x, y] != null && worldMap[x, y].ActualBuildings == Building.Tower &&
-                    worldMap[x, y].Owner == actualPlayer.ID)
+                if (worldMap[x, y] != null && worldMap[x, y]!.ActualBuildings == Building.Tower &&
+                    worldMap[x, y]!.Owner == actualPlayer.ID)
                 {
                     towerSlots.Add(new Point(x, y));
                 }
@@ -119,8 +107,8 @@ public class Board
         {
             for (int y = 0; y < worldMap.GetLength(1); y++)
             {
-                if (worldMap[x, y] != null && worldMap[x, y].ActualBuildings == Building.Temple &&
-                    worldMap[x, y].Owner == actualPlayer.ID)
+                if (worldMap[x, y] != null && worldMap[x, y]!.ActualBuildings == Building.Temple &&
+                    worldMap[x, y]!.Owner == actualPlayer.ID)
                 {
                     templeSlots.Add(new Point(x, y));
                 }
@@ -137,8 +125,8 @@ public class Board
         {
             for (int y = 0; y < worldMap.GetLength(1); y++)
             {
-                if (worldMap[x, y] != null && worldMap[x, y].ActualBuildings == Building.Barrack &&
-                    worldMap[x, y].Owner == actualPlayer.ID)
+                if (worldMap[x, y] != null && worldMap[x, y]!.ActualBuildings == Building.Barrack &&
+                    worldMap[x, y]!.Owner == actualPlayer.ID)
                 {
                     templeSlots.Add(new Point(x, y));
                 }
@@ -147,4 +135,20 @@ public class Board
 
         return templeSlots.ToArray();
     }
+
+    private Point GetCellCoord(Cell c)
+    {
+        for (int i = 0; i < worldMap.GetLength(0); i++)
+        {
+            for (int j = 0; j < worldMap.GetLength(1); j++)
+            {
+                if (worldMap[i,j] == c)
+                    return new(i, j);
+            }
+        }
+
+        throw new($"Cell {c} not found!");
+    }
+
+  
 }

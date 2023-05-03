@@ -6,17 +6,13 @@ public class Cell
 {
     public Biomes ActualBiome { get; }
     public Building ActualBuildings { get; set; }
-    private int level;
     public PlayerColor Owner { get; set; }
     private Village actualVillage;
-    public Point Coord { get; private set; }
 
-    public Cell(Biomes biome, int level, Point coord)
+    public Cell(Biomes biome, int level)
     {
         this.ActualBiome = biome;
-        this.level = level;
-        this.Coord = coord;
-        this.actualVillage = new Village();
+        this.actualVillage = new();
         this.ActualBuildings = Building.None;
     }
 
@@ -39,4 +35,7 @@ public class Cell
     {
         return ActualBiome != Biomes.Volcano && ActualBuildings == Building.None;
     }
+    
+    
+    
 }
