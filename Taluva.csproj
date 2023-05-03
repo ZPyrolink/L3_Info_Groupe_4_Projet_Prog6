@@ -52,6 +52,7 @@
      <Compile Include="Packages\com.group4.taluva\Scripts\Model\Village.cs" />
      <Compile Include="Packages\com.group4.taluva\Scripts\Controller\GameManagement.cs" />
      <Compile Include="Packages\com.group4.taluva\Scripts\Model\TurnPhase.cs" />
+     <Compile Include="Packages\com.group4.taluva\Scripts\Model\BiomeColor.cs" />
      <Folder Include="Packages\com.group4.taluva\Scripts" />
      <Folder Include="Packages\com.group4.taluva\Scripts\Model" />
      <None Include="Packages\com.group4.taluva\Scripts\Taluva.asmdef" />
