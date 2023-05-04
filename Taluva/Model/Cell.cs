@@ -9,13 +9,19 @@ public class Cell
     public PlayerColor Owner { get; set; }
 
     public Village? actualVillage;
-    public readonly Chunk parentCunk;
+    public Chunk parentCunk;
 
     public Cell(Biomes biome,Chunk c)
     {
         this.ActualBiome = biome;
         this.ActualBuildings = Building.None;
         this.parentCunk = c ;
+    }
+
+    public Cell(Biomes biome)
+    {
+        this.ActualBiome = biome;
+        this.ActualBuildings = Building.None;
     }
 
     /// <summary>

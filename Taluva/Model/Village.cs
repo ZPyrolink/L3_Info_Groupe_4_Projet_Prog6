@@ -6,7 +6,7 @@ public class Village
 
     public Village()
     {
-        neighbors = new Cell[5];
+        neighbors = new Cell[6];
     }
 
     public void AddNeighbor(Cell c)

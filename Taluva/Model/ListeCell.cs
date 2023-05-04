@@ -22,7 +22,12 @@ public class ListeCell
                 int reps = 0;
                 while (reps < OcurrenceMatrix[i,j])
                 {
-                    ListeChunk.Add(new Chunk(0, new Cell((Biomes)(i + 1)), new Cell((Biomes)(j + 1))));
+                    Cell c1 = new Cell((Biomes)(i + 1));
+                    Cell c2 = new Cell((Biomes)(j + 1));
+                    Chunk c = new Chunk(0, c1, c2);
+                    c1.parentCunk = c;
+                    c2.parentCunk = c;
+                    ListeChunk.Add(c);
                     reps++;
                 }
             }
