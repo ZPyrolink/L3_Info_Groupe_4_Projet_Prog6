@@ -75,13 +75,21 @@ public class CameraMgr : MonoBehaviour
         if (mouseMove == Vector2.zero)
             return;
 
+        if (Input.GetMouseButton(1))
+            RightClickMove(mouseMove);
+        else
+            OutsideWindowMove(mouseMove);
+    }
+
+    private void RightClickMove(Vector2 mouseMove)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void OutsideWindowMove(Vector2 mouseMove)
+    {
         Vector2 mousePosition = Input.mousePosition;
         Vector2 screenSize = new(Screen.width, Screen.height);
-        
-        Debug.Log(mousePosition.x);
-        Debug.Log(screenSize.x - screenDetectionOffset);
-        Debug.Log(mousePosition.x >= screenSize.x - screenDetectionOffset);
-        Debug.Log(mouseMove.x > 0);
 
         Vector3 movement = new();
         if (mousePosition.x <= screenDetectionOffset && mouseMove.x < 0 ||
