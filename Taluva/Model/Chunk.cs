@@ -13,7 +13,9 @@ public class Chunk
 		this.Coords = new Cell[3];
 		this.Coords[0] = new Cell(Biomes.Volcano , this);
 		this.Coords[1] = left;
+		left.parentCunk = this;
 		this.Coords[2] = right;
+		right.parentCunk = this;
 		this.Level = l;
 
 	}
