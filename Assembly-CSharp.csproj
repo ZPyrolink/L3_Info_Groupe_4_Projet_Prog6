@@ -51,9 +51,7 @@
      <Folder Include="Assets\Material" />
      <Folder Include="Assets\Material\Tower" />
      <Folder Include="Assets\Models" />
-     <Folder Include="Packages\com.group4.taluva" />
      <Folder Include="Assets\Material\Hut" />
-     <None Include="Packages\com.group4.taluva\package.json" />
      <Folder Include="Assets\Scripts" />
      <Folder Include="Assets\Sprites" />
      <Folder Include="Assets\Material\Temple" />
@@ -314,9 +312,6 @@
      </Reference>
      <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
      <HintPath>C:\Users\Pyrolink\Desktop\cours\PROG6\Taluva\Library\PackageCache\com.unity.visualscripting@1.8.0\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
-     </Reference>
-     <Reference Include="ReportGeneratorMerged">
-     <HintPath>C:\Users\Pyrolink\Desktop\cours\PROG6\Taluva\Library\PackageCache\com.unity.testtools.codecoverage@1.2.2\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
      </Reference>
      <Reference Include="netstandard">
      <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.24f1\Editor\Data\NetStandard\ref\2.1.0\netstandard.dll</HintPath>
@@ -699,12 +694,6 @@
      <Reference Include="Unity.VisualStudio.Editor">
      <HintPath>C:\Users\Pyrolink\Desktop\cours\PROG6\Taluva\Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
      </Reference>
-     <Reference Include="Unity.Performance.Profile-Analyzer.Editor">
-     <HintPath>C:\Users\Pyrolink\Desktop\cours\PROG6\Taluva\Library\ScriptAssemblies\Unity.Performance.Profile-Analyzer.Editor.dll</HintPath>
-     </Reference>
-     <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Model">
-     <HintPath>C:\Users\Pyrolink\Desktop\cours\PROG6\Taluva\Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Model.dll</HintPath>
-     </Reference>
      <Reference Include="Unity.Timeline.Editor">
      <HintPath>C:\Users\Pyrolink\Desktop\cours\PROG6\Taluva\Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
      </Reference>
@@ -723,9 +712,6 @@
      <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
      <HintPath>C:\Users\Pyrolink\Desktop\cours\PROG6\Taluva\Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
      </Reference>
-     <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection">
-     <HintPath>C:\Users\Pyrolink\Desktop\cours\PROG6\Taluva\Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection.dll</HintPath>
-     </Reference>
      <Reference Include="Unity.VisualScripting.Flow">
      <HintPath>C:\Users\Pyrolink\Desktop\cours\PROG6\Taluva\Library\ScriptAssemblies\Unity.VisualScripting.Flow.dll</HintPath>
      </Reference>
@@ -738,9 +724,6 @@
      <Reference Include="Unity.Rider.Editor">
      <HintPath>C:\Users\Pyrolink\Desktop\cours\PROG6\Taluva\Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
      </Reference>
-     <Reference Include="Unity.TestTools.CodeCoverage.Editor">
-     <HintPath>C:\Users\Pyrolink\Desktop\cours\PROG6\Taluva\Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.dll</HintPath>
-     </Reference>
      <Reference Include="UnityEngine.UI">
      <HintPath>C:\Users\Pyrolink\Desktop\cours\PROG6\Taluva\Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
      </Reference>
@@ -750,14 +733,15 @@
      <Reference Include="Unity.VisualScripting.Core">
      <HintPath>C:\Users\Pyrolink\Desktop\cours\PROG6\Taluva\Library\ScriptAssemblies\Unity.VisualScripting.Core.dll</HintPath>
      </Reference>
-     <Reference Include="Unity.EditorCoroutines.Editor">
-     <HintPath>C:\Users\Pyrolink\Desktop\cours\PROG6\Taluva\Library\ScriptAssemblies\Unity.EditorCoroutines.Editor.dll</HintPath>
-     </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Taluva.csproj">
       <Project>{06a9ca1f-46ef-f65f-da2f-47ed5145b25f}</Project>
       <Name>Taluva</Name>
+    </ProjectReference>
+    <ProjectReference Include="Taluva.Tests.csproj">
+      <Project>{4c175123-55e0-85b6-b290-f6d07aa81e4d}</Project>
+      <Name>Taluva.Tests</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
