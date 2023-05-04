@@ -8,9 +8,12 @@ public class Chunk
 	private int rotation;
 	private int Level=1;
 
-	public Chunk(int l)
+	public Chunk(int l, Cell left, Cell right)
 	{
 		this.Coords = new Cell[3];
+		this.Coords[0] = new Cell(Biomes.Volcano);
+		this.Coords[1] = left;
+		this.Coords[2] = right;
 		this.Level = l;
 
 	}
@@ -19,10 +22,9 @@ public class Chunk
 	{
 		throw new NotImplementedException();
 	}
-
+	
 	private bool CanRotate()
 	{
 		throw new NotImplementedException();
 	}
-	
 }

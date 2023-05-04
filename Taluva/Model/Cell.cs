@@ -9,7 +9,7 @@ public class Cell
     public PlayerColor Owner { get; set; }
     private Village actualVillage;
 
-    public Cell(Biomes biome, int level)
+    public Cell(Biomes biome)
     {
         this.ActualBiome = biome;
         this.actualVillage = new();
