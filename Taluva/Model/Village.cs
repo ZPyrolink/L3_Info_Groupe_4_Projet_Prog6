@@ -2,7 +2,7 @@
 
 public class Village
 {
-    private Cell?[] neighbors;
+    public Cell?[] neighbors;
 
     public Village()
     {
@@ -25,6 +25,32 @@ public class Village
     {
         //Ici, je supprime ma cell dans les voisins de mes voisins
         //Puis, verifie si le village doit etre séparé en 2
+    }
+
+    public int VillageSize()
+    {
+        int villageSize = 1;
+
+        List<Cell> cells = new List<Cell>();
+        List<Cell> visited = new List<Cell>();
+        foreach(Cell c in neighbors) {
+            if (c == null || !c.HaveBuilding())
+                continue;
+            cells.Add(c);
+        }
+
+        while(cells.Count != 0) {
+            Cell cell = cells[0];
+            villageSize++;
+            visited.Add(cell);
+            foreach (Cell c in cell.actualVillage.neighbors) {
+                if (c == null || !c.HaveBuilding() || visited.Contains(c))
+                    continue;
+                cells.Add(c);
+            }
+        }
+
+        return villageSize;
     }
 
     public bool CheckVillageIntegrity()
