@@ -36,8 +36,8 @@ namespace Taluva.Model
         {
             int villageSize = 1;
 
-            List<Cell> cells = new List<Cell>();
-            List<Cell> visited = new List<Cell>();
+            List<Cell> cells = new();
+            List<Cell> visited = new();
             foreach (Cell? c in neighbors)
             {
                 if (c == null || !c.HaveBuilding())

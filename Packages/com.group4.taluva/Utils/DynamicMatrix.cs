@@ -13,7 +13,7 @@ namespace Taluva.Utils
 
         public DynamicMatrix()
         {
-            matrix = new Dictionary<int, Dictionary<int, T>>();
+            matrix = new();
         }
 
         public int MaxLine => matrix.Keys.Order().ToArray()[matrix.Keys.Count - 1];
@@ -32,7 +32,7 @@ namespace Taluva.Utils
         {
             if (!matrix.ContainsKey(coordonees.x))
             {
-                Dictionary<int, T> tmp = new Dictionary<int, T>();
+                Dictionary<int, T> tmp = new();
                 tmp.Add(coordonees.y, value);
                 matrix.Add(coordonees.x, tmp);
                 return;

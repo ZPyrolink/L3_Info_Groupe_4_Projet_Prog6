@@ -1,7 +1,4 @@
-﻿using System;
-using System.Drawing;
-
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Taluva.Model
 {

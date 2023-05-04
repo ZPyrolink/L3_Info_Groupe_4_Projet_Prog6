@@ -23,7 +23,7 @@ namespace Taluva.Controller
             this.maxTurn = 12 * nbPlayers;
             actualPlayer = players[0];
             for (int i = 0; i < this.NbPlayers; i++)
-                players[i] = new Player((PlayerColor) i);
+                players[i] = new((PlayerColor) i);
         }
 
         public Player? GetWinner()

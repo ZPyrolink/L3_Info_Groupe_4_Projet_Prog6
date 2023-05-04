@@ -5,7 +5,7 @@ namespace Taluva.Model
 {
     public class ListeCell
     {
-        public List<Chunk> ListeChunk = new List<Chunk>();
+        public List<Chunk> ListeChunk = new();
 
         private int[,] OcurrenceMatrix =
         {
@@ -26,9 +26,9 @@ namespace Taluva.Model
                     int reps = 0;
                     while (reps < OcurrenceMatrix[i, j])
                     {
-                        Cell c1 = new Cell((Biomes) (i + 1));
-                        Cell c2 = new Cell((Biomes) (j + 1));
-                        Chunk c = new Chunk(0, c1, c2);
+                        Cell c1 = new((Biomes) (i + 1));
+                        Cell c2 = new((Biomes) (j + 1));
+                        Chunk c = new(0, c1, c2);
                         c1.parentCunk = c;
                         c2.parentCunk = c;
                         ListeChunk.Add(c);
