@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Text.RegularExpressions;
 using Taluva.Utils;
 
 namespace Taluva
@@ -28,7 +29,9 @@ namespace Taluva
         }
         public static void InterpretActions(string s)
         {
-            switch (s)
+            string[] splitted = s.Split(" ");
+            
+            switch (splitted[0])
             {
                 case "Redo":
                     Console.WriteLine("Redo");
@@ -37,12 +40,8 @@ namespace Taluva
                     Console.WriteLine("Undo");
                     break;
                 case "Play":
-                    PlayParser(s);
+                    PlayParser(splitted);
                     Console.WriteLine("Redo");
-                    break;
-                case "Print":
-                    Console.WriteLine("Print");
-                    //PrintMap();
                     break;
                 case "Quit":
                     Console.WriteLine("Quit");
@@ -53,9 +52,16 @@ namespace Taluva
             }
         }
 
-        public static void PlayParser(string s)
+        public static void PlayParser(string[] s)
         {
-            
+            Regex rg = new("[0-9].*");
+            if (rg.IsMatch(s[1]) && rg.IsMatch(s[2]) && rg.IsMatch(s[3]))     //Coordinate conversion
+            {
+                int x = int.Parse(s[1]);
+                int y = int.Parse(s[2]);
+                int r = int.Parse(s[3]);
+            }
+            //Play move ...
         }
     }
 
