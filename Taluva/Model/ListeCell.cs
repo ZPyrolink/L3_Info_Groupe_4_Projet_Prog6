@@ -29,13 +29,17 @@ public class ListeCell
         }
         
     }
-    public void PrintChunkToString(List<Chunk> l)
+
+    //print one chunk contents
+    public void PrintChunkToString(Chunk c)
     {
-        String res;
+        Console.WriteLine($"{c.Coords[0].ActualBiome}, {c.Coords[1].ActualBiome}, {c.Coords[2].ActualBiome}");
+    }
+    public void PrintChunkList(List<Chunk> l)
+    {
         foreach (Chunk c in l)
         {
-            res = $"{c.Coords[0].ActualBiome}, {c.Coords[1].ActualBiome}, {c.Coords[2].ActualBiome}";
-            Console.WriteLine(res);
+            PrintChunkToString(c);
         }
     }
 }
