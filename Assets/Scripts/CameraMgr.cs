@@ -29,7 +29,6 @@ public class CameraMgr : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Confined;
         _cam = Camera.main;
-        Debug.Log($"{Screen.width}, {Screen.height}");
     }
 
     private void Update()
@@ -81,10 +80,13 @@ public class CameraMgr : MonoBehaviour
             OutsideWindowMove(mouseMove);
     }
 
-    private void RightClickMove(Vector2 mouseMove)
+    private Vector3 ScreenToHorizontalPlane(Vector3 origin, Vector3 direction)
     {
-        throw new NotImplementedException();
+        _horizontalAxisPlane.Raycast(new(origin, direction), out float distance);
+        return origin + direction * distance;
     }
+
+    private void RightClickMove(Vector2 mouseMove) => Move(-mouseMove);
 
     private void OutsideWindowMove(Vector2 mouseMove)
     {
@@ -112,10 +114,8 @@ public class CameraMgr : MonoBehaviour
     public void Rotate(float angle)
     {
         Transform camTr = _cam.transform;
-        Vector3 camPos = camTr.position, camFor = camTr.forward;
-        _horizontalAxisPlane.Raycast(new(camPos, camFor), out float distance);
-        
-        _cam.transform.RotateAround(camPos + camFor * distance, Vector3.up, angle);
+        _cam.transform.RotateAround(ScreenToHorizontalPlane(camTr.position, camTr.forward),
+            Vector3.up, angle);
     }
 
     public void Zoom(int factor)
@@ -124,6 +124,8 @@ public class CameraMgr : MonoBehaviour
         tmp -= factor;
         if (tmp < 5)
             tmp = 5;
+        if (tmp > 50)
+            tmp = 50;
         _cam.orthographicSize = tmp;
     }
 }
