@@ -59,7 +59,7 @@ namespace Taluva
             {
                 int x = int.Parse(s[1]);
                 int y = int.Parse(s[2]);
-                int r = int.Parse(s[3]);
+                int r = int.Parse(s[3]);        //verify in Rotations enum
             }
             //Play move ...
         }
