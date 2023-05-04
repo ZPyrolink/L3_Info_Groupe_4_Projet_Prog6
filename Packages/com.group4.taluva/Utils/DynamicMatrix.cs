@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
+
+using UnityEngine;
 
 namespace Taluva.Utils
 {
@@ -27,29 +28,29 @@ namespace Taluva.Utils
 
         public bool ContainsColumn(int line, int column) => matrix[line].ContainsKey(column);
 
-        public void Add(T value, Point coordonees)
+        public void Add(T value, Vector2Int coordonees)
         {
-            if (!matrix.ContainsKey(coordonees.X))
+            if (!matrix.ContainsKey(coordonees.x))
             {
                 Dictionary<int, T> tmp = new Dictionary<int, T>();
-                tmp.Add(coordonees.Y, value);
-                matrix.Add(coordonees.X, tmp);
+                tmp.Add(coordonees.y, value);
+                matrix.Add(coordonees.x, tmp);
                 return;
             }
 
-            if (matrix[coordonees.X].ContainsKey(coordonees.Y))
-                matrix[coordonees.X][coordonees.Y] = value;
+            if (matrix[coordonees.x].ContainsKey(coordonees.y))
+                matrix[coordonees.x][coordonees.y] = value;
             else
             {
-                matrix[coordonees.X].Add(coordonees.Y, value);
+                matrix[coordonees.x].Add(coordonees.y, value);
             }
 
         }
 
-        public bool Remove(Point p) => matrix[p.X].Remove(p.Y);
+        public bool Remove(Vector2Int p) => matrix[p.x].Remove(p.y);
 
 
-        public T GetValue(Point coordonnes) => matrix[coordonnes.X][coordonnes.Y];
+        public T GetValue(Vector2Int coordonnes) => matrix[coordonnes.x][coordonnes.y];
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -68,8 +69,8 @@ namespace Taluva.Utils
             return GetEnumerator();
         }
 
-        public bool IsVoid(Point coordonnes) =>
-            matrix.ContainsKey(coordonnes.X) ? !matrix[coordonnes.X].ContainsKey(coordonnes.Y) : true;
+        public bool IsVoid(Vector2Int coordonnes) =>
+            matrix.ContainsKey(coordonnes.x) ? !matrix[coordonnes.x].ContainsKey(coordonnes.y) : true;
 
         public bool IsEmpty() => matrix.Count == 0;
 

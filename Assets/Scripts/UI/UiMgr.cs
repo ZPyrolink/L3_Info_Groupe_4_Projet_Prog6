@@ -1,13 +1,12 @@
 using System;
 
 using Taluva.Model;
+using Taluva.Utils;
 
 using UnityEngine;
 using UnityEngine.UI;
 
 using UnityUtils.GameObjects;
-
-using Utils;
 
 using GameObject = UnityEngine.GameObject;
 using Random = UnityEngine.Random;
@@ -45,10 +44,10 @@ namespace UI
         [SerializeField]
         private Player[] players =
         {
-            new("P1", ColorUtils.FromInt((int) PlayerColor.Red), new[] { 0, 1, 2 }),
-            new("P2", ColorUtils.FromInt((int) PlayerColor.Green), new[] { 1, 1, 2 }),
-            new("P3", ColorUtils.FromInt((int) PlayerColor.Blue), new[] { 2, 1, 2 }),
-            new("P4", ColorUtils.FromInt((int) PlayerColor.Yellow), new[] { 3, 1, 2 })
+            new("P1", PlayerColor.Red.GetColor(), new[] { 0, 1, 2 }),
+            new("P2", PlayerColor.Green.GetColor(), new[] { 1, 1, 2 }),
+            new("P3", PlayerColor.Blue.GetColor(), new[] { 2, 1, 2 }),
+            new("P4", PlayerColor.Yellow.GetColor(), new[] { 3, 1, 2 })
         };
 
         [SerializeField]
@@ -205,11 +204,11 @@ namespace UI
 
         private void Phase1()
         {
-            int[] values = (int[]) Enum.GetValues(typeof(BiomeColor));
+            BiomeColor[] values = (BiomeColor[]) Enum.GetValues(typeof(BiomeColor));
             MeshRenderer mr = tile.transform.GetComponentInChildren<MeshRenderer>();
-            mr.materials[1].color = ColorUtils.FromInt(values[Random.Range(0, values.Length - 1)]);
-            mr.materials[2].color = ColorUtils.FromInt(values[Random.Range(0, values.Length - 1)]);
-            mr.materials[3].color = ColorUtils.FromInt(values[Random.Range(0, values.Length - 1)]);
+            mr.materials[1].color = values[Random.Range(0, values.Length - 1)].GetColor();
+            mr.materials[2].color = values[Random.Range(0, values.Length - 1)].GetColor();
+            mr.materials[3].color = values[Random.Range(0, values.Length - 1)].GetColor();
             tile.SetActive(true);
             builds.SetActive(false);
         }

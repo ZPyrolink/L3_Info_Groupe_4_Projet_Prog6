@@ -2,6 +2,8 @@ using System;
 using System.Drawing;
 using Taluva.Model;
 
+using UnityEngine;
+
 public class Player
 {
 	Chunk lastChunk;
@@ -16,7 +18,7 @@ public class Player
         this.ID = id;
     }
 
-    public void Play(TurnPhase phase, Board gameBoard, Point p, Building b, Chunk chunk)
+    public void Play(TurnPhase phase, Board gameBoard, Vector2 p, Building b, Chunk chunk)
     {
         throw new NotImplementedException();
     }

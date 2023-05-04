@@ -1,3 +1,5 @@
+using System;
+
 namespace Taluva.Model
 {
    public enum Rotation
@@ -8,5 +10,11 @@ namespace Taluva.Model
       S = 3,
       SW = 4,
       NW = 5
+   }
+
+   public static class RotationExt
+   {
+      public static float Degree(this Rotation value) =>
+         360f / Enum.GetValues(typeof(Rotation)).Length * (int) value;
    }
 }
