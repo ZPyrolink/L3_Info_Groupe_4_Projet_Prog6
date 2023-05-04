@@ -175,7 +175,7 @@ namespace UI
         {
             for (int i = 0; i < players.Length; i++)
             {
-                guis[i] ??= (GameObject) playerPrefab.InstantiateAt(parent: transform);
+                guis[i] ??= Instantiate(playerPrefab, transform);
 
                 guis[i].GetComponent<Image>().color = i == currentPlayerIndex ? Color.white : new(.75f, .75f, .75f);
 

@@ -43,8 +43,8 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\Utils\ColorUtils.cs" />
      <Compile Include="Assets\Scripts\UI\UiMgr.cs" />
-     <Compile Include="Assets\Scripts\UI\MenuMgr.cs" />
      <Compile Include="Assets\Scripts\CameraMgr.cs" />
+     <Compile Include="Assets\Scripts\UI\MenuMgr.cs" />
      <Folder Include="Assets" />
      <Folder Include="Assets\Scripts\Utils" />
      <Folder Include="Assets\Scripts\UI" />

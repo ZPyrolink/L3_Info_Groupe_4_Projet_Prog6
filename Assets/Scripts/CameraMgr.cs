@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 
 using UnityEngine;
 
@@ -23,6 +21,8 @@ public class CameraMgr : MonoBehaviour
 
     [SerializeField]
     private KeyCode zoomOut = KeyCode.KeypadMinus;
+
+    private Plane _horizontalAxisPlane = new(Vector3.up, Vector3.zero);
 
     // Start is called before the first frame update
     private void Start()
@@ -111,7 +111,11 @@ public class CameraMgr : MonoBehaviour
 
     public void Rotate(float angle)
     {
-        _cam.transform.RotateAround(Vector3.zero, Vector3.up, angle);
+        Transform camTr = _cam.transform;
+        Vector3 camPos = camTr.position, camFor = camTr.forward;
+        _horizontalAxisPlane.Raycast(new(camPos, camFor), out float distance);
+        
+        _cam.transform.RotateAround(camPos + camFor * distance, Vector3.up, angle);
     }
 
     public void Zoom(int factor)
