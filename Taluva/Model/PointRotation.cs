@@ -4,8 +4,8 @@ namespace Taluva.Model
 {
     public class PointRotation
     {
-        Point point;
-        Rotation rotation;
+        public readonly Point point;
+        public readonly Rotation rotation;
 
         public PointRotation (Point point, Rotation rotation)
         {

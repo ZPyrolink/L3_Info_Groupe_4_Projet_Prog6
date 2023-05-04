@@ -15,15 +15,14 @@ public class Board
 
     private void AddCell(Cell c, Point coord)
     {
-        Point p = new Point(coord.X, coord.Y);
-        worldMap.Add(c, p);
+        worldMap.Add(c, new Point(coord.X,coord.Y));
     }
 
-    //private void RemoveCell(Cell c)
-    //{
-    //    Point p = GetCellCoord(c);
-    //    worldMap[p.X, p.Y] = null;
-    //}
+    private void RemoveCell(Cell c)
+    {
+        Point p = GetCellCoord(c);
+        worldMap.Remove(p);
+    }
 
     public PointRotation[] GetChunkSlots()
     {
@@ -390,29 +389,80 @@ public class Board
     }
 
 
-    public void AddChunk(Chunk c, Player player)
+    public void AddChunk(Chunk c, Player player ,PointRotation p)
     {
         PointRotation[] points = GetChunkSlots();
         List<PointRotation> pointsdispo = points.ToList();
-        List<Cell> chunk = new List<Cell>();
-        foreach (Cell ce in c.Coords)
-            chunk.Add(ce);
-        bool ok = true;
-        foreach (Cell tmp in chunk) {
-            Point co = GetCellCoord(tmp);
-            if (!pointsdispo.Contains(new PointRotation(co, c.rotation))) {
-                ok = false;
+        if (pointsdispo.Contains(p))
+            return;
+        if (p.point.X % 2 == 0)
+        {
+            if (p.rotation == Rotation.N)
+            {
+                worldMap.Add(c.Coords[1], new Point(p.point.X -1 , p.point.Y));
+                worldMap.Add(c.Coords[2], new Point(p.point.X -1 , p.point.Y - 1));
             }
-
-            if (!ok) {
-                return;
+            else if (p.rotation == Rotation.S)
+            {
+                worldMap.Add(c.Coords[1], new Point(p.point.X +1 , p.point.Y - 1));
+                worldMap.Add(c.Coords[2], new Point(p.point.X +1 , p.point.Y ));
             }
+            else if (p.rotation == Rotation.NE)
+            {
+                worldMap.Add(c.Coords[1], new Point(p.point.X  , p.point.Y + 1));
+                worldMap.Add(c.Coords[2], new Point(p.point.X - 1 , p.point.Y ));
+            }
+            else if (p.rotation == Rotation.SE)
+            {
+                worldMap.Add(c.Coords[1], new Point(p.point.X + 1   , p.point.Y));
+                worldMap.Add(c.Coords[2], new Point(p.point.X , p.point.Y + 1));
+            }
+            else if (p.rotation == Rotation.SW)
+            {
+                worldMap.Add(c.Coords[1], new Point(p.point.X   , p.point.Y - 1));
+                worldMap.Add(c.Coords[2], new Point(p.point.X + 1 , p.point.Y - 1));
+            }
+            else if (p.rotation == Rotation.NW)
+            {
+                worldMap.Add(c.Coords[1], new Point(p.point.X -1    , p.point.Y - 1));
+                worldMap.Add(c.Coords[2], new Point(p.point.X , p.point.Y - 1));
+            }
+            worldMap.Add(c.Coords[0], p.point);
+                
         }
-
-        foreach (Cell tp in chunk) {
-            Point coord = GetCellCoord(tp);
-            worldMap.Add(tp, coord);
-
+        else
+        {
+            if (p.rotation == Rotation.N)
+            {
+                worldMap.Add(c.Coords[1], new Point(p.point.X - 1 , p.point.Y + 1));
+                worldMap.Add(c.Coords[2], new Point(p.point.X - 1 , p.point.Y ));
+            }
+            else if (p.rotation == Rotation.S)
+            {
+                worldMap.Add(c.Coords[1], new Point(p.point.X + 1 , p.point.Y ));
+                worldMap.Add(c.Coords[2], new Point(p.point.X +1 , p.point.Y + 1 ));
+            }
+            else if (p.rotation == Rotation.NE)
+            {
+                worldMap.Add(c.Coords[1], new Point(p.point.X  , p.point.Y + 1));
+                worldMap.Add(c.Coords[2], new Point(p.point.X - 1 , p.point.Y + 1 ));
+            }
+            else if (p.rotation == Rotation.SE)
+            {
+                worldMap.Add(c.Coords[1], new Point(p.point.X + 1   , p.point.Y + 1));
+                worldMap.Add(c.Coords[2], new Point(p.point.X , p.point.Y + 1));
+            }
+            else if (p.rotation == Rotation.SW)
+            {
+                worldMap.Add(c.Coords[1], new Point(p.point.X   , p.point.Y - 1));
+                worldMap.Add(c.Coords[2], new Point(p.point.X + 1 , p.point.Y));
+            }
+            else if (p.rotation == Rotation.NW)
+            {
+                worldMap.Add(c.Coords[1], new Point(p.point.X -1    , p.point.Y));
+                worldMap.Add(c.Coords[2], new Point(p.point.X , p.point.Y - 1));
+            }
+            worldMap.Add(c.Coords[0], p.point);
         }
 
 
@@ -457,9 +507,9 @@ public class Board
     }
     public void RemoveChunk(Chunk c)
     {
-        foreach (Cell cell in c.Coords) {
-            Point tmp = GetCellCoord(cell);
-            worldMap.Remove(tmp);
+        foreach (Cell cell in c.Coords)
+        {
+            worldMap.Remove(GetCellCoord(cell));
         }
     }
 
@@ -485,8 +535,7 @@ public class Board
             if (!worldMap.IsVoid(new Point(p.X, p.Y)) && worldMap.GetValue(p).Owner == actualPlayer.ID &&
                 worldMap.GetValue(p).ActualBuildings == Building.None) {
                 // Cellule de niveau 3 ou plus 
-                if (worldMap.GetValue(p).parentCunk.Level >= 3)
-                {
+                if (worldMap.GetValue(p).parentCunk.Level >= 3) {
                     // la cellule est adjacente à une cité du joueur actuel.
                     if (IsAdjacentToCity(p, actualPlayer))
                     {

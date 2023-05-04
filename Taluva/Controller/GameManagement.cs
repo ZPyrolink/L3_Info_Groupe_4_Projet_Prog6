@@ -18,13 +18,13 @@ public class GameManagment
         this.actualTurn = 1;
         this.gameBoard = new();
         this.NbPlayers = nbPlayers;
-        this.maxTurn = maxTurn;
+        this.maxTurn = 12 * nbPlayers;
         actualPlayer = players[0];
         for (int i = 0; i < this.NbPlayers; i++)
             players[i] = new Player((PlayerColor)i);
     }
 
-    public Player getWinner()
+    public Player? GetWinner()
     {
         if (maxTurn == 0)
             return NormalEnd;
@@ -33,7 +33,7 @@ public class GameManagment
         return null;
     }
 
-    private Player EarlyEnd
+    private Player? EarlyEnd
     {
         get
         {
