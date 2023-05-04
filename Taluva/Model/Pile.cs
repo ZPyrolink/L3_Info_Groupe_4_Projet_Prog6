@@ -1,27 +1,23 @@
-﻿using System.Collections;
-
-namespace Taluva.Model;
+﻿namespace Taluva.Model;
 
 public class Pile<T>
 {
-    private Stack<T> pile;
-    private List<T> played;
+    private readonly Stack<T> _stack;
+    private readonly List<T> _played;
 
     public Pile(T[] list)
     {
-        Random random = new Random();
-        list = list.OrderBy(x => random.Next()).ToArray();
-        for (int i = 0; i < list.Length; i++)
-        {
-            pile.Push(list[i]);
-        }
-        played = new List<T>();
+        Random random = new();
+        _stack = new(list.Length);
+        _played = new();
+
+        _stack = new(list.OrderBy(x => random.Next()));
     }
 
-    public T draw()
+    public T Draw()
     {
-        T c = pile.Pop();
-        played.Add(c);
+        T c = _stack.Pop();
+        _played.Add(c);
         return c;
     }
 }
