@@ -13,9 +13,9 @@ public class Board
         worldMap = new DynamicMatrix<Cell>();
     }
 
-    private void AddCell(Cell c , Point coord)
+    private void AddCell(Cell c, Point coord)
     {
-        Point p = new Point(coord.X,coord.Y);
+        Point p = new Point(coord.X, coord.Y);
         worldMap.Add(c, p);
     }
 
@@ -28,9 +28,12 @@ public class Board
     public PointRotation[] GetChunkSlots()
     {
         if (worldMap.IsEmpty()) {
-            Point[] p = new Point[1];
-            p[0] = new Point(0, 0);
-            return p;
+            PointRotation[] pr = new PointRotation[6];
+            Point p = new Point(0, 0);
+            for (int i = 0; i < 6; i++) {
+                pr[i] = new PointRotation(p, (Rotation) i);
+            }
+            return pr;
         }
 
         List<Point> slots = new List<Point>();
@@ -38,7 +41,7 @@ public class Board
 
         foreach (Cell c in worldMap) {
             Point p = GetCellCoord(c);
-            if(c.ActualBiome == Biomes.Volcano) {
+            if (c.ActualBiome == Biomes.Volcano) {
                 slots.Add(p);
             }
 
@@ -78,9 +81,9 @@ public class Board
             foreach (Point pt in slots) {
                 if (worldMap.GetValue(pt).ActualBiome == Biomes.Volcano)
                     continue;
-                
-                if(pt.X % 2 == 0) {
-                    if(worldMap.IsVoid(new Point(pt.X, pt.Y - 1)) && worldMap.IsVoid(new Point(pt.X - 1, pt.Y - 1)))
+
+                if (pt.X % 2 == 0) {
+                    if (worldMap.IsVoid(new Point(pt.X, pt.Y - 1)) && worldMap.IsVoid(new Point(pt.X - 1, pt.Y - 1)))
                         chunkSlots.Add(new PointRotation(pt, Rotation.NW));
                     if (worldMap.IsVoid(new Point(pt.X, pt.Y - 1)) && worldMap.IsVoid(new Point(pt.X + 1, pt.Y - 1)))
                         chunkSlots.Add(new PointRotation(pt, Rotation.SW));
@@ -90,7 +93,7 @@ public class Board
                         chunkSlots.Add(new PointRotation(pt, Rotation.SE));
                     if (worldMap.IsVoid(new Point(pt.X - 1, pt.Y - 1)) && worldMap.IsVoid(new Point(pt.X - 1, pt.Y)))
                         chunkSlots.Add(new PointRotation(pt, Rotation.N));
-                    if(worldMap.IsVoid(new Point(pt.X + 1, pt.Y - 1)) && worldMap.IsVoid(new Point(pt.X + 1, pt.Y)))
+                    if (worldMap.IsVoid(new Point(pt.X + 1, pt.Y - 1)) && worldMap.IsVoid(new Point(pt.X + 1, pt.Y)))
                         chunkSlots.Add(new PointRotation(pt, Rotation.S));
                 } else {
                     if (worldMap.IsVoid(new Point(pt.X, pt.Y - 1)) && worldMap.IsVoid(new Point(pt.X - 1, pt.Y)))
@@ -114,52 +117,57 @@ public class Board
             foreach (Point pt in slots) {
                 if (pt.X % 2 == 0) {
                     if (!worldMap.IsVoid(new Point(pt.X, pt.Y - 1)) && !worldMap.IsVoid(new Point(pt.X - 1, pt.Y - 1)))
-                        if (!worldMap.GetValue(new Point(pt.X, pt.Y - 1)).HaveBuilding() &&
-                            !worldMap.GetValue(new Point(pt.X - 1, pt.Y - 1)).HaveBuilding())
-                            chunkSlots.Add(new PointRotation(pt, Rotation.S));
-                        else if(worldMap.GetValue(new Point(pt.X, pt.Y - 1)).HaveBuilding() && 
-                            !worldMap.GetValue(new Point(pt.X - 1, pt.Y - 1)).HaveBuilding() &&
-                            worldMap.GetValue(new Point(pt.X, pt.Y - 1)).actualVillage.VillageSize() > 1)
-                            if(worldMap.GetValue(new Point(pt.X, pt.Y - 1)).ActualBuildings == Building.Barrack)
-                                chunkSlots.Add(pt);
-                            //Implementer la recherche de village autour afin de savoir si c'est un building isolé
+                        if (worldMap.GetValue(pt).parentCunk.rotation != Rotation.NW)
+                            if (!worldMap.GetValue(new Point(pt.X, pt.Y - 1)).HaveBuilding() &&
+                                !worldMap.GetValue(new Point(pt.X - 1, pt.Y - 1)).HaveBuilding()) {
+                                chunkSlots.Add(new PointRotation(pt, Rotation.NW));
+                            } else if (worldMap.GetValue(new Point(pt.X, pt.Y - 1)).HaveBuilding() &&
+                                !worldMap.GetValue(new Point(pt.X - 1, pt.Y - 1)).HaveBuilding() &&
+                                worldMap.GetValue(new Point(pt.X, pt.Y - 1)).actualVillage.VillageSize() > 1) {
+                                if (worldMap.GetValue(new Point(pt.X, pt.Y - 1)).ActualBuildings == Building.Barrack)
+                                    chunkSlots.Add(new PointRotation(pt, Rotation.NW));
+                            } else if (!worldMap.GetValue(new Point(pt.X, pt.Y - 1)).HaveBuilding() &&
+                                        worldMap.GetValue(new Point(pt.X - 1, pt.Y - 1)).HaveBuilding() &&
+                                        worldMap.GetValue(new Point(pt.X - 1, pt.Y - 1)).actualVillage.VillageSize() > 1) {
+                                if (worldMap.GetValue(new Point(pt.X - 1, pt.Y - 1)).ActualBuildings == Building.Barrack)
+                                    chunkSlots.Add(new PointRotation(pt, Rotation.NW));
+                            } else if (worldMap.GetValue(new Point(pt.X, pt.Y - 1)).HaveBuilding() &&
+                                        worldMap.GetValue(new Point(pt.X - 1, pt.Y - 1)).HaveBuilding() &&
+                                        worldMap.GetValue(new Point(pt.X - 1, pt.Y - 1)).actualVillage.VillageSize() > 2) {
+                                if (worldMap.GetValue(new Point(pt.X, pt.Y - 1)).ActualBuildings == Building.Barrack
+                                    && worldMap.GetValue(new Point(pt.X - 1, pt.Y - 1)).ActualBuildings == Building.Barrack)
+                                    chunkSlots.Add(new PointRotation(pt, Rotation.NW));
+                            }
                 }
             }
         }
-    
-
         return chunkSlots.ToArray();
     }
-
 
     public void AddChunk(Chunk c, Player player)
     {
         Point[] points = GetChunkSlots();
         List<Point> pointsdispo = points.ToList();
         List<Cell> chunk = new List<Cell>();
-        foreach(Cell ce in c.Coords)
+        foreach (Cell ce in c.Coords)
             chunk.Add(ce);
         bool ok = true;
-        foreach(Cell tmp in chunk)
-        {
+        foreach (Cell tmp in chunk) {
             Point co = GetCellCoord(tmp);
-            if(!pointsdispo.Contains(co))
-            {
+            if (!pointsdispo.Contains(co)) {
                 ok = false;
             }
-            if(!ok)
-            {
-                return ;
+            if (!ok) {
+                return;
             }
         }
-        foreach(Cell tp in chunk)
-        {
+        foreach (Cell tp in chunk) {
             Point coord = GetCellCoord(tp);
-            worldMap.Add(tp , coord);
-            
+            worldMap.Add(tp, coord);
+
         }
 
-        
+
     }
 
 
@@ -184,15 +192,13 @@ public class Board
         throw new NotImplementedException();
     }
 
-    public Point[] GetBarrackSlots(Player actualPlayer )
+    public Point[] GetBarrackSlots(Player actualPlayer)
     {
         List<Point> barrackSlots = new List<Point>();
-        foreach(Cell c in worldMap)
-        {
+        foreach (Cell c in worldMap) {
             Point p = GetCellCoord(c);
-            if (!worldMap.IsVoid(new Point(p.X, p.Y)) && worldMap.GetValue(p).ActualBuildings == Building.None &&  worldMap.GetValue(p).Owner == actualPlayer.ID)
-            {
-                barrackSlots.Add(new Point(p.X,p.Y));
+            if (!worldMap.IsVoid(new Point(p.X, p.Y)) && worldMap.GetValue(p).ActualBuildings == Building.None && worldMap.GetValue(p).Owner == actualPlayer.ID) {
+                barrackSlots.Add(new Point(p.X, p.Y));
             }
         }
 
@@ -202,20 +208,15 @@ public class Board
     public Point[] GetTowerSlots(Player actualPlayer)
     {
         List<Point> towerSlots = new List<Point>();
-        foreach (Cell c in worldMap)
-        {
+        foreach (Cell c in worldMap) {
             Point p = GetCellCoord(c);
-            if (!worldMap.IsVoid(new Point(p.X, p.Y)) && worldMap.GetValue(p).Owner == actualPlayer.ID && worldMap.GetValue(p).ActualBuildings == Building.None)
-            {
+            if (!worldMap.IsVoid(new Point(p.X, p.Y)) && worldMap.GetValue(p).Owner == actualPlayer.ID && worldMap.GetValue(p).ActualBuildings == Building.None) {
                 // Cellule de niveau 3 ou plus 
-                if (worldMap.GetValue(p).parentCunk.Level >= 3)
-                {
+                if (worldMap.GetValue(p).parentCunk.Level >= 3) {
                     // la cellule est adjacente à une cité du joueur actuel.
-                    if (IsAdjacentToCity(p, actualPlayer))
-                    {
+                    if (IsAdjacentToCity(p, actualPlayer)) {
                         // aucune autre tour est présente dans cette cité.
-                        if (!CityHasTower(p, actualPlayer))
-                        {
+                        if (!CityHasTower(p, actualPlayer)) {
                             towerSlots.Add(new Point(p.X, p.Y));
                         }
                     }
@@ -228,19 +229,16 @@ public class Board
     public bool IsAdjacentToCity(Point cellCoord, Player actualPlayer)
     {
         Cell cell = worldMap.GetValue(cellCoord);
-        if (cell != null && cell.actualVillage != null)
-        {
-            foreach (Cell neighbor in cell.actualVillage.neighbors)
-            {
-                if (neighbor != null && neighbor.Owner == actualPlayer.ID && neighbor.ActualBuildings != Building.None)
-                {
+        if (cell != null && cell.actualVillage != null) {
+            foreach (Cell neighbor in cell.actualVillage.neighbors) {
+                if (neighbor != null && neighbor.Owner == actualPlayer.ID && neighbor.ActualBuildings != Building.None) {
                     return true;
                 }
             }
         }
         return false;
     }
-    
+
     public Point[] GetAdjacentPositions(Point cellp)
     {
         List<Point> adjacentPositions = new List<Point>();
@@ -256,16 +254,13 @@ public class Board
 
         return adjacentPositions.ToArray();
     }
-    
+
     public bool CityHasTower(Point cellCoord, Player actualPlayer)
     {
         Cell cell = worldMap.GetValue(cellCoord);
-        if (cell != null && cell.actualVillage != null)
-        {
-            foreach (Cell neighbor in cell.actualVillage.neighbors)
-            {
-                if (neighbor != null && neighbor.Owner == actualPlayer.ID && neighbor.ActualBuildings == Building.Tower)
-                {
+        if (cell != null && cell.actualVillage != null) {
+            foreach (Cell neighbor in cell.actualVillage.neighbors) {
+                if (neighbor != null && neighbor.Owner == actualPlayer.ID && neighbor.ActualBuildings == Building.Tower) {
                     return true;
                 }
             }
@@ -276,10 +271,8 @@ public class Board
     public Point[] GetTempleSlot(Player actualPlayer)
     {
         List<Point> templeSlots = new List<Point>();
-        foreach (Cell cell in worldMap)
-        {
-            if (CanBuildTemple(cell, actualPlayer))
-            {
+        foreach (Cell cell in worldMap) {
+            if (CanBuildTemple(cell, actualPlayer)) {
                 Point p = GetCellCoord(cell);
                 templeSlots.Add(p);
             }
@@ -289,14 +282,12 @@ public class Board
 
     public bool CanBuildTemple(Cell cell, Player actualPlayer)
     {
-        if (cell.Owner != actualPlayer.ID || cell.ActualBuildings == Building.Temple)
-        {
+        if (cell.Owner != actualPlayer.ID || cell.ActualBuildings == Building.Temple) {
             return false;
         }
 
         Village village = cell.actualVillage;
-        if (village == null || cell.parentCunk.Level < 3 || VillageHasTemple(village))
-        {
+        if (village == null || cell.parentCunk.Level < 3 || VillageHasTemple(village)) {
             return false;
         }
 
@@ -305,10 +296,8 @@ public class Board
 
     public bool VillageHasTemple(Village village)
     {
-        foreach (Cell cell in village.neighbors)
-        {
-            if (cell.ActualBuildings == Building.Temple)
-            {
+        foreach (Cell cell in village.neighbors) {
+            if (cell.ActualBuildings == Building.Temple) {
                 return true;
             }
         }

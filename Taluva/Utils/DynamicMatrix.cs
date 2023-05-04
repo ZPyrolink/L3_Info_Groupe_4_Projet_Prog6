@@ -45,6 +45,9 @@ public class DynamicMatrix<T> : IEnumerable<T>
 
     }
 
+    public bool Remove(Point p) => matrix[p.X].Remove(p.Y);
+    
+
     public T GetValue(Point coordonnes) => matrix[coordonnes.X][coordonnes.Y];
 
     public IEnumerator<T> GetEnumerator()
