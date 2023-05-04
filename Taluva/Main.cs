@@ -4,6 +4,7 @@ using Taluva.Utils;
 
 namespace Taluva
 {
+    
     class MainClass
     {
         static void Main(string[] args)
@@ -18,6 +19,43 @@ namespace Taluva
             matrix.Add("L", new Point(0, 0));
 
             Console.WriteLine(matrix);
+            
+            //interpret commands
+
+            string s = Console.ReadLine();
+            if(s!=null) InterpretActions(s);
+
+        }
+        public static void InterpretActions(string s)
+        {
+            switch (s)
+            {
+                case "Redo":
+                    Console.WriteLine("Redo");
+                    break;
+                case "Undo":
+                    Console.WriteLine("Undo");
+                    break;
+                case "Play":
+                    PlayParser(s);
+                    Console.WriteLine("Redo");
+                    break;
+                case "Print":
+                    Console.WriteLine("Print");
+                    //PrintMap();
+                    break;
+                case "Quit":
+                    Console.WriteLine("Quit");
+                    break;
+                default:
+                    Console.WriteLine("Command is not valid");
+                    break;
+            }
+        }
+
+        public static void PlayParser(string s)
+        {
+            
         }
     }
 

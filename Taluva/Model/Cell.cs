@@ -37,8 +37,28 @@ public class Cell
         this.ActualBuildings = building;
         this.actualVillage = new(this);
     }
-    
 
+    public string ToString(Cell c)
+    {
+        switch (c.ActualBiome)
+        {
+            case Biomes.Dessert:
+                return "D";
+            case Biomes.Forest:
+                return "F";
+            case Biomes.Lake:
+                return "L";
+            case Biomes.Montain:
+                return "M";
+            case Biomes.Plain:
+                return "P";
+            case Biomes.Volcano:
+                return "V";
+            default:
+                return "";
+        }
+    }
+    
     public bool HaveBuilding() => !(this.ActualBuildings == Building.None);
     
     
