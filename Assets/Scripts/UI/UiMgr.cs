@@ -76,14 +76,14 @@ namespace UI
         [SerializeField]
         private int nbTilesPerPlayers = 12;
 
-        private int nbTiles;
+        private int _nbTiles;
 
         private int NbTiles
         {
-            get => nbTiles;
+            get => _nbTiles;
             set
             {
-                nbTiles = value;
+                _nbTiles = value;
                 uiNbTiles.text = NB_TILES_PLACEHOLDER.Replace("%nb%", value.ToString());
             }
         }
@@ -93,7 +93,7 @@ namespace UI
         [SerializeField]
         private GameObject playerPrefab;
 
-        private readonly GameObject[] guis = new GameObject[4];
+        private readonly GameObject[] _guis = new GameObject[4];
 
         [SerializeField]
         private Text[] currentPlayerBuild;
@@ -175,18 +175,18 @@ namespace UI
         {
             for (int i = 0; i < players.Length; i++)
             {
-                guis[i] ??= Instantiate(playerPrefab, transform);
+                _guis[i] ??= Instantiate(playerPrefab, transform);
 
-                guis[i].GetComponent<Image>().color = i == currentPlayerIndex ? Color.white : new(.75f, .75f, .75f);
+                _guis[i].GetComponent<Image>().color = i == currentPlayerIndex ? Color.white : new(.75f, .75f, .75f);
 
-                guis[i].transform.GetChild(0).GetComponent<Text>().text = players[i].Name;
-                guis[i].transform.GetChild(1).GetComponent<Image>().color = players[i].Color;
+                _guis[i].transform.GetChild(0).GetComponent<Text>().text = players[i].Name;
+                _guis[i].transform.GetChild(1).GetComponent<Image>().color = players[i].Color;
 
-                guis[i].transform.GetChild(2).GetComponentInChildren<Text>().text = players[i].Builds[0].ToString();
-                guis[i].transform.GetChild(3).GetComponentInChildren<Text>().text = players[i].Builds[1].ToString();
-                guis[i].transform.GetChild(4).GetComponentInChildren<Text>().text = players[i].Builds[2].ToString();
+                _guis[i].transform.GetChild(2).GetComponentInChildren<Text>().text = players[i].Builds[0].ToString();
+                _guis[i].transform.GetChild(3).GetComponentInChildren<Text>().text = players[i].Builds[1].ToString();
+                _guis[i].transform.GetChild(4).GetComponentInChildren<Text>().text = players[i].Builds[2].ToString();
 
-                RectTransform rt = guis[i].GetComponent<RectTransform>();
+                RectTransform rt = _guis[i].GetComponent<RectTransform>();
 
                 rt.pivot = Vector2.one;
                 rt.anchorMin = Vector2.one;
