@@ -455,7 +455,6 @@ public class Board
 
 
     }
-    
     public void RemoveChunk(Chunk c)
     {
         foreach (Cell cell in c.Coords) {
@@ -626,7 +625,4 @@ public class Board
 
         throw new($"Cell {c} not found!");
     }
-
-    private void PrintMap()=>Console.WriteLine(worldMap); 
-    
 }
