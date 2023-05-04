@@ -3,10 +3,12 @@
 public class Village
 {
     public Cell?[] neighbors;
+    public Cell currentCell;
 
-    public Village()
+    public Village(Cell c)
     {
         neighbors = new Cell[6];
+        currentCell = c;
     }
 
     public void AddNeighbor(Cell c)
@@ -33,17 +35,19 @@ public class Village
 
         List<Cell> cells = new List<Cell>();
         List<Cell> visited = new List<Cell>();
-        foreach(Cell c in neighbors) {
+        foreach(Cell? c in neighbors) {
             if (c == null || !c.HaveBuilding())
                 continue;
             cells.Add(c);
         }
+        visited.Add(currentCell);
 
         while(cells.Count != 0) {
             Cell cell = cells[0];
+            cells.Remove(cell);
             villageSize++;
             visited.Add(cell);
-            foreach (Cell c in cell.actualVillage.neighbors) {
+            foreach (Cell? c in cell.actualVillage.neighbors) {
                 if (c == null || !c.HaveBuilding() || visited.Contains(c))
                     continue;
                 cells.Add(c);

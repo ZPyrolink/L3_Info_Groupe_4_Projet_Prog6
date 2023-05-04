@@ -35,7 +35,7 @@ public class Cell
     public void Build(Building building)
     {
         this.ActualBuildings = building;
-        this.actualVillage = new();
+        this.actualVillage = new(this);
     }
     
 
