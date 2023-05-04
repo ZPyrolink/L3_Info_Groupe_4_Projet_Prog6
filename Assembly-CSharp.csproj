@@ -43,25 +43,23 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\Utils\ColorUtils.cs" />
      <Compile Include="Assets\Scripts\UI\UiMgr.cs" />
+     <Compile Include="Assets\Scripts\UI\MenuMgr.cs" />
+     <Compile Include="Assets\Scripts\CameraMgr.cs" />
      <Folder Include="Assets" />
      <Folder Include="Assets\Scripts\Utils" />
      <Folder Include="Assets\Scripts\UI" />
      <Folder Include="Assets\Material" />
-     <Folder Include="Assets\Projects" />
      <Folder Include="Assets\Material\Tower" />
      <Folder Include="Assets\Models" />
-     <Folder Include="Assets\Projects\Taluva\Model" />
      <Folder Include="Packages\com.group4.taluva" />
      <Folder Include="Assets\Material\Hut" />
      <None Include="Packages\com.group4.taluva\package.json" />
      <Folder Include="Assets\Scripts" />
      <Folder Include="Assets\Sprites" />
      <Folder Include="Assets\Material\Temple" />
-     <Folder Include="Assets\Projects\Taluva\Controller" />
      <Folder Include="Assets\Prefab" />
      <Folder Include="Assets\Animation" />
      <Folder Include="Assets\Scenes" />
-     <Folder Include="Assets\Projects\Taluva" />
      <Reference Include="UnityEngine">
      <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.24f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
      </Reference>

@@ -9,6 +9,7 @@ using UnityUtils.GameObjects;
 
 using Utils;
 
+using GameObject = UnityEngine.GameObject;
 using Random = UnityEngine.Random;
 
 namespace UI
@@ -56,7 +57,35 @@ namespace UI
         public int CurrentPlayerIndex
         {
             get => currentPlayerIndex;
-            set => currentPlayerIndex = value >= players.Length ? 0 : value;
+            set
+            {
+                if (value >= players.Length)
+                    currentPlayerIndex = 0;
+                else if (value < 0)
+                    currentPlayerIndex = players.Length - 1;
+                else
+                    currentPlayerIndex = value;
+            }
+        }
+
+        [SerializeField]
+        private Text uiNbTiles;
+
+        private const string NB_TILES_PLACEHOLDER = "%nb% tuiles restantes";
+
+        [SerializeField]
+        private int nbTilesPerPlayers = 12;
+
+        private int nbTiles;
+
+        private int NbTiles
+        {
+            get => nbTiles;
+            set
+            {
+                nbTiles = value;
+                uiNbTiles.text = NB_TILES_PLACEHOLDER.Replace("%nb%", value.ToString());
+            }
         }
 
         private Player CurrentPlayer => players[currentPlayerIndex];
@@ -72,6 +101,9 @@ namespace UI
         [SerializeField]
         private GameObject tile, builds;
 
+        [SerializeField]
+        private GameObject menuCanva; 
+
         [Header("Debug keys")]
         [SerializeField]
         private KeyCode phase1 = KeyCode.Keypad1;
@@ -79,22 +111,28 @@ namespace UI
         [SerializeField]
         private KeyCode phase2 = KeyCode.Keypad2,
             nextPlayer = KeyCode.KeypadEnter,
-            nextPhase = KeyCode.Return;
+            nextPhase = KeyCode.Return,
+            menu = KeyCode.Escape;
 
-        private byte _phase;
-        private byte Phase
+        private sbyte _phase;
+        private sbyte Phase
         {
             get => _phase;
             set
             {
-                if (value > 2)
+                switch (value)
                 {
-                    NextPlayer();
-                    _phase = 1;
-                }
-                else
-                {
-                    _phase = value;
+                    case > 2:
+                        NextPlayer();
+                        _phase = 1;
+                        break;
+                    case <= 0:
+                        PreviousPlayer();
+                        _phase = 2;
+                        break;
+                    default:
+                        _phase = value;
+                        break;
                 }
 
                 (_phase switch
@@ -111,6 +149,7 @@ namespace UI
         private void Start()
         {
             Phase = 1;
+            NbTiles = nbTilesPerPlayers * players.Length;
         }
 
         private void Update()
@@ -126,6 +165,9 @@ namespace UI
 
             if (Input.GetKeyDown(phase2))
                 Phase = 2;
+            
+            if (Input.GetKeyDown(menu))
+                ToggleMenu();
         }
 
         // Start is called before the first frame update
@@ -133,8 +175,7 @@ namespace UI
         {
             for (int i = 0; i < players.Length; i++)
             {
-                if (guis[i] is null)
-                    guis[i] = (GameObject) playerPrefab.InstantiateAt(parent: transform);
+                guis[i] ??= (GameObject) playerPrefab.InstantiateAt(parent: transform);
 
                 guis[i].GetComponent<Image>().color = i == currentPlayerIndex ? Color.white : new(.75f, .75f, .75f);
 
@@ -177,8 +218,18 @@ namespace UI
         {
             tile.SetActive(false);
             builds.SetActive(true);
+            NbTiles--;
         }
 
+        public void Undo() => Phase--;
+        public void Redo() => Phase++;
+
         private void NextPlayer() => CurrentPlayerIndex++;
+        private void PreviousPlayer() => CurrentPlayerIndex--;
+
+        public void ToggleMenu()
+        {
+            menuCanva.SetActive(!menuCanva.activeSelf);
+        }
     }
 }

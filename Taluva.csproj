@@ -41,18 +41,18 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
-     <Compile Include="Packages\com.group4.taluva\Scripts\Model\Biomes.cs" />
      <Compile Include="Packages\com.group4.taluva\Scripts\Model\Chunk.cs" />
-     <Compile Include="Packages\com.group4.taluva\Scripts\Model\Board.cs" />
-     <Compile Include="Packages\com.group4.taluva\Scripts\Model\Cell.cs" />
-     <Compile Include="Packages\com.group4.taluva\Scripts\Model\PlayerColor.cs" />
-     <Compile Include="Packages\com.group4.taluva\Scripts\Model\Difficulty.cs" />
-     <Compile Include="Packages\com.group4.taluva\Scripts\Model\Player.cs" />
      <Compile Include="Packages\com.group4.taluva\Scripts\Model\Building.cs" />
-     <Compile Include="Packages\com.group4.taluva\Scripts\Model\Village.cs" />
      <Compile Include="Packages\com.group4.taluva\Scripts\Controller\GameManagement.cs" />
      <Compile Include="Packages\com.group4.taluva\Scripts\Model\TurnPhase.cs" />
+     <Compile Include="Packages\com.group4.taluva\Scripts\Model\Biomes.cs" />
+     <Compile Include="Packages\com.group4.taluva\Scripts\Model\Player.cs" />
+     <Compile Include="Packages\com.group4.taluva\Scripts\Model\PlayerColor.cs" />
+     <Compile Include="Packages\com.group4.taluva\Scripts\Model\Board.cs" />
+     <Compile Include="Packages\com.group4.taluva\Scripts\Model\Cell.cs" />
      <Compile Include="Packages\com.group4.taluva\Scripts\Model\BiomeColor.cs" />
+     <Compile Include="Packages\com.group4.taluva\Scripts\Model\Village.cs" />
+     <Compile Include="Packages\com.group4.taluva\Scripts\Model\Difficulty.cs" />
      <Folder Include="Packages\com.group4.taluva\Scripts" />
      <Folder Include="Packages\com.group4.taluva\Scripts\Model" />
      <None Include="Packages\com.group4.taluva\Scripts\Taluva.asmdef" />
