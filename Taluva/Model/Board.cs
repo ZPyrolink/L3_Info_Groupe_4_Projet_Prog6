@@ -455,7 +455,6 @@ public class Board
 
 
     }
-*/
     public void RemoveChunk(Chunk c)
     {
         foreach (Cell cell in c.Coords) {
@@ -486,11 +485,13 @@ public class Board
             if (!worldMap.IsVoid(new Point(p.X, p.Y)) && worldMap.GetValue(p).Owner == actualPlayer.ID &&
                 worldMap.GetValue(p).ActualBuildings == Building.None) {
                 // Cellule de niveau 3 ou plus 
-                if (worldMap.GetValue(p).parentCunk.Level >= 3) {
+                if (worldMap.GetValue(p).parentCunk.Level >= 3)
+                {
                     // la cellule est adjacente à une cité du joueur actuel.
-                    if (IsAdjacentToCity(p, actualPlayer)) {
+                    if (IsAdjacentToCity(p, actualPlayer))
+                    {
                         // aucune autre tour est présente dans cette cité.
-                        if (!CityHasTower(p, actualPlayer)) {
+                        if (c.actualVillage != null && !CityHasTower(c.actualVillage)) {
                             towerSlots.Add(new Point(p.X, p.Y));
                         }
                     }
@@ -503,18 +504,46 @@ public class Board
 
     public bool IsAdjacentToCity(Point cellCoord, Player actualPlayer)
     {
-        Cell cell = worldMap.GetValue(cellCoord);
-        if (cell != null && cell.actualVillage != null) {
-            foreach (Cell neighbor in cell.actualVillage.neighbors) {
-                if (neighbor != null && neighbor.Owner == actualPlayer.ID && neighbor.ActualBuildings != Building.None) {
-                    return true;
-                }
+        
+        foreach (Point neighbor in GetAdjacentPositions(cellCoord))
+        {
+            Cell c = worldMap.GetValue(neighbor);
+            if (c.actualVillage != null && c.Owner == actualPlayer.ID)
+                return true;
+        }
+        return false;
+    }
+
+    public bool CityHasTower(Village village)
+    {
+        List<Cell> cells = new List<Cell>();
+        List<Cell> visited = new List<Cell>();
+        foreach (Cell? c in village.neighbors) {
+            if (c == null || !c.HaveBuilding())
+                continue;
+            if (c.ActualBuildings == Building.Tower)
+                return true;
+            cells.Add(c);
+        }
+        visited.Add(village.currentCell);
+
+        while (cells.Count != 0) {
+            Cell cell = cells[0];
+            cells.Remove(cell);
+            visited.Add(cell);
+            foreach (Cell? c in cell.actualVillage.neighbors) {
+                if (c == null || !c.HaveBuilding() || visited.Contains(c))
+                    continue;
+                cells.Add(c);
+            }
+            if (cell.ActualBuildings == Building.Tower)
+            {
+                return true;
             }
         }
 
         return false;
     }
-
     public Point[] GetAdjacentPositions(Point cellp)
     {
         List<Point> adjacentPositions = new List<Point>();
@@ -530,20 +559,7 @@ public class Board
 
         return adjacentPositions.ToArray();
     }
-
-    public bool CityHasTower(Point cellCoord, Player actualPlayer)
-    {
-        Cell cell = worldMap.GetValue(cellCoord);
-        if (cell != null && cell.actualVillage != null) {
-            foreach (Cell neighbor in cell.actualVillage.neighbors) {
-                if (neighbor != null && neighbor.Owner == actualPlayer.ID && neighbor.ActualBuildings == Building.Tower) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
+    
 
     public Point[] GetTempleSlot(Player actualPlayer)
     {
@@ -553,6 +569,7 @@ public class Board
                 templeSlots.Add(GetCellCoord(cell));
             }
         }
+
         return templeSlots.ToArray();
     }
 
@@ -582,6 +599,7 @@ public class Board
         if (worldMap.GetValue(pv).actualVillage.VillageSize() < 3
             && worldMap.GetValue(pv).Owner != actualPlayer.ID && !VillageHasTemple(worldMap.GetValue(pv).actualVillage))
             return false;
+        
 
         return true;
     }
@@ -609,8 +627,11 @@ public class Board
                 cells.Add(c);
             }
             if (cell.ActualBuildings == Building.Temple)
+            {
                 return true;
+            }
         }
+
         return false;
     }
 

@@ -24,7 +24,16 @@ public class GameManagment
             players[i] = new Player((PlayerColor)i);
     }
 
-    private Player Winner
+    public Player getWinner()
+    {
+        if (maxTurn == 0)
+            return NormalEnd;
+        if (EarlyEnd != null)
+            return EarlyEnd;
+        return null;
+    }
+
+    private Player EarlyEnd
     {
         get
         {
@@ -48,8 +57,75 @@ public class GameManagment
             throw new NotImplementedException();
         }
     }
-    
+    private Player NormalEnd
+    {
+        get
+        {
+            int maxTemple = 0;
+            Player winner1 = null;
+            foreach (Player p in players)
+            {
+                if (p.nbTemple > maxTemple)
+                {
+                    maxTemple = p.nbTemple;
+                    winner1 = p;
+                }
+            }
 
+            int egalityTemple = 0;
+            foreach (Player p in players)
+            {
+                if (p.nbTemple == maxTemple)
+                    egalityTemple++;
+            }
+
+            if (egalityTemple >= 2)
+            {
+                int maxTower = 0;
+                Player winner2 = null;
+                foreach (Player p in players)
+                {
+                    if (p.nbTemple > maxTower)
+                    {
+                        maxTower = p.nbTemple;
+                        winner2 = p;
+                    }
+                }
+
+                int egalityTower = 0;
+                foreach (Player p in players)
+                {
+                    if (p.nbTemple == maxTemple)
+                        egalityTower++;
+                }
+
+                if (egalityTower >= 2)
+                {
+                    int maxBarrack = 0;
+                    Player winner3 = null;
+                    foreach (Player p in players)
+                    {
+                        if (p.nbTemple > maxBarrack)
+                        {
+                            maxBarrack = p.nbTemple;
+                            winner3 = p;
+                        }
+                    }
+
+                    return winner3;
+                }
+                else
+                {
+                    return winner2;
+                }
+            }
+            else
+            {
+                return winner1;
+            }
+        }
+    }
+    
     public void InitPlay()
     {
         while (actualTurn <= maxTurn)
