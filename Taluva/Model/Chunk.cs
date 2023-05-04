@@ -6,7 +6,7 @@ public class Chunk
 {
 	public Cell[] Coords { get; private set; }
 	private int rotation;
-	private int Level=1;
+	public readonly int Level=1;
 
 	public Chunk(int l)
 	{

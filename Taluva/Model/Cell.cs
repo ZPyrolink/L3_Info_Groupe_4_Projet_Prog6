@@ -4,16 +4,18 @@ namespace Taluva.Model;
 
 public class Cell
 {
-    public Biomes ActualBiome { get; }
+    public readonly Biomes ActualBiome;
     public Building ActualBuildings { get; set; }
     public PlayerColor Owner { get; set; }
 
     public Village? actualVillage;
+    public readonly Chunk parentCunk;
 
-    public Cell(Biomes biome, int level)
+    public Cell(Biomes biome, int level,Chunk c)
     {
         this.ActualBiome = biome;
         this.ActualBuildings = Building.None;
+        this.parentCunk = c ;
     }
 
     /// <summary>

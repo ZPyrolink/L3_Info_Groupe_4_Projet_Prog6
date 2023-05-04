@@ -13,9 +13,9 @@ public class Board
         worldMap = new DynamicMatrix<Cell>();
     }
 
-    private void AddCell(Cell c)
+    private void AddCell(Cell c , Point coord)
     {
-        Point p = GetCellCoord(c);
+        Point p = new Point(coord.X,coord.Y);
         worldMap.Add(c, p);
     }
 
@@ -152,6 +152,7 @@ public class Board
         {
             Point coord = GetCellCoord(tp);
             worldMap.Add(tp , coord);
+            
         }
 
         
@@ -185,7 +186,7 @@ public class Board
         foreach(Cell c in worldMap)
         {
             Point p = GetCellCoord(c);
-            if (!worldMap.IsVoid(new Point(p.X, p.Y)) && worldMap.GetValue(p).Owner == actualPlayer.ID)
+            if (!worldMap.IsVoid(new Point(p.X, p.Y)) && worldMap.GetValue(p).ActualBuildings == Building.None &&  worldMap.GetValue(p).Owner == actualPlayer.ID)
             {
                 barrackSlots.Add(new Point(p.X,p.Y));
             }
@@ -196,28 +197,118 @@ public class Board
 
     public Point[] GetTowerSlots(Player actualPlayer)
     {
-        List<Point> barrackSlots = new List<Point>();
-        foreach(Cell c in worldMap)
+        List<Point> towerSlots = new List<Point>();
+        foreach (Cell c in worldMap)
         {
-            Point tmp = GetCellCoord(c);
-            if(!worldMap.IsVoid(new Point(tmp.X,tmp.Y)) && worldMap.GetValue(tmp).ActualBuildings == Building.Tower && worldMap.GetValue(tmp).Owner == actualPlayer.ID )
-                barrackSlots.Add(new Point(tmp.X,tmp.Y));
+            Point p = GetCellCoord(c);
+            if (!worldMap.IsVoid(new Point(p.X, p.Y)) && worldMap.GetValue(p).Owner == actualPlayer.ID && worldMap.GetValue(p).ActualBuildings == Building.None)
+            {
+                // Cellule de niveau 3 ou plus 
+                if (worldMap.GetValue(p).parentCunk.Level >= 3)
+                {
+                    // la cellule est adjacente à une cité du joueur actuel.
+                    if (IsAdjacentToCity(p, actualPlayer))
+                    {
+                        // aucune autre tour est présente dans cette cité.
+                        if (!CityHasTower(p, actualPlayer))
+                        {
+                            towerSlots.Add(new Point(p.X, p.Y));
+                        }
+                    }
+                }
+            }
         }
 
-        return barrackSlots.ToArray();
+        return towerSlots.ToArray();
+    }
+    public bool IsAdjacentToCity(Point cellCoord, Player actualPlayer)
+    {
+        Cell cell = worldMap.GetValue(cellCoord);
+        if (cell != null && cell.actualVillage != null)
+        {
+            foreach (Cell neighbor in cell.actualVillage.neighbors)
+            {
+                if (neighbor != null && neighbor.Owner == actualPlayer.ID && neighbor.ActualBuildings != Building.None)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    public Point[] GetAdjacentPositions(Point cellp)
+    {
+        List<Point> adjacentPositions = new List<Point>();
+
+        int yOffset = cellp.X % 2 == 0 ? -1 : 1;
+
+        adjacentPositions.Add(new Point(cellp.X - 1, cellp.Y));
+        adjacentPositions.Add(new Point(cellp.X - 1, cellp.Y + yOffset));
+        adjacentPositions.Add(new Point(cellp.X, cellp.Y - 1));
+        adjacentPositions.Add(new Point(cellp.X, cellp.Y + 1));
+        adjacentPositions.Add(new Point(cellp.X + 1, cellp.Y + yOffset));
+        adjacentPositions.Add(new Point(cellp.X + 1, cellp.Y));
+
+        return adjacentPositions.ToArray();
+    }
+    
+    public bool CityHasTower(Point cellCoord, Player actualPlayer)
+    {
+        Cell cell = worldMap.GetValue(cellCoord);
+        if (cell != null && cell.actualVillage != null)
+        {
+            foreach (Cell neighbor in cell.actualVillage.neighbors)
+            {
+                if (neighbor != null && neighbor.Owner == actualPlayer.ID && neighbor.ActualBuildings == Building.Tower)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
-    public Point[] GetTempleSlots(Player actualPlayer)
+    public Point[] GetTempleSlot(Player actualPlayer)
     {
-        List<Point> barrackSlots = new List<Point>();
-        foreach(Cell c in worldMap)
+        List<Point> templeSlots = new List<Point>();
+        foreach (Cell cell in worldMap)
         {
-            Point tmp = GetCellCoord(c);
-            if(!worldMap.IsVoid(new Point(tmp.X,tmp.Y)) && worldMap.GetValue(tmp).ActualBuildings == Building.Temple && worldMap.GetValue(tmp).Owner == actualPlayer.ID )
-                barrackSlots.Add(new Point(tmp.X,tmp.Y));
+            if (CanBuildTemple(cell, actualPlayer))
+            {
+                Point p = GetCellCoord(cell);
+                templeSlots.Add(p);
+            }
+        }
+        return templeSlots.ToArray();
+    }
+
+    public bool CanBuildTemple(Cell cell, Player actualPlayer)
+    {
+        if (cell.Owner != actualPlayer.ID || cell.ActualBuildings == Building.Temple)
+        {
+            return false;
         }
 
-        return barrackSlots.ToArray();
+        Village village = cell.actualVillage;
+        if (village == null || cell.parentCunk.Level < 3 || VillageHasTemple(village))
+        {
+            return false;
+        }
+
+        return IsAdjacentToCity(GetCellCoord(cell), actualPlayer);
+    }
+
+    public bool VillageHasTemple(Village village)
+    {
+        foreach (Cell cell in village.neighbors)
+        {
+            if (cell.ActualBuildings == Building.Temple)
+            {
+                return true;
+            }
+        }
+        return false;
     }
     private Point GetCellCoord(Cell c)
     {

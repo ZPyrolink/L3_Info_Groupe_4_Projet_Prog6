@@ -32,7 +32,7 @@ public class GameManagment
             {
                 int completedBuildingTypes = 0;
 
-                if (gameBoard.GetTempleSlots(p).Length ==  p.nbTemple)
+                if (gameBoard.GetTempleSlot(p).Length ==  p.nbTemple)
                     completedBuildingTypes++;
 
                 if (gameBoard.GetBarrackSlots(p).Length == p.nbBarrack)
@@ -48,29 +48,7 @@ public class GameManagment
             throw new NotImplementedException();
         }
     }
-
-    [Obsolete($"Use {nameof(Winner)} property instead")]
-    private Player GetWinner()
-    {
-        foreach (Player p in players)
-        {
-            int completedBuildingTypes = 0;
-
-            if (gameBoard.GetTempleSlots(p).Length ==  p.nbTemple)
-                completedBuildingTypes++;
-
-            if (gameBoard.GetBarrackSlots(p).Length == p.nbBarrack)
-                completedBuildingTypes++;
-
-            if (gameBoard.GetTowerSlots(p).Length == p.nbTowers)
-                completedBuildingTypes++;
-
-            if (completedBuildingTypes >= 2)
-                return p;
-        }
-
-        throw new NotImplementedException();
-    }
+    
 
     public void InitPlay()
     {
