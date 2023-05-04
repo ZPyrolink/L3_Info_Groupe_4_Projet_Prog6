@@ -5,8 +5,8 @@ public enum Biomes
     None,
     Forest,
     Lake,
-    Dessert,
+    Desert,
     Plain,
-    Montain,
+    Mountain,
     Volcano
 }

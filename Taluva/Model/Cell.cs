@@ -42,13 +42,13 @@ public class Cell
     {
         switch (c.ActualBiome)
         {
-            case Biomes.Dessert:
+            case Biomes.Desert:
                 return "D";
             case Biomes.Forest:
                 return "F";
             case Biomes.Lake:
                 return "L";
-            case Biomes.Montain:
+            case Biomes.Mountain:
                 return "M";
             case Biomes.Plain:
                 return "P";

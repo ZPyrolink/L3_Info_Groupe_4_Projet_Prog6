@@ -23,6 +23,44 @@ public class Board
         Point p = GetCellCoord(c);
         worldMap.Remove(p);
     }
+    private Point[] GetNeighbors(Point p)
+    {
+        Point[] neighborsCoord = new Point[6];
+        int offset = 0;
+        if (p.X % 2 == 0)
+        {
+            offset = -1;
+        }
+        // Neighbors visited clockwise
+        neighborsCoord[(offset + 6) % 6] = new Point(p.X - 1, p.Y + 1 + offset);
+        neighborsCoord[offset + 1] = new Point(p.X, p.Y + 1);
+        neighborsCoord[offset + 2] = new Point(p.X - 1, p.Y + 1 + offset);
+        neighborsCoord[offset + 3] = new Point(p.X - 1, p.Y + offset);
+        neighborsCoord[offset + 4] = new Point(p.X , p.Y- 1 );
+        neighborsCoord[offset + 5] = new Point(p.X - 1, p.Y+ 1 + offset);
+
+        return neighborsCoord;
+    }
+
+    public bool[] GetPossibleRotation(Point p)
+    {
+        bool[] possible = new bool[6];
+        Point[] neighbors = GetNeighbors(p);
+        int i = 0;
+        bool previous = worldMap.IsVoid(neighbors[5]);
+        foreach (Point neighbor in neighbors)
+        {
+            
+            possible[i] = previous && (previous = worldMap.IsVoid(neighbors[i]));
+            i++;
+        }
+        return possible;
+    }
+    //private void RemoveCell(Cell c)
+    //{
+    //    Point p = GetCellCoord(c);
+    //    worldMap[p.X, p.Y] = null;
+    //}
 
     public PointRotation[] GetChunkSlots()
     {
@@ -505,6 +543,7 @@ public class Board
 
 
     }
+
     public void RemoveChunk(Chunk c)
     {
         foreach (Cell cell in c.Coords)
