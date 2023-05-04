@@ -11,7 +11,7 @@ public class Cell
     public Village? actualVillage;
     public readonly Chunk parentCunk;
 
-    public Cell(Biomes biome, int level,Chunk c)
+    public Cell(Biomes biome,Chunk c)
     {
         this.ActualBiome = biome;
         this.ActualBuildings = Building.None;
