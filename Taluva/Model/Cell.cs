@@ -10,7 +10,7 @@ public class Cell
 
     public Village? actualVillage;
 
-    public Cell(Biomes biome, int level)
+    public Cell(Biomes biome)
     {
         this.ActualBiome = biome;
         this.ActualBuildings = Building.None;
