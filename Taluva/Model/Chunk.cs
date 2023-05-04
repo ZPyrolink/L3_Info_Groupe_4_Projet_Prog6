@@ -11,7 +11,7 @@ public class Chunk
 	public Chunk(int l, Cell left, Cell right)
 	{
 		this.Coords = new Cell[3];
-		this.Coords[0] = new Cell(Biomes.Volcano);
+		this.Coords[0] = new Cell(Biomes.Volcano , this);
 		this.Coords[1] = left;
 		this.Coords[2] = right;
 		this.Level = l;
