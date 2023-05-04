@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Collections;
+using System.Drawing;
 using Taluva.Utils;
 
 namespace Taluva.Model;
@@ -129,14 +130,16 @@ public class Board
 
     public void AddChunk(Chunk c, Player player)
     {
-        ArrayList<Cell> dispo = GetChunkSlots().ToList;
-        ArrayList<> c = new ArrayList<Cell>();
+        Point[] points = GetChunkSlots();
+        List<Point> pointsdispo = points.ToList();
+        List<Cell> chunk = new List<Cell>();
         foreach(Cell ce in c.Coords)
-            c.Add(new Cell(ce));
+            chunk.Add(ce);
         bool ok = true;
-        foreach(Cell tmp in c)
+        foreach(Cell tmp in chunk)
         {
-            if(!dispo.Contains(tmp))
+            Point co = GetCellCoord(tmp);
+            if(!pointsdispo.Contains(co))
             {
                 ok = false;
             }
@@ -145,17 +148,17 @@ public class Board
                 return ;
             }
         }
-        foreach(Cell tp in c)
+        foreach(Cell tp in chunk)
         {
             Point coord = GetCellCoord(tp);
-            worldMap[coord.X, coord.Y] =tp;
+            worldMap.Add(tp , coord);
         }
 
         
     }
 
 
-    public void PlaceBuilding(Cell coord, Building b, Player player)
+    /*public void PlaceBuilding(Cell coord, Building b, Player player)
     {
         //Faire des verifications puis utiliser la fonction build de cell
         Point p = GetCellCoord(coord);
@@ -170,7 +173,7 @@ public class Board
         }
 
     }
-
+*/
     public void RemoveChunk(Chunk c)
     {
         throw new NotImplementedException();
@@ -181,9 +184,11 @@ public class Board
         List<Point> barrackSlots = new List<Point>();
         foreach(Cell c in worldMap)
         {
-            Point tmp = GetCellCoord(c);
-            if(!worldMap.IsVoid(new Point(tmp.X,tmp.Y)) && worldMap.GetValue(tmp).ActualBuildings == Building.Barrack && worldMap.GetValue(tmp).Owner == actualPlayer.ID)
-                barrackSlots.Add(new Point(tmp.X,tmp.Y));
+            Point p = GetCellCoord(c);
+            if (!worldMap.IsVoid(new Point(p.X, p.Y)) && worldMap.GetValue(p).Owner == actualPlayer.ID)
+            {
+                barrackSlots.Add(new Point(p.X,p.Y));
+            }
         }
 
         return barrackSlots.ToArray();

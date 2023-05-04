@@ -35,7 +35,7 @@ public class GameManagment
                 if (gameBoard.GetTempleSlots(p).Length ==  p.nbTemple)
                     completedBuildingTypes++;
 
-                if (gameBoard.GetBarracksSlots(p).Length == p.nbBarrack)
+                if (gameBoard.GetBarrackSlots(p).Length == p.nbBarrack)
                     completedBuildingTypes++;
 
                 if (gameBoard.GetTowerSlots(p).Length == p.nbTowers)
@@ -59,7 +59,7 @@ public class GameManagment
             if (gameBoard.GetTempleSlots(p).Length ==  p.nbTemple)
                 completedBuildingTypes++;
 
-            if (gameBoard.GetBarracksSlots(p).Length == p.nbBarrack)
+            if (gameBoard.GetBarrackSlots(p).Length == p.nbBarrack)
                 completedBuildingTypes++;
 
             if (gameBoard.GetTowerSlots(p).Length == p.nbTowers)
