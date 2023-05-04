@@ -71,13 +71,13 @@ public class DynamicMatrix<T> : IEnumerable<T>
         string s = "";
         bool pair = true;
 
-        for (int i = matrix.Keys.Order().ToArray()[0]; i <= matrix.Keys.Order().ToArray()[matrix.Keys.Count - 1]; i++) {
+        for (int i = MinLine; i <= MaxLine; i++) {
             if (!pair)
                 s += " ";
 
-            if (matrix.ContainsKey(i))
-                for (int j = matrix[i].Keys.Order().ToArray()[0]; j <= matrix[i].Keys.Order().ToArray()[matrix[i].Keys.Count - 1]; j++) {
-                    if (matrix[i].ContainsKey(j))
+            if (ContainsLine(i))
+                for (int j = MinColumn(i); j <= MaxColumn(i); j++) {
+                    if (ContainsColumn(i,j))
                         s += matrix[i][j];
                     else
                         s += " ";

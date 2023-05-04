@@ -25,7 +25,7 @@ public class Board
     //    worldMap[p.X, p.Y] = null;
     //}
 
-    public Point[] GetChunkSlots()
+    public PointRotation[] GetChunkSlots()
     {
         if (worldMap.IsEmpty()) {
             Point[] p = new Point[1];
@@ -34,7 +34,7 @@ public class Board
         }
 
         List<Point> slots = new List<Point>();
-        List<Point> chunkSlots = new List<Point>();
+        List<PointRotation> chunkSlots = new List<PointRotation>();
 
         foreach (Cell c in worldMap) {
             Point p = GetCellCoord(c);
@@ -80,39 +80,43 @@ public class Board
                     continue;
                 
                 if(pt.X % 2 == 0) {
-                    if(worldMap.IsVoid(new Point(pt.X, pt.Y - 1)) && (worldMap.IsVoid(new Point(pt.X - 1, pt.Y - 1)) 
-                        || worldMap.IsVoid(new Point(pt.X + 1, pt.Y - 1))))
-                        chunkSlots.Add(pt);
-                    else if(worldMap.IsVoid(new Point(pt.X, pt.Y + 1)) && (worldMap.IsVoid(new Point(pt.X - 1, pt.Y))
-                        || worldMap.IsVoid(new Point(pt.X + 1, pt.Y))))
-                        chunkSlots.Add(pt);
-                    else if(worldMap.IsVoid(new Point(pt.X - 1, pt.Y - 1)) && worldMap.IsVoid(new Point(pt.X - 1, pt.Y)))
-                        chunkSlots.Add(pt);
-                    else if(worldMap.IsVoid(new Point(pt.X + 1, pt.Y - 1)) && worldMap.IsVoid(new Point(pt.X + 1, pt.Y)))
-                        chunkSlots.Add(pt);
+                    if(worldMap.IsVoid(new Point(pt.X, pt.Y - 1)) && worldMap.IsVoid(new Point(pt.X - 1, pt.Y - 1)))
+                        chunkSlots.Add(new PointRotation(pt, Rotation.NW));
+                    if (worldMap.IsVoid(new Point(pt.X, pt.Y - 1)) && worldMap.IsVoid(new Point(pt.X + 1, pt.Y - 1)))
+                        chunkSlots.Add(new PointRotation(pt, Rotation.SW));
+                    if (worldMap.IsVoid(new Point(pt.X, pt.Y + 1)) && worldMap.IsVoid(new Point(pt.X - 1, pt.Y)))
+                        chunkSlots.Add(new PointRotation(pt, Rotation.NE));
+                    if (worldMap.IsVoid(new Point(pt.X, pt.Y + 1)) && worldMap.IsVoid(new Point(pt.X + 1, pt.Y)))
+                        chunkSlots.Add(new PointRotation(pt, Rotation.SE));
+                    if (worldMap.IsVoid(new Point(pt.X - 1, pt.Y - 1)) && worldMap.IsVoid(new Point(pt.X - 1, pt.Y)))
+                        chunkSlots.Add(new PointRotation(pt, Rotation.N));
+                    if(worldMap.IsVoid(new Point(pt.X + 1, pt.Y - 1)) && worldMap.IsVoid(new Point(pt.X + 1, pt.Y)))
+                        chunkSlots.Add(new PointRotation(pt, Rotation.S));
                 } else {
-                    if (worldMap.IsVoid(new Point(pt.X, pt.Y - 1)) && (worldMap.IsVoid(new Point(pt.X - 1, pt.Y))
-                        || worldMap.IsVoid(new Point(pt.X + 1, pt.Y))))
-                        chunkSlots.Add(pt);
-                    else if (worldMap.IsVoid(new Point(pt.X, pt.Y + 1)) && (worldMap.IsVoid(new Point(pt.X - 1, pt.Y + 1))
-                        || worldMap.IsVoid(new Point(pt.X + 1, pt.Y + 1))))
-                        chunkSlots.Add(pt);
-                    else if (worldMap.IsVoid(new Point(pt.X - 1, pt.Y + 1)) && worldMap.IsVoid(new Point(pt.X - 1, pt.Y)))
-                        chunkSlots.Add(pt);
-                    else if (worldMap.IsVoid(new Point(pt.X + 1, pt.Y + 1)) && worldMap.IsVoid(new Point(pt.X + 1, pt.Y)))
-                        chunkSlots.Add(pt);
+                    if (worldMap.IsVoid(new Point(pt.X, pt.Y - 1)) && worldMap.IsVoid(new Point(pt.X - 1, pt.Y)))
+                        chunkSlots.Add(new PointRotation(pt, Rotation.NW));
+                    if (worldMap.IsVoid(new Point(pt.X, pt.Y - 1)) && worldMap.IsVoid(new Point(pt.X + 1, pt.Y)))
+                        chunkSlots.Add(new PointRotation(pt, Rotation.SW));
+                    if (worldMap.IsVoid(new Point(pt.X, pt.Y + 1)) && worldMap.IsVoid(new Point(pt.X - 1, pt.Y + 1)))
+                        chunkSlots.Add(new PointRotation(pt, Rotation.NE));
+                    if (worldMap.IsVoid(new Point(pt.X, pt.Y + 1)) && worldMap.IsVoid(new Point(pt.X + 1, pt.Y + 1)))
+                        chunkSlots.Add(new PointRotation(pt, Rotation.SE));
+                    if (worldMap.IsVoid(new Point(pt.X - 1, pt.Y + 1)) && worldMap.IsVoid(new Point(pt.X - 1, pt.Y)))
+                        chunkSlots.Add(new PointRotation(pt, Rotation.N));
+                    if (worldMap.IsVoid(new Point(pt.X + 1, pt.Y + 1)) && worldMap.IsVoid(new Point(pt.X + 1, pt.Y)))
+                        chunkSlots.Add(new PointRotation(pt, Rotation.S));
                 }
 
                 slots.Remove(pt);
             }
 
-            //Recherche des points qui sont des volcans et qui permettent au moins une position pour ecraser la map
+            //Recherche des points qui sont des volcans et qui permettent une position pour ecraser la map
             foreach (Point pt in slots) {
                 if (pt.X % 2 == 0) {
                     if (!worldMap.IsVoid(new Point(pt.X, pt.Y - 1)) && !worldMap.IsVoid(new Point(pt.X - 1, pt.Y - 1)))
                         if (!worldMap.GetValue(new Point(pt.X, pt.Y - 1)).HaveBuilding() &&
                             !worldMap.GetValue(new Point(pt.X - 1, pt.Y - 1)).HaveBuilding())
-                            chunkSlots.Add(pt);
+                            chunkSlots.Add(new PointRotation(pt, Rotation.S));
                         else if(worldMap.GetValue(new Point(pt.X, pt.Y - 1)).HaveBuilding() && 
                             !worldMap.GetValue(new Point(pt.X - 1, pt.Y - 1)).HaveBuilding() &&
                             worldMap.GetValue(new Point(pt.X, pt.Y - 1)).actualVillage.VillageSize() > 1)
