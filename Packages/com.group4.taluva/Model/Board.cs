@@ -109,9 +109,11 @@ namespace Taluva.Model
             bool[] possible = new bool[6];
             Vector2Int[] neighbors = GetNeighbors(p);
             int i = 0;
-            bool previous = worldMap.IsVoid(neighbors[5]);
+            Vector2Int previous = neighbors[5];
             foreach (Vector2Int neighbor in neighbors) {
-                possible[i] = previous && (previous = worldMap.IsVoid(neighbor)) && IsConnected(neighbor);
+                possible[i] = worldMap.IsVoid(previous) && worldMap.IsVoid(neighbor) && 
+                    (IsConnected(neighbor) || IsConnected(previous));
+                previous = neighbor;
                 i++;
             }
 
