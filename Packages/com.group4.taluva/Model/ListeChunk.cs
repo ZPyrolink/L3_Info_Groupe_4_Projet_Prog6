@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Taluva.Model
 {
-    public class ListeCell
+    public class ListeChunk
     {
-        public List<Chunk> ListeChunk = new();
+        public List<Chunk> Chunks = new();
 
         private int[,] OcurrenceMatrix =
         {
@@ -31,7 +31,7 @@ namespace Taluva.Model
                         Chunk c = new(0, c1, c2);
                         c1.parentCunk = c;
                         c2.parentCunk = c;
-                        ListeChunk.Add(c);
+                        Chunks.Add(c);
                         reps++;
                     }
                 }
