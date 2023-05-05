@@ -22,7 +22,12 @@ public class ClickMgr : MonoBehaviour
     private void OutlineTile(GameObject go)
     {
         if (_current is not null)
+        {
+            if (_current.gameObject == go)
+                return;
+            
             Destroy(_current);
+        }
         _current = go.AddComponent<Outline>();
         _current.OutlineColor = Color.cyan;
         _current.OutlineWidth = .5f;
