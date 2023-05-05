@@ -9,7 +9,7 @@
         <AppDesignerFolder>Properties</AppDesignerFolder>
         <RootNamespace>TaluvaConsole</RootNamespace>
         <AssemblyName>TaluvaConsole</AssemblyName>
-        <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+        <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
         <LangVersion>9.0</LangVersion>
         <FileAlignment>512</FileAlignment>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

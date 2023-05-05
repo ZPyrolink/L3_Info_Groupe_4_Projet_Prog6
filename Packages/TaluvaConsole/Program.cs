@@ -9,8 +9,6 @@ DynamicMatrix<String> matrix = new();
 Pile<Chunk> Pile = ListeChunk.Pile;
 Board b = new Board();
 
-Console.WriteLine(matrix);
-
 //interpret commands
 Console.WriteLine("Enter a command : ");
 bool t = true;
