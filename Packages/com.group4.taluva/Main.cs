@@ -4,9 +4,9 @@ using Taluva.Utils;
 
 namespace Taluva
 {
-    class MainClass
+    public class MainClass
     {
-        static void Main(string[] args)
+        public static void Main()
         {
             DynamicMatrix<String> matrix = new();
 
