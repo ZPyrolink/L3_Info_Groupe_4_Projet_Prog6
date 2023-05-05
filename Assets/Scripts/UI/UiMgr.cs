@@ -8,6 +8,8 @@ using UnityEngine.UI;
 
 using UnityUtils.GameObjects;
 
+using Utils;
+
 using GameObject = UnityEngine.GameObject;
 using Random = UnityEngine.Random;
 
@@ -100,6 +102,8 @@ namespace UI
         [SerializeField]
         private GameObject tile, builds;
 
+        private float _defaultBuildsY;
+
         [SerializeField]
         private GameObject menuCanva; 
 
@@ -149,6 +153,8 @@ namespace UI
         {
             Phase = 1;
             NbTiles = nbTilesPerPlayers * players.Length;
+            _defaultBuildsY = builds.transform.GetChild(0).GetComponent<RectTransform>().anchoredPosition.y;
+            UpBuild(0);
         }
 
         private void Update()
@@ -229,6 +235,16 @@ namespace UI
         public void ToggleMenu()
         {
             menuCanva.SetActive(!menuCanva.activeSelf);
+        }
+
+        public void UpBuild(int i)
+        {
+            RectTransform child;
+            foreach (Transform t in builds.transform)
+                (child = t.GetComponent<RectTransform>()).anchoredPosition = child.anchoredPosition.With(y: _defaultBuildsY);
+
+            child = builds.transform.GetChild(i).GetComponent<RectTransform>();
+            child.anchoredPosition = child.anchoredPosition.With(y: 20);
         }
     }
 }
