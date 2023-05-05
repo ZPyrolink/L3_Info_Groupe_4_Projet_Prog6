@@ -21,6 +21,11 @@ namespace Taluva.Model
             worldMap.Add(c, new(coord.x, coord.y));
         }
 
+        public DynamicMatrix<Cell> GetMatrix()
+        {
+            return worldMap;
+        }
+
         private void RemoveCell(Cell c)
         {
             Vector2Int p = GetCellCoord(c);
@@ -167,8 +172,33 @@ namespace Taluva.Model
         {
             PointRotation[] points = GetChunkSlots();
             List<PointRotation> pointsdispo = points.ToList();
-            if (!pointsdispo.Contains(p))
+            bool exist = false;
+            foreach (PointRotation pr in points)
+            {
+                if (!pr.point.Equals(p.point))
+                {
+                    continue;
+                }
+
+                for (int i = 0; i < pr.rotations.Length; i++)
+                {
+                    if (pr.rotations[i] == p.rotations[i])
+                    {
+                        exist = true;
+                        break;
+                    }
+                }
+
+                if (exist)
+                {
+                    break;
+                }
+            }
+
+            if (!exist)
+            {
                 return;
+            }
 
             Vector2Int[] neighbors = GetNeighbors(p.point);
 

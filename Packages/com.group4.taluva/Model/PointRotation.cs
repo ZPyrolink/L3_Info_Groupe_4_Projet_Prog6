@@ -14,6 +14,12 @@ namespace Taluva.Model
             for (int i = 0; i < rotations.Length; i++)
                 this.rotations[i] = false;
         }
+        
+        public PointRotation(Vector2Int point,Rotation rot) : this(point)
+        {
+            this.rotations[(int)rot] = true;
+
+        }
 
         public void SetAllTrue()
         {
