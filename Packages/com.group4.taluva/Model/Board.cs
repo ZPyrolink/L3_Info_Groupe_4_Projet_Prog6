@@ -16,15 +16,68 @@ namespace Taluva.Model
             worldMap = new();
         }
 
-        private void AddCell(Cell c, Vector2Int coord)
-        {
-            worldMap.Add(c, new(coord.x, coord.y));
-        }
-
         private void RemoveCell(Cell c)
         {
             Vector2Int p = GetCellCoord(c);
             worldMap.Remove(p);
+        }
+
+        public List<Vector2Int> GetVillage(Vector2Int c)
+        {
+            List<Vector2Int> villagePositions = new();
+
+            PlayerColor color = worldMap.GetValue(c).Owner;
+
+            List<Vector2Int> cells = new();
+            List<Vector2Int> visited = new();
+
+            Vector2Int[] neighbors = GetNeighbors(c);
+            foreach (Vector2Int neighbor in neighbors) {
+                if(worldMap.IsVoid(neighbor) || worldMap.GetValue(neighbor).ActualBuildings == Building.None 
+                    || worldMap.GetValue(neighbor).Owner != color) 
+                    continue;
+                cells.Add(neighbor);
+            }
+
+            villagePositions.Add(c);
+            visited.Add(c);
+
+            while (cells.Count > 0) {
+                Vector2Int cellP = cells[0];
+                cells.Remove(cellP);
+                visited.Add(cellP);
+                villagePositions.Add(cellP);
+                neighbors = GetNeighbors(cellP);
+                foreach (Vector2Int neighbor in neighbors) {
+                    if (worldMap.IsVoid(neighbor) || worldMap.GetValue(neighbor).ActualBuildings == Building.None 
+                        || visited.Contains(neighbor) || worldMap.GetValue(neighbor).Owner != color)
+                        continue;
+                    cells.Add(neighbor);
+                }
+            }
+            return villagePositions;
+        }
+
+        public List<List<Vector2Int>> GetAllVillage(Vector2Int c)
+        {
+            List<List<Vector2Int>> allVillages = new();
+
+            Vector2Int[] neighbors = GetNeighbors(c);
+
+            List<List<Vector2Int>> villages = new();
+
+            for(int i = 0; i < neighbors.Length; i++) {
+                villages[i] = GetVillage(neighbors[i]);
+            }
+            for (int i = 0; i < villages.Count; i++) {
+                for(int j = i; j < villages.Count; j++) {
+                    if (villages[i].Contains(villages[j][0])) {
+                        villages.RemoveAt(j);
+                        j--;
+                    }
+                }
+            }
+            return allVillages;
         }
 
         private Vector2Int[] GetNeighbors(Vector2Int p)
@@ -62,26 +115,28 @@ namespace Taluva.Model
 
         public bool PossibleVolcano(Vector2Int left, Vector2Int right, Rotation r, Vector2Int pt)
         {
+            int level = worldMap.GetValue(pt).parentCunk.Level;
             if (!worldMap.IsVoid(left) && !worldMap.IsVoid(right))
-                if (worldMap.GetValue(pt).parentCunk.rotation != r)
-                    if (!worldMap.GetValue(left).HaveBuilding() &&
-                        !worldMap.GetValue(right).HaveBuilding()) {
-                        return true;
-                    } else if (worldMap.GetValue(left).HaveBuilding() && !worldMap.GetValue(right).HaveBuilding() &&
-                               worldMap.GetValue(left).actualVillage.VillageSize() > 1) {
-                        if (worldMap.GetValue(left).ActualBuildings == Building.Barrack)
+                if(worldMap.GetValue(left).parentCunk.Level == level && worldMap.GetValue(left).parentCunk.Level == level)
+                    if (worldMap.GetValue(pt).parentCunk.rotation != r)
+                        if (!worldMap.GetValue(left).HaveBuilding() &&
+                            !worldMap.GetValue(right).HaveBuilding()) {
                             return true;
-                    } else if (!worldMap.GetValue(left).HaveBuilding() && worldMap.GetValue(right).HaveBuilding() &&
-                               worldMap.GetValue(right).actualVillage.VillageSize() > 1) {
-                        if (worldMap.GetValue(right).ActualBuildings ==
-                            Building.Barrack)
-                            return true;
-                    } else if (worldMap.GetValue(left).HaveBuilding() && worldMap.GetValue(right).HaveBuilding() &&
-                               worldMap.GetValue(right).actualVillage.VillageSize() > 2) {
-                        if (worldMap.GetValue(left).ActualBuildings == Building.Barrack &&
-                            worldMap.GetValue(right).ActualBuildings == Building.Barrack)
-                            return true;
-                    }
+                        } else if (worldMap.GetValue(left).HaveBuilding() && !worldMap.GetValue(right).HaveBuilding() &&
+                                   worldMap.GetValue(left).actualVillage.VillageSize() > 1) {
+                            if (worldMap.GetValue(left).ActualBuildings == Building.Barrack)
+                                return true;
+                        } else if (!worldMap.GetValue(left).HaveBuilding() && worldMap.GetValue(right).HaveBuilding() &&
+                                   worldMap.GetValue(right).actualVillage.VillageSize() > 1) {
+                            if (worldMap.GetValue(right).ActualBuildings ==
+                                Building.Barrack)
+                                return true;
+                        } else if (worldMap.GetValue(left).HaveBuilding() && worldMap.GetValue(right).HaveBuilding() &&
+                                   worldMap.GetValue(right).actualVillage.VillageSize() > 2) {
+                            if (worldMap.GetValue(left).ActualBuildings == Building.Barrack &&
+                                worldMap.GetValue(right).ActualBuildings == Building.Barrack)
+                                return true;
+                        }
             return false;
         }
 
@@ -106,8 +161,13 @@ namespace Taluva.Model
                 Vector2Int[] neighbors = GetNeighbors(p);
 
                 foreach (Vector2Int neighbor in neighbors) {
-                    if (worldMap.IsVoid(neighbor))
+                    if (worldMap.IsVoid(neighbor)) {
                         slots.Add(neighbor);
+                        Vector2Int[] neighbors2 = GetNeighbors(neighbor);
+                        foreach(Vector2Int neighbor2 in neighbors2)
+                            if (worldMap.IsVoid(neighbor2))
+                                slots.Add(neighbor2);
+                    }
                 }
 
                 slots = slots.Distinct().ToList();
@@ -155,7 +215,7 @@ namespace Taluva.Model
             return chunkSlots.ToArray();
         }
 
-        public void AddCell(Chunk c, PointRotation p, Vector2Int left, Vector2Int right)
+        private void AddCell(Chunk c, PointRotation p, Vector2Int left, Vector2Int right)
         {
 
             worldMap.Add(c.Coords[1], left);
@@ -235,9 +295,9 @@ namespace Taluva.Model
             List<Vector2Int> barrackSlots = new();
             foreach (Cell c in worldMap) {
                 Vector2Int p = GetCellCoord(c);
-                if (!worldMap.IsVoid(new(p.x, p.y)) && worldMap.GetValue(p).ActualBuildings == Building.None &&
+                if (!worldMap.IsVoid(p) && worldMap.GetValue(p).ActualBuildings == Building.None &&
                     worldMap.GetValue(p).Owner == actualPlayer.ID) {
-                    barrackSlots.Add(new(p.x, p.y));
+                    barrackSlots.Add(p);
                 }
             }
 
@@ -249,7 +309,7 @@ namespace Taluva.Model
             List<Vector2Int> towerSlots = new();
             foreach (Cell c in worldMap) {
                 Vector2Int p = GetCellCoord(c);
-                if (!worldMap.IsVoid(new(p.x, p.y)) && worldMap.GetValue(p).Owner == actualPlayer.ID &&
+                if (!worldMap.IsVoid(p) && worldMap.GetValue(p).Owner == actualPlayer.ID &&
                     worldMap.GetValue(p).ActualBuildings == Building.None) {
                     // Cellule de niveau 3 ou plus 
                     if (worldMap.GetValue(p).parentCunk.Level >= 3) {
@@ -257,7 +317,7 @@ namespace Taluva.Model
                         if (IsAdjacentToCity(p, actualPlayer)) {
                             // aucune autre tour est présente dans cette cité.
                             if (!CityHasTower(p, actualPlayer)) {
-                                towerSlots.Add(new(p.x, p.y));
+                                towerSlots.Add(p);
                             }
                         }
                     }
@@ -280,22 +340,6 @@ namespace Taluva.Model
             }
 
             return false;
-        }
-
-        public Vector2Int[] GetAdjacentPositions(Vector2Int cellp)
-        {
-            List<Vector2Int> adjacentPositions = new();
-
-            int yOffset = cellp.x % 2 == 0 ? -1 : 1;
-
-            adjacentPositions.Add(new(cellp.x - 1, cellp.y));
-            adjacentPositions.Add(new(cellp.x - 1, cellp.y + yOffset));
-            adjacentPositions.Add(new(cellp.x, cellp.y - 1));
-            adjacentPositions.Add(new(cellp.x, cellp.y + 1));
-            adjacentPositions.Add(new(cellp.x + 1, cellp.y + yOffset));
-            adjacentPositions.Add(new(cellp.x + 1, cellp.y));
-
-            return adjacentPositions.ToArray();
         }
 
         public bool CityHasTower(Vector2Int cellCoord, Player actualPlayer)
@@ -331,7 +375,7 @@ namespace Taluva.Model
                 return false;
             }
 
-            Vector2Int[] pts = GetAdjacentPositions(GetCellCoord(cell));
+            Vector2Int[] pts = GetNeighbors(GetCellCoord(cell));
             bool v = false;
             Vector2Int pv = new();
             foreach (Vector2Int p in pts) {
