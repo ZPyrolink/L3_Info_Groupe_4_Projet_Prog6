@@ -1,15 +1,21 @@
 ﻿using System;
+using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Taluva.Model;
 using Taluva.Utils;
+using UnityEngine;
 
 namespace Taluva
 {
     class MainClass
     {
+        public static Pile<Chunk> Pile = ListeChunk.Pile;
+        public static Board b = new Board();
         static void Main(string[] args)
         {
             DynamicMatrix<String> matrix = new();
+            
 
             // matrix.Add("A", new(0, 0));
             // matrix.Add("B", new(0, 2));
@@ -20,11 +26,13 @@ namespace Taluva
 
             Console.WriteLine(matrix);
             
+            Console.WriteLine("Type in a command :");
             //interpret commands
             bool a = true;
             string s;
             while (a)
             {
+
                 s = Console.ReadLine();
                 if (s != null) InterpretActions(s);
                 else a = false;
@@ -57,20 +65,24 @@ namespace Taluva
             }
         }
 
+        
         public static void PlayParser(string[] s)
         {
             Regex rg = new("[0-9].*");
+            PointRotation pr = null;
+            Rotation r = 0;
             if (rg.IsMatch(s[1]) && rg.IsMatch(s[2]) && rg.IsMatch(s[3]))     //Coordinate conversion
             {
                 int x = int.Parse(s[1]);
                 int y = int.Parse(s[2]);
-                int r = int.Parse(s[3]);        //verify in Rotations enum
+                r = (Rotation)int.Parse(s[3]); //verify in Rotations enum
+                pr = new PointRotation(new Vector2Int(x, y), r);
             }
-
-            ListeChunk lc = new ListeChunk();
-            lc.CreateCellSelection();
             
-
+            Player p = new Player(PlayerColor.Red);
+            b.AddChunk(Pile.Draw(), p, pr);
+            Console.WriteLine(b.worldMap);
+            
             //Play mov
         }
     }

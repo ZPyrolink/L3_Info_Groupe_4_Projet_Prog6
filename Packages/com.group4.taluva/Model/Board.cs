@@ -9,7 +9,7 @@ namespace Taluva.Model
 {
     public class Board
     {
-        private readonly DynamicMatrix<Cell> worldMap;
+        public readonly DynamicMatrix<Cell> worldMap;
 
         public Board()
         {

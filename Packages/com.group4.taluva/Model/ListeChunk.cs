@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace Taluva.Model
 {
-    public class ListeChunk
+    public static class ListeChunk
     {
-        public List<Chunk> Chunks = new();
+        private static readonly List<Chunk> Chunks = new();
 
-        private int[,] OcurrenceMatrix =
+        private static readonly int[,] OcurrenceMatrix =
         {
             { 1, 2, 4, 6, 2 },
             { 1, 1, 1, 1, 1 },
@@ -16,8 +16,10 @@ namespace Taluva.Model
             { 2, 1, 1, 2, 1 }
         }; //indexes : Forest = 0, Lake = 1, desert = 2, Plain = 3, Mountain = 4
 
+        public static Pile<Chunk> Pile => new(Chunks.ToArray());
+
         //Create all chunks and store them in a list
-        public void CreateCellSelection()
+        static ListeChunk()
         {
             for (int i = 0; i < 5; i++)
             {
@@ -40,12 +42,12 @@ namespace Taluva.Model
         }
 
         //print one chunk contents
-        public void PrintChunkToString(Chunk c)
+        public static void PrintChunkToString(Chunk c)
         {
             Console.WriteLine($"{c.Coords[0].ActualBiome}, {c.Coords[1].ActualBiome}, {c.Coords[2].ActualBiome}");
         }
 
-        public void PrintChunkList(List<Chunk> l)
+        public static void PrintChunkList(List<Chunk> l)
         {
             foreach (Chunk c in l)
             {
