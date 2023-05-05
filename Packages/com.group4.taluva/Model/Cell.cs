@@ -35,10 +35,10 @@
             this.ActualBuildings = building;
             this.actualVillage = new(this);
         }
-
-        public string ToString(Cell c)
+        
+        public override string ToString()
         {
-            switch (c.ActualBiome)
+            switch (ActualBiome)
             {
                 case Biomes.Desert:
                     return "D";
