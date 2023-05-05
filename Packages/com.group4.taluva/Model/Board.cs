@@ -31,18 +31,17 @@ namespace Taluva.Model
         {
             Vector2Int[] neighborsCoord = new Vector2Int[6];
             int offset = 0;
-            if (p.x % 2 == 0)
-            {
+            if (p.x % 2 == 0) {
                 offset = -1;
             }
 
             // Neighbors visited clockwise
-            neighborsCoord[(offset + 6) % 6] = new(p.x - 1, p.y + 1 + offset);
-            neighborsCoord[offset + 1] = new(p.x, p.y + 1);
-            neighborsCoord[offset + 2] = new(p.x - 1, p.y + 1 + offset);
-            neighborsCoord[offset + 3] = new(p.x - 1, p.y + offset);
-            neighborsCoord[offset + 4] = new(p.x, p.y - 1);
-            neighborsCoord[offset + 5] = new(p.x - 1, p.y + 1 + offset);
+            neighborsCoord[0] = new(p.x - 1, p.y + 1 + offset);
+            neighborsCoord[1] = new(p.x, p.y + 1);
+            neighborsCoord[2] = new(p.x + 1, p.y + 1 + offset);
+            neighborsCoord[3] = new(p.x + 1, p.y + offset);
+            neighborsCoord[4] = new(p.x, p.y - 1);
+            neighborsCoord[5] = new(p.x - 1, p.y + offset);
 
             return neighborsCoord;
         }
@@ -53,668 +52,149 @@ namespace Taluva.Model
             Vector2Int[] neighbors = GetNeighbors(p);
             int i = 0;
             bool previous = worldMap.IsVoid(neighbors[5]);
-            foreach (Vector2Int neighbor in neighbors)
-            {
+            foreach (Vector2Int neighbor in neighbors) {
                 possible[i] = previous && (previous = worldMap.IsVoid(neighbors[i]));
                 i++;
             }
 
             return possible;
         }
-        //private void RemoveCell(Cell c)
-        //{
-        //    Point p = GetCellCoord(c);
-        //    worldMap[p.X, p.Y] = null;
-        //}
+
+        public bool PossibleVolcano(Vector2Int left, Vector2Int right, Rotation r, Vector2Int pt)
+        {
+            if (!worldMap.IsVoid(left) && !worldMap.IsVoid(right))
+                if (worldMap.GetValue(pt).parentCunk.rotation != r)
+                    if (!worldMap.GetValue(left).HaveBuilding() &&
+                        !worldMap.GetValue(right).HaveBuilding()) {
+                        return true;
+                    } else if (worldMap.GetValue(left).HaveBuilding() && !worldMap.GetValue(right).HaveBuilding() &&
+                               worldMap.GetValue(left).actualVillage.VillageSize() > 1) {
+                        if (worldMap.GetValue(left).ActualBuildings == Building.Barrack)
+                            return true;
+                    } else if (!worldMap.GetValue(left).HaveBuilding() && worldMap.GetValue(right).HaveBuilding() &&
+                               worldMap.GetValue(right).actualVillage.VillageSize() > 1) {
+                        if (worldMap.GetValue(right).ActualBuildings ==
+                            Building.Barrack)
+                            return true;
+                    } else if (worldMap.GetValue(left).HaveBuilding() && worldMap.GetValue(right).HaveBuilding() &&
+                               worldMap.GetValue(right).actualVillage.VillageSize() > 2) {
+                        if (worldMap.GetValue(left).ActualBuildings == Building.Barrack &&
+                            worldMap.GetValue(right).ActualBuildings == Building.Barrack)
+                            return true;
+                    }
+            return false;
+        }
 
         public PointRotation[] GetChunkSlots()
         {
-            if (worldMap.IsEmpty())
-            {
-                PointRotation[] pr = new PointRotation[6];
-                Vector2Int p = new(0, 0);
-                for (int i = 0; i < 6; i++)
-                {
-                    pr[i] = new(p, (Rotation) i);
-                }
-
+            if (worldMap.IsEmpty()) {
+                PointRotation[] pr = new PointRotation[1];
+                pr[0] = new(new(0, 0));
+                pr[0].SetAllTrue();
                 return pr;
             }
 
             List<Vector2Int> slots = new();
             List<PointRotation> chunkSlots = new();
 
-            foreach (Cell c in worldMap)
-            {
+            foreach (Cell c in worldMap) {
                 Vector2Int p = GetCellCoord(c);
-                if (c.ActualBiome == Biomes.Volcano)
-                {
+                if (c.ActualBiome == Biomes.Volcano) {
                     slots.Add(p);
                 }
 
-                if (worldMap.IsVoid(new(p.x, p.y - 1)))
-                {
-                    slots.Add(new(p.x, p.y - 1));
-                    continue;
-                }
-                else if (worldMap.IsVoid(new(p.x, p.y + 1)))
-                {
-                    slots.Add(new(p.x, p.y + 1));
-                    continue;
-                }
+                Vector2Int[] neighbors = GetNeighbors(p);
 
-                if (p.x % 2 == 0)
-                {
-                    if (worldMap.IsVoid(new(p.x - 1, p.y - 1)))
-                    {
-                        slots.Add(new(p.x - 1, p.y - 1));
-                    }
-                    else if (worldMap.IsVoid(new(p.x - 1, p.y)))
-                    {
-                        slots.Add(new(p.x - 1, p.y));
-                    }
-                    else if (worldMap.IsVoid(new(p.x + 1, p.y)))
-                    {
-                        slots.Add(new(p.x + 1, p.y));
-                    }
-                    else if (worldMap.IsVoid(new(p.x + 1, p.y - 1)))
-                    {
-                        slots.Add(new(p.x + 1, p.y - 1));
-                    }
-                }
-                else
-                {
-                    if (worldMap.IsVoid(new(p.x - 1, p.y + 1)))
-                    {
-                        slots.Add(new(p.x - 1, p.y + 1));
-                    }
-                    else if (worldMap.IsVoid(new(p.x - 1, p.y)))
-                    {
-                        slots.Add(new(p.x - 1, p.y));
-                    }
-                    else if (worldMap.IsVoid(new(p.x + 1, p.y)))
-                    {
-                        slots.Add(new(p.x + 1, p.y));
-                    }
-                    else if (worldMap.IsVoid(new(p.x + 1, p.y + 1)))
-                    {
-                        slots.Add(new(p.x + 1, p.y + 1));
-                    }
+                foreach (Vector2Int neighbor in neighbors) {
+                    if (worldMap.IsVoid(neighbor))
+                        slots.Add(neighbor);
                 }
 
                 slots = slots.Distinct().ToList();
 
 
                 //Recherche des points dans l'eau pouvant placer un chunk dans au moins une position
-                foreach (Vector2Int pt in slots)
-                {
+                foreach (Vector2Int pt in slots) {
                     if (worldMap.GetValue(pt).ActualBiome == Biomes.Volcano)
                         continue;
 
-                    if (pt.x % 2 == 0)
-                    {
-                        if (worldMap.IsVoid(new(pt.x, pt.y - 1)) &&
-                            worldMap.IsVoid(new(pt.x - 1, pt.y - 1)))
-                            chunkSlots.Add(new(pt, Rotation.NW));
-                        if (worldMap.IsVoid(new(pt.x, pt.y - 1)) &&
-                            worldMap.IsVoid(new(pt.x + 1, pt.y - 1)))
-                            chunkSlots.Add(new(pt, Rotation.SW));
-                        if (worldMap.IsVoid(new(pt.x, pt.y + 1)) && worldMap.IsVoid(new(pt.x - 1, pt.y)))
-                            chunkSlots.Add(new(pt, Rotation.NE));
-                        if (worldMap.IsVoid(new(pt.x, pt.y + 1)) && worldMap.IsVoid(new(pt.x + 1, pt.y)))
-                            chunkSlots.Add(new(pt, Rotation.SE));
-                        if (worldMap.IsVoid(new(pt.x - 1, pt.y - 1)) &&
-                            worldMap.IsVoid(new(pt.x - 1, pt.y)))
-                            chunkSlots.Add(new(pt, Rotation.N));
-                        if (worldMap.IsVoid(new(pt.x + 1, pt.y - 1)) &&
-                            worldMap.IsVoid(new(pt.x + 1, pt.y)))
-                            chunkSlots.Add(new(pt, Rotation.S));
-                    }
-                    else
-                    {
-                        if (worldMap.IsVoid(new(pt.x, pt.y - 1)) && worldMap.IsVoid(new(pt.x - 1, pt.y)))
-                            chunkSlots.Add(new(pt, Rotation.NW));
-                        if (worldMap.IsVoid(new(pt.x, pt.y - 1)) && worldMap.IsVoid(new(pt.x + 1, pt.y)))
-                            chunkSlots.Add(new(pt, Rotation.SW));
-                        if (worldMap.IsVoid(new(pt.x, pt.y + 1)) &&
-                            worldMap.IsVoid(new(pt.x - 1, pt.y + 1)))
-                            chunkSlots.Add(new(pt, Rotation.NE));
-                        if (worldMap.IsVoid(new(pt.x, pt.y + 1)) &&
-                            worldMap.IsVoid(new(pt.x + 1, pt.y + 1)))
-                            chunkSlots.Add(new(pt, Rotation.SE));
-                        if (worldMap.IsVoid(new(pt.x - 1, pt.y + 1)) &&
-                            worldMap.IsVoid(new(pt.x - 1, pt.y)))
-                            chunkSlots.Add(new(pt, Rotation.N));
-                        if (worldMap.IsVoid(new(pt.x + 1, pt.y + 1)) &&
-                            worldMap.IsVoid(new(pt.x + 1, pt.y)))
-                            chunkSlots.Add(new(pt, Rotation.S));
-                    }
+                    bool[] rotations = GetPossibleRotation(pt);
+                    PointRotation pr = new(pt);
 
+                    for (int i = 0; i < rotations.Length; i++) {
+                        if (rotations[i])
+                            pr.AddRotation((Rotation)i);
+                    }
+                    chunkSlots.Add(pr);
                     slots.Remove(pt);
                 }
 
                 //Recherche des points qui sont des volcans et qui permettent une position pour ecraser la map
-                foreach (Vector2Int pt in slots)
-                {
-                    if (pt.x % 2 == 0)
-                    {
-                        if (!worldMap.IsVoid(new(pt.x, pt.y - 1)) &&
-                            !worldMap.IsVoid(new(pt.x - 1, pt.y - 1)))
-                            if (worldMap.GetValue(pt).parentCunk.rotation != Rotation.NW)
-                                if (!worldMap.GetValue(new(pt.x, pt.y - 1)).HaveBuilding() &&
-                                    !worldMap.GetValue(new(pt.x - 1, pt.y - 1)).HaveBuilding())
-                                {
-                                    chunkSlots.Add(new(pt, Rotation.NW));
-                                }
-                                else if (worldMap.GetValue(new(pt.x, pt.y - 1)).HaveBuilding() &&
-                                         !worldMap.GetValue(new(pt.x - 1, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x, pt.y - 1)).actualVillage.VillageSize() > 1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x, pt.y - 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.NW));
-                                }
-                                else if (!worldMap.GetValue(new(pt.x, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y - 1)).actualVillage.VillageSize() >
-                                         1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x - 1, pt.y - 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.NW));
-                                }
-                                else if (worldMap.GetValue(new(pt.x, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y - 1)).actualVillage.VillageSize() >
-                                         2)
-                                {
-                                    if (worldMap.GetValue(new(pt.x, pt.y - 1)).ActualBuildings == Building.Barrack
-                                        && worldMap.GetValue(new(pt.x - 1, pt.y - 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.NW));
-                                }
+                foreach (Vector2Int pt in slots) {
 
-                        if (!worldMap.IsVoid(new(pt.x, pt.y - 1)) &&
-                            !worldMap.IsVoid(new(pt.x + 1, pt.y - 1)))
-                            if (worldMap.GetValue(pt).parentCunk.rotation != Rotation.SW)
-                                if (!worldMap.GetValue(new(pt.x, pt.y - 1)).HaveBuilding() &&
-                                    !worldMap.GetValue(new(pt.x + 1, pt.y - 1)).HaveBuilding())
-                                {
-                                    chunkSlots.Add(new(pt, Rotation.SW));
-                                }
-                                else if (worldMap.GetValue(new(pt.x, pt.y - 1)).HaveBuilding() &&
-                                         !worldMap.GetValue(new(pt.x + 1, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x, pt.y - 1)).actualVillage.VillageSize() > 1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x, pt.y - 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.SW));
-                                }
-                                else if (!worldMap.GetValue(new(pt.x, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y - 1)).actualVillage.VillageSize() >
-                                         1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x + 1, pt.y - 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.SW));
-                                }
-                                else if (worldMap.GetValue(new(pt.x, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y - 1)).actualVillage.VillageSize() >
-                                         2)
-                                {
-                                    if (worldMap.GetValue(new(pt.x, pt.y - 1)).ActualBuildings == Building.Barrack
-                                        && worldMap.GetValue(new(pt.x + 1, pt.y - 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.SW));
-                                }
+                    neighbors = GetNeighbors(pt);
+                    PointRotation pr = new(pt);
 
-                        if (!worldMap.IsVoid(new(pt.x, pt.y + 1)) && !worldMap.IsVoid(new(pt.x - 1, pt.y)))
-                            if (worldMap.GetValue(pt).parentCunk.rotation != Rotation.NE)
-                                if (!worldMap.GetValue(new(pt.x, pt.y + 1)).HaveBuilding() &&
-                                    !worldMap.GetValue(new(pt.x - 1, pt.y)).HaveBuilding())
-                                {
-                                    chunkSlots.Add(new(pt, Rotation.NE));
-                                }
-                                else if (worldMap.GetValue(new(pt.x, pt.y + 1)).HaveBuilding() &&
-                                         !worldMap.GetValue(new(pt.x - 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x, pt.y + 1)).actualVillage.VillageSize() > 1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x, pt.y + 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.NE));
-                                }
-                                else if (!worldMap.GetValue(new(pt.x, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y)).actualVillage.VillageSize() > 1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x - 1, pt.y)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.NE));
-                                }
-                                else if (worldMap.GetValue(new(pt.x, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y)).actualVillage.VillageSize() > 2)
-                                {
-                                    if (worldMap.GetValue(new(pt.x, pt.y + 1)).ActualBuildings == Building.Barrack
-                                        && worldMap.GetValue(new(pt.x - 1, pt.y)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.NE));
-                                }
+                    if (PossibleVolcano(neighbors[0], neighbors[1], Rotation.NE, pt))
+                        pr.AddRotation(Rotation.NE);
+                    if (PossibleVolcano(neighbors[1], neighbors[2], Rotation.SE, pt))
+                        pr.AddRotation(Rotation.SE);
+                    if (PossibleVolcano(neighbors[2], neighbors[3], Rotation.S, pt))
+                        pr.AddRotation(Rotation.S);
+                    if (PossibleVolcano(neighbors[3], neighbors[4], Rotation.SW, pt))
+                        pr.AddRotation(Rotation.SW);
+                    if (PossibleVolcano(neighbors[4], neighbors[5], Rotation.NW, pt))
+                        pr.AddRotation(Rotation.NW);
+                    if (PossibleVolcano(neighbors[5], neighbors[0], Rotation.N, pt))
+                        pr.AddRotation(Rotation.N);
 
-                        if (!worldMap.IsVoid(new(pt.x, pt.y + 1)) && !worldMap.IsVoid(new(pt.x + 1, pt.y)))
-                            if (worldMap.GetValue(pt).parentCunk.rotation != Rotation.SE)
-                                if (!worldMap.GetValue(new(pt.x, pt.y + 1)).HaveBuilding() &&
-                                    !worldMap.GetValue(new(pt.x + 1, pt.y)).HaveBuilding())
-                                {
-                                    chunkSlots.Add(new(pt, Rotation.SE));
-                                }
-                                else if (worldMap.GetValue(new(pt.x, pt.y + 1)).HaveBuilding() &&
-                                         !worldMap.GetValue(new(pt.x + 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x, pt.y + 1)).actualVillage.VillageSize() > 1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x, pt.y + 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.SE));
-                                }
-                                else if (!worldMap.GetValue(new(pt.x, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y)).actualVillage.VillageSize() > 1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x + 1, pt.y)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.SE));
-                                }
-                                else if (worldMap.GetValue(new(pt.x, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y)).actualVillage.VillageSize() > 2)
-                                {
-                                    if (worldMap.GetValue(new(pt.x, pt.y + 1)).ActualBuildings == Building.Barrack
-                                        && worldMap.GetValue(new(pt.x + 1, pt.y)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.SE));
-                                }
-
-                        if (!worldMap.IsVoid(new(pt.x - 1, pt.y - 1)) &&
-                            !worldMap.IsVoid(new(pt.x - 1, pt.y)))
-                            if (worldMap.GetValue(pt).parentCunk.rotation != Rotation.N)
-                                if (!worldMap.GetValue(new(pt.x - 1, pt.y - 1)).HaveBuilding() &&
-                                    !worldMap.GetValue(new(pt.x - 1, pt.y)).HaveBuilding())
-                                {
-                                    chunkSlots.Add(new(pt, Rotation.N));
-                                }
-                                else if (worldMap.GetValue(new(pt.x - 1, pt.y - 1)).HaveBuilding() &&
-                                         !worldMap.GetValue(new(pt.x - 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y - 1)).actualVillage.VillageSize() >
-                                         1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x - 1, pt.y - 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.N));
-                                }
-                                else if (!worldMap.GetValue(new(pt.x - 1, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y)).actualVillage.VillageSize() > 1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x - 1, pt.y)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.N));
-                                }
-                                else if (worldMap.GetValue(new(pt.x - 1, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y)).actualVillage.VillageSize() > 2)
-                                {
-                                    if (worldMap.GetValue(new(pt.x - 1, pt.y - 1)).ActualBuildings ==
-                                        Building.Barrack
-                                        && worldMap.GetValue(new(pt.x - 1, pt.y)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.N));
-                                }
-
-                        if (!worldMap.IsVoid(new(pt.x + 1, pt.y - 1)) &&
-                            !worldMap.IsVoid(new(pt.x + 1, pt.y)))
-                            if (worldMap.GetValue(pt).parentCunk.rotation != Rotation.S)
-                                if (!worldMap.GetValue(new(pt.x + 1, pt.y - 1)).HaveBuilding() &&
-                                    !worldMap.GetValue(new(pt.x + 1, pt.y)).HaveBuilding())
-                                {
-                                    chunkSlots.Add(new(pt, Rotation.S));
-                                }
-                                else if (worldMap.GetValue(new(pt.x + 1, pt.y - 1)).HaveBuilding() &&
-                                         !worldMap.GetValue(new(pt.x + 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y - 1)).actualVillage.VillageSize() >
-                                         1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x + 1, pt.y - 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.S));
-                                }
-                                else if (!worldMap.GetValue(new(pt.x + 1, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y)).actualVillage.VillageSize() > 1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x + 1, pt.y)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.S));
-                                }
-                                else if (worldMap.GetValue(new(pt.x + 1, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y)).actualVillage.VillageSize() > 2)
-                                {
-                                    if (worldMap.GetValue(new(pt.x + 1, pt.y - 1)).ActualBuildings ==
-                                        Building.Barrack
-                                        && worldMap.GetValue(new(pt.x + 1, pt.y)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.S));
-                                }
-                    }
-                    else
-                    {
-                        if (!worldMap.IsVoid(new(pt.x, pt.y - 1)) && !worldMap.IsVoid(new(pt.x - 1, pt.y)))
-                            if (worldMap.GetValue(pt).parentCunk.rotation != Rotation.NW)
-                                if (!worldMap.GetValue(new(pt.x, pt.y - 1)).HaveBuilding() &&
-                                    !worldMap.GetValue(new(pt.x - 1, pt.y)).HaveBuilding())
-                                {
-                                    chunkSlots.Add(new(pt, Rotation.NW));
-                                }
-                                else if (worldMap.GetValue(new(pt.x, pt.y - 1)).HaveBuilding() &&
-                                         !worldMap.GetValue(new(pt.x - 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x, pt.y - 1)).actualVillage.VillageSize() > 1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x, pt.y - 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.NW));
-                                }
-                                else if (!worldMap.GetValue(new(pt.x, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y)).actualVillage.VillageSize() > 1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x - 1, pt.y)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.NW));
-                                }
-                                else if (worldMap.GetValue(new(pt.x, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y)).actualVillage.VillageSize() > 2)
-                                {
-                                    if (worldMap.GetValue(new(pt.x, pt.y - 1)).ActualBuildings == Building.Barrack
-                                        && worldMap.GetValue(new(pt.x - 1, pt.y)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.NW));
-                                }
-
-                        if (!worldMap.IsVoid(new(pt.x, pt.y - 1)) && !worldMap.IsVoid(new(pt.x + 1, pt.y)))
-                            if (worldMap.GetValue(pt).parentCunk.rotation != Rotation.SW)
-                                if (!worldMap.GetValue(new(pt.x, pt.y - 1)).HaveBuilding() &&
-                                    !worldMap.GetValue(new(pt.x + 1, pt.y)).HaveBuilding())
-                                {
-                                    chunkSlots.Add(new(pt, Rotation.SW));
-                                }
-                                else if (worldMap.GetValue(new(pt.x, pt.y - 1)).HaveBuilding() &&
-                                         !worldMap.GetValue(new(pt.x + 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x, pt.y - 1)).actualVillage.VillageSize() > 1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x, pt.y - 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.SW));
-                                }
-                                else if (!worldMap.GetValue(new(pt.x, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y)).actualVillage.VillageSize() > 1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x + 1, pt.y)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.SW));
-                                }
-                                else if (worldMap.GetValue(new(pt.x, pt.y - 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y)).actualVillage.VillageSize() > 2)
-                                {
-                                    if (worldMap.GetValue(new(pt.x, pt.y - 1)).ActualBuildings == Building.Barrack
-                                        && worldMap.GetValue(new(pt.x + 1, pt.y)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.SW));
-                                }
-
-                        if (!worldMap.IsVoid(new(pt.x, pt.y + 1)) &&
-                            !worldMap.IsVoid(new(pt.x - 1, pt.y + 1)))
-                            if (worldMap.GetValue(pt).parentCunk.rotation != Rotation.NE)
-                                if (!worldMap.GetValue(new(pt.x, pt.y + 1)).HaveBuilding() &&
-                                    !worldMap.GetValue(new(pt.x - 1, pt.y + 1)).HaveBuilding())
-                                {
-                                    chunkSlots.Add(new(pt, Rotation.NE));
-                                }
-                                else if (worldMap.GetValue(new(pt.x, pt.y + 1)).HaveBuilding() &&
-                                         !worldMap.GetValue(new(pt.x - 1, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x, pt.y + 1)).actualVillage.VillageSize() > 1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x, pt.y + 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.NE));
-                                }
-                                else if (!worldMap.GetValue(new(pt.x, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y + 1)).actualVillage.VillageSize() >
-                                         1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x - 1, pt.y + 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.NE));
-                                }
-                                else if (worldMap.GetValue(new(pt.x, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y + 1)).actualVillage.VillageSize() >
-                                         2)
-                                {
-                                    if (worldMap.GetValue(new(pt.x, pt.y + 1)).ActualBuildings == Building.Barrack
-                                        && worldMap.GetValue(new(pt.x - 1, pt.y + 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.NE));
-                                }
-
-                        if (!worldMap.IsVoid(new(pt.x, pt.y + 1)) &&
-                            !worldMap.IsVoid(new(pt.x + 1, pt.y + 1)))
-                            if (worldMap.GetValue(pt).parentCunk.rotation != Rotation.SE)
-                                if (!worldMap.GetValue(new(pt.x, pt.y + 1)).HaveBuilding() &&
-                                    !worldMap.GetValue(new(pt.x + 1, pt.y + 1)).HaveBuilding())
-                                {
-                                    chunkSlots.Add(new(pt, Rotation.SE));
-                                }
-                                else if (worldMap.GetValue(new(pt.x, pt.y + 1)).HaveBuilding() &&
-                                         !worldMap.GetValue(new(pt.x + 1, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x, pt.y + 1)).actualVillage.VillageSize() > 1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x, pt.y + 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.SE));
-                                }
-                                else if (!worldMap.GetValue(new(pt.x, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y + 1)).actualVillage.VillageSize() >
-                                         1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x + 1, pt.y + 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.SE));
-                                }
-                                else if (worldMap.GetValue(new(pt.x, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y + 1)).actualVillage.VillageSize() >
-                                         2)
-                                {
-                                    if (worldMap.GetValue(new(pt.x, pt.y + 1)).ActualBuildings == Building.Barrack
-                                        && worldMap.GetValue(new(pt.x + 1, pt.y + 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.SE));
-                                }
-
-                        if (!worldMap.IsVoid(new(pt.x - 1, pt.y + 1)) &&
-                            !worldMap.IsVoid(new(pt.x - 1, pt.y)))
-                            if (worldMap.GetValue(pt).parentCunk.rotation != Rotation.N)
-                                if (!worldMap.GetValue(new(pt.x - 1, pt.y + 1)).HaveBuilding() &&
-                                    !worldMap.GetValue(new(pt.x - 1, pt.y)).HaveBuilding())
-                                {
-                                    chunkSlots.Add(new(pt, Rotation.N));
-                                }
-                                else if (worldMap.GetValue(new(pt.x - 1, pt.y + 1)).HaveBuilding() &&
-                                         !worldMap.GetValue(new(pt.x - 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y + 1)).actualVillage.VillageSize() >
-                                         1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x - 1, pt.y + 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.N));
-                                }
-                                else if (!worldMap.GetValue(new(pt.x - 1, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y)).actualVillage.VillageSize() > 1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x - 1, pt.y)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.N));
-                                }
-                                else if (worldMap.GetValue(new(pt.x - 1, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x - 1, pt.y)).actualVillage.VillageSize() > 2)
-                                {
-                                    if (worldMap.GetValue(new(pt.x - 1, pt.y + 1)).ActualBuildings ==
-                                        Building.Barrack
-                                        && worldMap.GetValue(new(pt.x - 1, pt.y)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.N));
-                                }
-
-                        if (!worldMap.IsVoid(new(pt.x + 1, pt.y + 1)) &&
-                            !worldMap.IsVoid(new(pt.x + 1, pt.y)))
-                            if (worldMap.GetValue(pt).parentCunk.rotation != Rotation.S)
-                                if (!worldMap.GetValue(new(pt.x + 1, pt.y + 1)).HaveBuilding() &&
-                                    !worldMap.GetValue(new(pt.x + 1, pt.y)).HaveBuilding())
-                                {
-                                    chunkSlots.Add(new(pt, Rotation.S));
-                                }
-                                else if (worldMap.GetValue(new(pt.x + 1, pt.y + 1)).HaveBuilding() &&
-                                         !worldMap.GetValue(new(pt.x + 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y + 1)).actualVillage.VillageSize() >
-                                         1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x + 1, pt.y + 1)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.S));
-                                }
-                                else if (!worldMap.GetValue(new(pt.x + 1, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y)).actualVillage.VillageSize() > 1)
-                                {
-                                    if (worldMap.GetValue(new(pt.x + 1, pt.y)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.S));
-                                }
-                                else if (worldMap.GetValue(new(pt.x + 1, pt.y + 1)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y)).HaveBuilding() &&
-                                         worldMap.GetValue(new(pt.x + 1, pt.y)).actualVillage.VillageSize() > 2)
-                                {
-                                    if (worldMap.GetValue(new(pt.x + 1, pt.y + 1)).ActualBuildings ==
-                                        Building.Barrack
-                                        && worldMap.GetValue(new(pt.x + 1, pt.y)).ActualBuildings ==
-                                        Building.Barrack)
-                                        chunkSlots.Add(new(pt, Rotation.S));
-                                }
-                    }
+                    chunkSlots.Add(pr);
                 }
             }
 
             return chunkSlots.ToArray();
         }
 
+        public void AddCell(Chunk c, PointRotation p, Vector2Int left, Vector2Int right)
+        {
+
+            worldMap.Add(c.Coords[1], left);
+            worldMap.Add(c.Coords[2], right);
+            worldMap.Add(c.Coords[0], p.point);
+        }
 
         public void AddChunk(Chunk c, Player player, PointRotation p)
         {
             PointRotation[] points = GetChunkSlots();
             List<PointRotation> pointsdispo = points.ToList();
-            if (pointsdispo.Contains(p))
+            if (!pointsdispo.Contains(p))
                 return;
-            if (p.point.x % 2 == 0)
-            {
-                if (p.rotation == Rotation.N)
-                {
-                    worldMap.Add(c.Coords[1], new(p.point.x - 1, p.point.y));
-                    worldMap.Add(c.Coords[2], new(p.point.x - 1, p.point.y - 1));
-                }
-                else if (p.rotation == Rotation.S)
-                {
-                    worldMap.Add(c.Coords[1], new(p.point.x + 1, p.point.y - 1));
-                    worldMap.Add(c.Coords[2], new(p.point.x + 1, p.point.y));
-                }
-                else if (p.rotation == Rotation.NE)
-                {
-                    worldMap.Add(c.Coords[1], new(p.point.x, p.point.y + 1));
-                    worldMap.Add(c.Coords[2], new(p.point.x - 1, p.point.y));
-                }
-                else if (p.rotation == Rotation.SE)
-                {
-                    worldMap.Add(c.Coords[1], new(p.point.x + 1, p.point.y));
-                    worldMap.Add(c.Coords[2], new(p.point.x, p.point.y + 1));
-                }
-                else if (p.rotation == Rotation.SW)
-                {
-                    worldMap.Add(c.Coords[1], new(p.point.x, p.point.y - 1));
-                    worldMap.Add(c.Coords[2], new(p.point.x + 1, p.point.y - 1));
-                }
-                else if (p.rotation == Rotation.NW)
-                {
-                    worldMap.Add(c.Coords[1], new(p.point.x - 1, p.point.y - 1));
-                    worldMap.Add(c.Coords[2], new(p.point.x, p.point.y - 1));
-                }
 
-                worldMap.Add(c.Coords[0], p.point);
-            }
-            else
-            {
-                if (p.rotation == Rotation.N)
-                {
-                    worldMap.Add(c.Coords[1], new(p.point.x - 1, p.point.y + 1));
-                    worldMap.Add(c.Coords[2], new(p.point.x - 1, p.point.y));
-                }
-                else if (p.rotation == Rotation.S)
-                {
-                    worldMap.Add(c.Coords[1], new(p.point.x + 1, p.point.y));
-                    worldMap.Add(c.Coords[2], new(p.point.x + 1, p.point.y + 1));
-                }
-                else if (p.rotation == Rotation.NE)
-                {
-                    worldMap.Add(c.Coords[1], new(p.point.x, p.point.y + 1));
-                    worldMap.Add(c.Coords[2], new(p.point.x - 1, p.point.y + 1));
-                }
-                else if (p.rotation == Rotation.SE)
-                {
-                    worldMap.Add(c.Coords[1], new(p.point.x + 1, p.point.y + 1));
-                    worldMap.Add(c.Coords[2], new(p.point.x, p.point.y + 1));
-                }
-                else if (p.rotation == Rotation.SW)
-                {
-                    worldMap.Add(c.Coords[1], new(p.point.x, p.point.y - 1));
-                    worldMap.Add(c.Coords[2], new(p.point.x + 1, p.point.y));
-                }
-                else if (p.rotation == Rotation.NW)
-                {
-                    worldMap.Add(c.Coords[1], new(p.point.x - 1, p.point.y));
-                    worldMap.Add(c.Coords[2], new(p.point.x, p.point.y - 1));
-                }
+            Vector2Int[] neighbors = GetNeighbors(p.point);
 
-                worldMap.Add(c.Coords[0], p.point);
+            if (p.rotations[(int)Rotation.N]) {
+                AddCell(c, p, neighbors[0], neighbors[5]);
+            } else if (p.rotations[(int)Rotation.S]) {
+                AddCell(c, p, neighbors[3], neighbors[2]);
+            } else if (p.rotations[(int)Rotation.NE]) {
+                AddCell(c, p, neighbors[1], neighbors[0]);
+            } else if (p.rotations[(int)Rotation.SE]) {
+                AddCell(c, p, neighbors[2], neighbors[1]);
+            } else if (p.rotations[(int)Rotation.SW]) {
+                AddCell(c, p, neighbors[4], neighbors[3]);
+            } else if (p.rotations[(int)Rotation.NW]) {
+                AddCell(c, p, neighbors[5], neighbors[4]);
             }
         }
 
 
         public void PlaceBuilding(Cell c, Vector2Int coord, Building b, Player player)
         {
-            switch (b)
-            {
+            switch (b) {
                 case Building.Barrack:
                     Vector2Int[] pointsB = GetBarrackSlots(player);
                     List<Vector2Int> dispoB = pointsB.ToList();
-                    if (dispoB.Contains(coord))
-                    {
+                    if (dispoB.Contains(coord)) {
                         worldMap.Add(c, coord);
                         player.nbBarrack--;
                     }
@@ -723,8 +203,7 @@ namespace Taluva.Model
                 case Building.Temple:
                     Vector2Int[] pointsTe = GetTempleSlot(player);
                     List<Vector2Int> dispoTe = pointsTe.ToList();
-                    if (dispoTe.Contains(coord))
-                    {
+                    if (dispoTe.Contains(coord)) {
                         worldMap.Add(c, coord);
                         player.nbTemple--;
                     }
@@ -733,8 +212,7 @@ namespace Taluva.Model
                 case Building.Tower:
                     Vector2Int[] pointsTo = GetTowerSlots(player);
                     List<Vector2Int> dispoTo = pointsTo.ToList();
-                    if (dispoTo.Contains(coord))
-                    {
+                    if (dispoTo.Contains(coord)) {
                         worldMap.Add(c, coord);
                         player.nbTowers--;
                     }
@@ -747,8 +225,7 @@ namespace Taluva.Model
 
         public void RemoveChunk(Chunk c)
         {
-            foreach (Cell cell in c.Coords)
-            {
+            foreach (Cell cell in c.Coords) {
                 worldMap.Remove(GetCellCoord(cell));
             }
         }
@@ -756,12 +233,10 @@ namespace Taluva.Model
         public Vector2Int[] GetBarrackSlots(Player actualPlayer)
         {
             List<Vector2Int> barrackSlots = new();
-            foreach (Cell c in worldMap)
-            {
+            foreach (Cell c in worldMap) {
                 Vector2Int p = GetCellCoord(c);
                 if (!worldMap.IsVoid(new(p.x, p.y)) && worldMap.GetValue(p).ActualBuildings == Building.None &&
-                    worldMap.GetValue(p).Owner == actualPlayer.ID)
-                {
+                    worldMap.GetValue(p).Owner == actualPlayer.ID) {
                     barrackSlots.Add(new(p.x, p.y));
                 }
             }
@@ -772,21 +247,16 @@ namespace Taluva.Model
         public Vector2Int[] GetTowerSlots(Player actualPlayer)
         {
             List<Vector2Int> towerSlots = new();
-            foreach (Cell c in worldMap)
-            {
+            foreach (Cell c in worldMap) {
                 Vector2Int p = GetCellCoord(c);
                 if (!worldMap.IsVoid(new(p.x, p.y)) && worldMap.GetValue(p).Owner == actualPlayer.ID &&
-                    worldMap.GetValue(p).ActualBuildings == Building.None)
-                {
+                    worldMap.GetValue(p).ActualBuildings == Building.None) {
                     // Cellule de niveau 3 ou plus 
-                    if (worldMap.GetValue(p).parentCunk.Level >= 3)
-                    {
+                    if (worldMap.GetValue(p).parentCunk.Level >= 3) {
                         // la cellule est adjacente à une cité du joueur actuel.
-                        if (IsAdjacentToCity(p, actualPlayer))
-                        {
+                        if (IsAdjacentToCity(p, actualPlayer)) {
                             // aucune autre tour est présente dans cette cité.
-                            if (!CityHasTower(p, actualPlayer))
-                            {
+                            if (!CityHasTower(p, actualPlayer)) {
                                 towerSlots.Add(new(p.x, p.y));
                             }
                         }
@@ -800,13 +270,10 @@ namespace Taluva.Model
         public bool IsAdjacentToCity(Vector2Int cellCoord, Player actualPlayer)
         {
             Cell cell = worldMap.GetValue(cellCoord);
-            if (cell != null && cell.actualVillage != null)
-            {
-                foreach (Cell neighbor in cell.actualVillage.neighbors)
-                {
+            if (cell != null && cell.actualVillage != null) {
+                foreach (Cell neighbor in cell.actualVillage.neighbors) {
                     if (neighbor != null && neighbor.Owner == actualPlayer.ID &&
-                        neighbor.ActualBuildings != Building.None)
-                    {
+                        neighbor.ActualBuildings != Building.None) {
                         return true;
                     }
                 }
@@ -834,13 +301,10 @@ namespace Taluva.Model
         public bool CityHasTower(Vector2Int cellCoord, Player actualPlayer)
         {
             Cell cell = worldMap.GetValue(cellCoord);
-            if (cell != null && cell.actualVillage != null)
-            {
-                foreach (Cell neighbor in cell.actualVillage.neighbors)
-                {
+            if (cell != null && cell.actualVillage != null) {
+                foreach (Cell neighbor in cell.actualVillage.neighbors) {
                     if (neighbor != null && neighbor.Owner == actualPlayer.ID &&
-                        neighbor.ActualBuildings == Building.Tower)
-                    {
+                        neighbor.ActualBuildings == Building.Tower) {
                         return true;
                     }
                 }
@@ -852,10 +316,8 @@ namespace Taluva.Model
         public Vector2Int[] GetTempleSlot(Player actualPlayer)
         {
             List<Vector2Int> templeSlots = new();
-            foreach (Cell cell in worldMap)
-            {
-                if (CanBuildTemple(cell, actualPlayer))
-                {
+            foreach (Cell cell in worldMap) {
+                if (CanBuildTemple(cell, actualPlayer)) {
                     templeSlots.Add(GetCellCoord(cell));
                 }
             }
@@ -865,45 +327,40 @@ namespace Taluva.Model
 
         public bool CanBuildTemple(Cell cell, Player actualPlayer)
         {
-            if (cell.ActualBuildings != Building.None)
-            {
+            if (cell.ActualBuildings != Building.None) {
                 return false;
             }
 
             Vector2Int[] pts = GetAdjacentPositions(GetCellCoord(cell));
             bool v = false;
             Vector2Int pv = new();
-            foreach (Vector2Int p in pts)
-            {
+            foreach (Vector2Int p in pts) {
                 if (worldMap.IsVoid(p) || worldMap.GetValue(p).actualVillage == null)
                     continue;
-                else
-                {
+                else {
                     v = true;
                     pv = p;
                     break;
                 }
             }
 
-            if (!v)
-            {
+            if (!v) {
                 return false;
             }
 
             if (worldMap.GetValue(pv).actualVillage.VillageSize() < 3
                 && worldMap.GetValue(pv).Owner != actualPlayer.ID &&
-                !VillageHasTemple(worldMap.GetValue(pv).actualVillage))
+                !CityHasTemple(worldMap.GetValue(pv).actualVillage))
                 return false;
 
             return true;
         }
 
-        public bool VillageHasTemple(Village village)
+        public bool CityHasTemple(Village village)
         {
             List<Cell> cells = new();
             List<Cell> visited = new();
-            foreach (Cell? c in village.neighbors)
-            {
+            foreach (Cell? c in village.neighbors) {
                 if (c == null || !c.HaveBuilding())
                     continue;
                 if (c.ActualBuildings == Building.Temple)
@@ -913,13 +370,11 @@ namespace Taluva.Model
 
             visited.Add(village.currentCell);
 
-            while (cells.Count != 0)
-            {
+            while (cells.Count != 0) {
                 Cell cell = cells[0];
                 cells.Remove(cell);
                 visited.Add(cell);
-                foreach (Cell? c in cell.actualVillage.neighbors)
-                {
+                foreach (Cell? c in cell.actualVillage.neighbors) {
                     if (c == null || !c.HaveBuilding() || visited.Contains(c))
                         continue;
                     cells.Add(c);
@@ -934,11 +389,9 @@ namespace Taluva.Model
 
         private Vector2Int GetCellCoord(Cell c)
         {
-            for (int i = worldMap.MinLine; i <= worldMap.MaxLine; i++)
-            {
+            for (int i = worldMap.MinLine; i <= worldMap.MaxLine; i++) {
                 if (worldMap.ContainsLine(i))
-                    for (int j = worldMap.MinColumn(i); j <= worldMap.MaxColumn(i); j++)
-                    {
+                    for (int j = worldMap.MinColumn(i); j <= worldMap.MaxColumn(i); j++) {
                         if (worldMap.ContainsColumn(i, j))
                             return new(i, j);
                     }

@@ -1,11 +1,12 @@
 using NUnit.Framework;
+using UnityEngine;
 
 using Taluva.Utils;
 
 namespace TestsTaluva
 {
     [TestFixture]
-    internal class TestDynamicMatrix
+    public class TestDynamicMatrix
     {
         private DynamicMatrix<string> _matrix;
 
@@ -51,6 +52,47 @@ namespace TestsTaluva
 
             Assert.AreEqual("L", _matrix.GetValue(new(0, 0)));
             Assert.AreEqual("K", _matrix.GetValue(new(1, 0)));
+        }
+
+        [Test]
+        public void TestRemove()
+        {
+            Assert.IsTrue(_matrix.Remove(new Vector2Int(0, 0)));
+            Assert.IsTrue(_matrix.IsVoid(new Vector2Int(0, 0)));
+
+            Assert.IsFalse(_matrix.Remove(new Vector2Int(5, 5)));
+        }
+
+        [Test]
+        public void TestEmpty()
+        {
+            DynamicMatrix<string> tmp = new();
+
+            Assert.IsTrue( tmp.IsEmpty());
+
+            tmp.Add("A", new Vector2Int(0, 0));
+
+            Assert.IsFalse( tmp.IsEmpty());
+
+            tmp.Remove(new Vector2Int(0, 0));
+
+            Assert.IsTrue(tmp.IsEmpty());
+        }
+
+        [Test]
+        public void TestBorn()
+        {
+            Assert.AreEqual(_matrix.MinLine, 0);
+            Assert.AreEqual(_matrix.MaxLine, 1);
+
+            Assert.AreEqual(_matrix.MaxColumn(0), 1);
+            Assert.AreEqual(_matrix.MinColumn(0), 0);
+        }
+
+        [Test]
+        public void TestContains()
+        {
+            Assert.IsTrue(_matrix.ContainsLine(0));
         }
     }
 }
