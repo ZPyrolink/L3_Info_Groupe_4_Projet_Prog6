@@ -1,16 +1,14 @@
 using System;
 
 using Taluva.Model;
-using Taluva.Utils;
 
 using UnityEngine;
 using UnityEngine.UI;
 
-using UnityUtils.GameObjects;
-
 using Utils;
 
 using GameObject = UnityEngine.GameObject;
+// using Outline = Imports.QuickOutline.Scripts.Outline;
 using Random = UnityEngine.Random;
 
 namespace UI
@@ -105,7 +103,7 @@ namespace UI
         private float _defaultBuildsY;
 
         [SerializeField]
-        private GameObject menuCanva; 
+        private GameObject menuCanva;
 
         [Header("Debug keys")]
         [SerializeField]
@@ -154,7 +152,6 @@ namespace UI
             Phase = 1;
             NbTiles = nbTilesPerPlayers * players.Length;
             _defaultBuildsY = builds.transform.GetChild(0).GetComponent<RectTransform>().anchoredPosition.y;
-            UpBuild(0);
         }
 
         private void Update()
@@ -170,7 +167,7 @@ namespace UI
 
             if (Input.GetKeyDown(phase2))
                 Phase = 2;
-            
+
             if (Input.GetKeyDown(menu))
                 ToggleMenu();
         }
@@ -224,6 +221,7 @@ namespace UI
             tile.SetActive(false);
             builds.SetActive(true);
             NbTiles--;
+            UpBuild(0);
         }
 
         public void Undo() => Phase--;
@@ -241,10 +239,17 @@ namespace UI
         {
             RectTransform child;
             foreach (Transform t in builds.transform)
-                (child = t.GetComponent<RectTransform>()).anchoredPosition = child.anchoredPosition.With(y: _defaultBuildsY);
+            {
+                child = t.GetComponent<RectTransform>();
+                child.anchoredPosition = child.anchoredPosition.With(y: _defaultBuildsY);
+                // t.GetComponentInChildren<Outline>().OutlineMode = Outline.Mode.OutlineHidden;
+            }
 
             child = builds.transform.GetChild(i).GetComponent<RectTransform>();
             child.anchoredPosition = child.anchoredPosition.With(y: 20);
+            // Outline outline = child.GetComponentInChildren<Outline>();
+            // outline.OutlineMode = Outline.Mode.OutlineVisible;
+            // outline.OutlineColor = CurrentPlayer.Color;
         }
     }
 }
