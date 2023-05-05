@@ -5,7 +5,7 @@ using Taluva.Utils;
 namespace TestsTaluva
 {
     [TestFixture]
-    public class TestDynamicMatrix
+    internal class TestDynamicMatrix
     {
         private DynamicMatrix<string> _matrix;
 
