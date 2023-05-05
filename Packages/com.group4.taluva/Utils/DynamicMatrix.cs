@@ -27,6 +27,7 @@ namespace Taluva.Utils
         public bool ContainsLine(int line) => matrix.ContainsKey(line);
 
         public bool ContainsColumn(int line, int column) => matrix[line].ContainsKey(column);
+        public bool ContainsColumn(Vector2Int p) => matrix[p.x].ContainsKey(p.y);
 
         public void Add(T value, Vector2Int coordonees)
         {
@@ -47,7 +48,17 @@ namespace Taluva.Utils
 
         }
 
-        public bool Remove(Vector2Int p) => matrix[p.x].Remove(p.y);
+        public bool Remove(Vector2Int p) {
+            bool remove = false;
+            if(ContainsLine(p.x))
+                if(ContainsColumn(p))
+                    remove = matrix[p.x].Remove(p.y);
+
+            if(remove)
+                if (matrix[p.x].Count == 0)
+                    matrix.Remove(p.x);
+            return remove;
+        }
 
 
         public T GetValue(Vector2Int coordonnes) => matrix[coordonnes.x][coordonnes.y];
