@@ -85,7 +85,7 @@ namespace Taluva.Model
             return allVillages;
         }
 
-        private Vector2Int[] GetNeighbors(Vector2Int p)
+        public Vector2Int[] GetNeighbors(Vector2Int p)
         {
             Vector2Int[] neighborsCoord = new Vector2Int[6];
             int offset = 0;
