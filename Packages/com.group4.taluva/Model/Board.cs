@@ -111,11 +111,21 @@ namespace Taluva.Model
             int i = 0;
             bool previous = worldMap.IsVoid(neighbors[5]);
             foreach (Vector2Int neighbor in neighbors) {
-                possible[i] = previous && (previous = worldMap.IsVoid(neighbors[i]));
+                possible[i] = previous && (previous = worldMap.IsVoid(neighbor)) && IsConnected(neighbor);
                 i++;
             }
 
             return possible;
+        }
+
+        public bool IsConnected(Vector2Int p)
+        {
+            Vector2Int[] neighbors = GetNeighbors(p);
+            foreach (Vector2Int neighbor in neighbors) {
+                if(!worldMap.IsVoid(neighbor)) 
+                    return true;
+            }
+            return false;
         }
 
         public bool PossibleVolcano(Vector2Int left, Vector2Int right, Rotation r, Vector2Int pt)
