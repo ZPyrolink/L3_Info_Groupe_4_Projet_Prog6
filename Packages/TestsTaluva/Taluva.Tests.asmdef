@@ -1,21 +1,21 @@
 {
-  "name": "Taluva.Tests",
-  "rootNamespace": "TestsTaluva",
-  "references": [
-    "Taluva",
-
-    "Microsoft.NET.Test.Sdk",
-    "MSTest.TestAdapter",
-    "MSTest.TestFramework",
-    "coverlet.collector"
-  ],
-  "includePlatforms": [],
-  "excludePlatforms": [],
-  "allowUnsafeCode": false,
-  "overrideReferences": false,
-  "precompiledReferences": [],
-  "autoReferenced": true,
-  "defineConstraints": [],
-  "versionDefines": [],
-  "noEngineReferences": false
+    "name": "Taluva.Tests",
+    "rootNamespace": "TestsTaluva",
+    "references": [
+        "Taluva"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
 }
