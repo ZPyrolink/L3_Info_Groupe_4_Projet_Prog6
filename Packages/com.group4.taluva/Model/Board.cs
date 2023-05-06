@@ -110,17 +110,17 @@ namespace Taluva.Model
 
         public bool PossibleVolcano(Vector2Int left, Vector2Int right, Rotation r, Vector2Int pt)
         {
-            int level = WorldMap.GetValue(pt).parentCunk.Level;
+            int level = WorldMap.GetValue(pt).ParentCunk.Level;
 
             if (WorldMap.IsVoid(left) || WorldMap.IsVoid(right))
                 return false;
 
             Cell leftCell = WorldMap.GetValue(left);
 
-            if (leftCell.parentCunk.Level != level || leftCell.parentCunk.Level != level)
+            if (leftCell.ParentCunk.Level != level || leftCell.ParentCunk.Level != level)
                 return false;
 
-            if (WorldMap.GetValue(pt).parentCunk.rotation == r)
+            if (WorldMap.GetValue(pt).ParentCunk.rotation == r)
                 return false;
 
             Cell rightCell = WorldMap.GetValue(right);
@@ -307,7 +307,7 @@ namespace Taluva.Model
         public Vector2Int[] GetTowerSlots(Player actualPlayer) => WorldMap
             .Select(GetCellCoord)
             .Where(p => !WorldMap.IsVoid(p) && WorldMap.GetValue(p).ActualBuildings == Building.None)
-            .Where(p => WorldMap.GetValue(p).parentCunk.Level >= 3)
+            .Where(p => WorldMap.GetValue(p).ParentCunk.Level >= 3)
             .Where(p => IsAdjacentToCity(p, actualPlayer))
             .Where(p => !GetAllVillage(p)
                 .Where(village => WorldMap.GetValue(village[0]).Owner == actualPlayer.ID)

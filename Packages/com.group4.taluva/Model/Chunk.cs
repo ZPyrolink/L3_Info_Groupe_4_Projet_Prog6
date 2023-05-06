@@ -13,9 +13,9 @@ namespace Taluva.Model
 			this.Coords = new Cell[3];
 			this.Coords[0] = new(Biomes.Volcano, this);
 			this.Coords[1] = left;
-			left.parentCunk = this;
+			left.ParentCunk = this;
 			this.Coords[2] = right;
-			right.parentCunk = this;
+			right.ParentCunk = this;
 			this.Level = l;
 
 		}
