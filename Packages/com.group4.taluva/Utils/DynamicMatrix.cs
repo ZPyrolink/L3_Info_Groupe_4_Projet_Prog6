@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Text;
 using UnityEngine;
 
 namespace Taluva.Utils
@@ -85,32 +85,32 @@ namespace Taluva.Utils
 
         public bool IsEmpty() => matrix.Count == 0;
 
-        override
-            public string ToString()
+        
+            public override string ToString()
         {
-            string s = "";
+            StringBuilder s = new StringBuilder();
             bool pair = true;
 
             for (int i = MinLine; i <= MaxLine; i++)
             {
                 if (!pair)
-                    s += " ";
+                    s.Append(" ");
 
                 if (ContainsLine(i))
                     for (int j = MinColumn(i); j <= MaxColumn(i); j++)
                     {
                         if (ContainsColumn(i, j))
-                            s += matrix[i][j];
+                            s.Append(matrix[i][j]);
                         else
-                            s += " ";
-                        s += " ";
+                            s.Append(" ");
+                        s.Append(" ");
                     }
 
-                s += '\n';
+                s.Append("\n");
                 pair = !pair;
             }
 
-            return s;
+            return s.ToString();
         }
 
     }

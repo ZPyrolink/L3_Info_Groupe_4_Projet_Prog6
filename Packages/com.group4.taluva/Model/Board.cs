@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-
+using Codice.CM.Client.Differences;
 using Taluva.Utils;
 
 using UnityEngine;
@@ -9,7 +10,7 @@ namespace Taluva.Model
 {
     public class Board
     {
-        private readonly DynamicMatrix<Cell> worldMap;
+        public readonly DynamicMatrix<Cell> worldMap;
 
         public Board()
         {
@@ -112,7 +113,7 @@ namespace Taluva.Model
             Vector2Int previous = neighbors[5];
             foreach (Vector2Int neighbor in neighbors) {
                 possible[i] = worldMap.IsVoid(previous) && worldMap.IsVoid(neighbor) && 
-                    (IsConnected(neighbor) || IsConnected(previous));
+                    (IsConnected(neighbor) || IsConnected(previous) || IsConnected(p));
                 previous = neighbor;
                 i++;
             }
@@ -187,13 +188,20 @@ namespace Taluva.Model
                     }
                 }
 
-                slots = slots.Distinct().ToList();
-
+                List<Vector2Int> distinctSlots = slots.Distinct().ToList();
+                List<Vector2Int> pointRemove = new();
 
                 //Recherche des points dans l'eau pouvant placer un chunk dans au moins une position
-                foreach (Vector2Int pt in slots) {
-                    if (worldMap.GetValue(pt).ActualBiome == Biomes.Volcano)
-                        continue;
+                foreach (Vector2Int pt in distinctSlots) {
+                    if(!worldMap.IsVoid(pt))
+                        if (worldMap.GetValue(pt).ActualBiome == Biomes.Volcano)
+                            continue;
+                        else
+                        {
+                            pointRemove.Add(pt);
+                            continue;
+                        }
+                            
 
                     bool[] rotations = GetPossibleRotation(pt);
                     PointRotation pr = new(pt);
@@ -203,11 +211,16 @@ namespace Taluva.Model
                             pr.AddRotation((Rotation)i);
                     }
                     chunkSlots.Add(pr);
-                    slots.Remove(pt);
+                    pointRemove.Add(pt);
+                }
+
+                foreach (Vector2Int pr in pointRemove)
+                {
+                    distinctSlots.Remove(pr);
                 }
 
                 //Recherche des points qui sont des volcans et qui permettent une position pour ecraser la map
-                foreach (Vector2Int pt in slots) {
+                foreach (Vector2Int pt in distinctSlots) {
 
                     neighbors = GetNeighbors(pt);
                     PointRotation pr = new(pt);
@@ -294,7 +307,7 @@ namespace Taluva.Model
         {
             switch (b) {
                 case Building.Barrack:
-                    Vector2Int[] pointsB = GetBarrackSlots(player);
+                    Vector2Int[] pointsB = GetBarrackSlots();
                     List<Vector2Int> dispoB = pointsB.ToList();
                     if (dispoB.Contains(coord)) {
                         worldMap.Add(c, coord);
@@ -332,13 +345,12 @@ namespace Taluva.Model
             }
         }
 
-        public Vector2Int[] GetBarrackSlots(Player actualPlayer)
+        public Vector2Int[] GetBarrackSlots()
         {
             List<Vector2Int> barrackSlots = new();
             foreach (Cell c in worldMap) {
                 Vector2Int p = GetCellCoord(c);
-                if (!worldMap.IsVoid(p) && worldMap.GetValue(p).ActualBuildings == Building.None &&
-                    worldMap.GetValue(p).Owner == actualPlayer.ID) {
+                if (!worldMap.IsVoid(p) && worldMap.GetValue(p).ActualBuildings == Building.None && worldMap.GetValue(p).ActualBiome != Biomes.Volcano) {
                     barrackSlots.Add(p);
                 }
             }
@@ -473,17 +485,23 @@ namespace Taluva.Model
             return false;
         }
 
-        private Vector2Int GetCellCoord(Cell c)
+        public Vector2Int GetCellCoord(Cell c)
         {
-            for (int i = worldMap.MinLine; i <= worldMap.MaxLine; i++) {
+            for (int i = worldMap.MinLine; i <= worldMap.MaxLine; i++)
+            {
                 if (worldMap.ContainsLine(i))
-                    for (int j = worldMap.MinColumn(i); j <= worldMap.MaxColumn(i); j++) {
-                        if (worldMap.ContainsColumn(i, j))
-                            return new(i, j);
+                {
+                    for (int j = worldMap.MinColumn(i); j <= worldMap.MaxColumn(i); j++)
+                    {
+                        if (worldMap.ContainsColumn(i, j) && worldMap.GetValue(new Vector2Int(i, j)) == c)
+                        {
+                            return new Vector2Int(i, j);
+                        }
                     }
+                }
             }
 
-            throw new($"Cell {c} not found!");
+            throw new Exception($"Cell {c} not found!");
         }
     }
 }
