@@ -169,9 +169,9 @@ void Place(string[] s)
     if (rg.IsMatch(s[1]) && rg.IsMatch(s[2]) && rg.IsMatch(s[3]) && rg.IsMatch(s[4]))     //Coordinate conversion
     {
         x = int.Parse(s[1]);
-        y = int.Parse(s[1]);
-        z = int.Parse(s[1]);
-        k = int.Parse(s[1]);
+        y = int.Parse(s[2]);
+        z = int.Parse(s[3]);
+        k = int.Parse(s[4]);
         Vector2Int p = new Vector2Int(x, y);
         Cell c = b.worldMap.GetValue(p);
         if (z == 0)
