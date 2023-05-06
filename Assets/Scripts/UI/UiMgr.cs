@@ -3,6 +3,7 @@ using System;
 using Taluva.Model;
 
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 using Utils;
@@ -15,58 +16,6 @@ namespace UI
 {
     public class UiMgr : MonoBehaviour
     {
-        [Serializable]
-        public class Player
-        {
-            [SerializeField]
-            private string name;
-
-            public string Name => name;
-
-            [SerializeField]
-            private Color color;
-
-            public Color Color => color;
-
-            [SerializeField]
-            private int[] builds;
-
-            public int[] Builds => builds;
-
-            public Player(string name, Color color, int[] builds)
-            {
-                this.name = name;
-                this.color = color;
-                this.builds = builds;
-            }
-        }
-
-        [SerializeField]
-        private Player[] players =
-        {
-            new("P1", PlayerColor.Red.GetColor(), new[] { 0, 1, 2 }),
-            new("P2", PlayerColor.Green.GetColor(), new[] { 1, 1, 2 }),
-            new("P3", PlayerColor.Blue.GetColor(), new[] { 2, 1, 2 }),
-            new("P4", PlayerColor.Yellow.GetColor(), new[] { 3, 1, 2 })
-        };
-
-        [SerializeField]
-        private int currentPlayerIndex;
-
-        public int CurrentPlayerIndex
-        {
-            get => currentPlayerIndex;
-            set
-            {
-                if (value >= players.Length)
-                    currentPlayerIndex = 0;
-                else if (value < 0)
-                    currentPlayerIndex = players.Length - 1;
-                else
-                    currentPlayerIndex = value;
-            }
-        }
-
         [SerializeField]
         private Text uiNbTiles;
 
@@ -86,8 +35,6 @@ namespace UI
                 uiNbTiles.text = NB_TILES_PLACEHOLDER.Replace("%nb%", value.ToString());
             }
         }
-
-        private Player CurrentPlayer => players[currentPlayerIndex];
 
         [SerializeField]
         private GameObject playerPrefab;
@@ -150,7 +97,7 @@ namespace UI
         private void Start()
         {
             Phase = 1;
-            NbTiles = nbTilesPerPlayers * players.Length;
+            NbTiles = nbTilesPerPlayers * PlayerMgr.Instance.Length;
             _defaultBuildsY = builds.transform.GetChild(0).GetComponent<RectTransform>().anchoredPosition.y;
         }
 
@@ -175,18 +122,22 @@ namespace UI
         // Start is called before the first frame update
         private void OnGUI()
         {
-            for (int i = 0; i < players.Length; i++)
+            for (int i = 0; i < PlayerMgr.Instance.Length; i++)
             {
                 _guis[i] ??= Instantiate(playerPrefab, transform);
 
-                _guis[i].GetComponent<Image>().color = i == currentPlayerIndex ? Color.white : new(.75f, .75f, .75f);
+                _guis[i].GetComponent<Image>().color =
+                    i == PlayerMgr.Instance.CurrentIndex ? Color.white : new(.75f, .75f, .75f);
 
-                _guis[i].transform.GetChild(0).GetComponent<Text>().text = players[i].Name;
-                _guis[i].transform.GetChild(1).GetComponent<Image>().color = players[i].Color;
+                _guis[i].transform.GetChild(0).GetComponent<Text>().text = PlayerMgr.Instance[i].Name;
+                _guis[i].transform.GetChild(1).GetComponent<Image>().color = PlayerMgr.Instance[i].Color;
 
-                _guis[i].transform.GetChild(2).GetComponentInChildren<Text>().text = players[i].Builds[0].ToString();
-                _guis[i].transform.GetChild(3).GetComponentInChildren<Text>().text = players[i].Builds[1].ToString();
-                _guis[i].transform.GetChild(4).GetComponentInChildren<Text>().text = players[i].Builds[2].ToString();
+                _guis[i].transform.GetChild(2).GetComponentInChildren<Text>().text =
+                    PlayerMgr.Instance[i].Builds[0].ToString();
+                _guis[i].transform.GetChild(3).GetComponentInChildren<Text>().text =
+                    PlayerMgr.Instance[i].Builds[1].ToString();
+                _guis[i].transform.GetChild(4).GetComponentInChildren<Text>().text =
+                    PlayerMgr.Instance[i].Builds[2].ToString();
 
                 RectTransform rt = _guis[i].GetComponent<RectTransform>();
 
@@ -196,9 +147,9 @@ namespace UI
                 rt.anchoredPosition = new(-10, -10 - 110 * i);
             }
 
-            currentPlayerBuild[0].text = CurrentPlayer.Builds[0].ToString();
-            currentPlayerBuild[1].text = CurrentPlayer.Builds[1].ToString();
-            currentPlayerBuild[2].text = CurrentPlayer.Builds[2].ToString();
+            currentPlayerBuild[0].text = PlayerMgr.Instance.Current.Builds[0].ToString();
+            currentPlayerBuild[1].text = PlayerMgr.Instance.Current.Builds[1].ToString();
+            currentPlayerBuild[2].text = PlayerMgr.Instance.Current.Builds[2].ToString();
         }
 
         #endregion
@@ -209,9 +160,10 @@ namespace UI
         {
             BiomeColor[] values = (BiomeColor[]) Enum.GetValues(typeof(BiomeColor));
             MeshRenderer mr = tile.transform.GetComponentInChildren<MeshRenderer>();
-            mr.materials[1].color = values[Random.Range(0, values.Length - 1)].GetColor();
-            mr.materials[2].color = values[Random.Range(0, values.Length - 1)].GetColor();
+
             mr.materials[3].color = values[Random.Range(0, values.Length - 1)].GetColor();
+            mr.materials[2].color = values[Random.Range(0, values.Length - 1)].GetColor();
+            mr.materials[0].color = values[Random.Range(0, values.Length - 1)].GetColor();
             tile.SetActive(true);
             builds.SetActive(false);
         }
@@ -227,8 +179,8 @@ namespace UI
         public void Undo() => Phase--;
         public void Redo() => Phase++;
 
-        private void NextPlayer() => CurrentPlayerIndex++;
-        private void PreviousPlayer() => CurrentPlayerIndex--;
+        private void NextPlayer() => PlayerMgr.Instance.CurrentIndex++;
+        private void PreviousPlayer() => PlayerMgr.Instance.CurrentIndex--;
 
         public void ToggleMenu()
         {

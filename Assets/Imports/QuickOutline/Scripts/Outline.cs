@@ -15,6 +15,7 @@ using UnityEngine;
 namespace Imports.QuickOutline.Scripts
 {
     [DisallowMultipleComponent]
+    [AddComponentMenu("Quick Outline")]
     public class Outline : MonoBehaviour
     {
         private static HashSet<Mesh> registeredMeshes = new();
