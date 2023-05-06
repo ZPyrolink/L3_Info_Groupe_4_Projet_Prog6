@@ -3,13 +3,12 @@ using System;
 using Taluva.Model;
 
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 using Utils;
 
 using GameObject = UnityEngine.GameObject;
-// using Outline = Imports.QuickOutline.Scripts.Outline;
+using Outline = Imports.QuickOutline.Scripts.Outline;
 using Random = UnityEngine.Random;
 
 namespace UI
@@ -194,14 +193,14 @@ namespace UI
             {
                 child = t.GetComponent<RectTransform>();
                 child.anchoredPosition = child.anchoredPosition.With(y: _defaultBuildsY);
-                // t.GetComponentInChildren<Outline>().OutlineMode = Outline.Mode.OutlineHidden;
+                t.GetComponentInChildren<Outline>().enabled = false;
             }
 
             child = builds.transform.GetChild(i).GetComponent<RectTransform>();
             child.anchoredPosition = child.anchoredPosition.With(y: 20);
-            // Outline outline = child.GetComponentInChildren<Outline>();
-            // outline.OutlineMode = Outline.Mode.OutlineVisible;
-            // outline.OutlineColor = CurrentPlayer.Color;
+            Outline outline = child.GetComponentInChildren<Outline>();
+            outline.enabled = true;
+            outline.OutlineColor = PlayerMgr.Instance.Current.Color;
         }
     }
 }
