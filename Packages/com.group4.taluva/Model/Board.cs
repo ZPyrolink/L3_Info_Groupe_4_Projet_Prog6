@@ -113,7 +113,7 @@ namespace Taluva.Model
             Vector2Int previous = neighbors[5];
             foreach (Vector2Int neighbor in neighbors) {
                 possible[i] = worldMap.IsVoid(previous) && worldMap.IsVoid(neighbor) && 
-                    (IsConnected(neighbor) || IsConnected(previous));
+                    (IsConnected(neighbor) || IsConnected(previous) || IsConnected(p));
                 previous = neighbor;
                 i++;
             }
