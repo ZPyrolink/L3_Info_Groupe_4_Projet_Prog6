@@ -42,7 +42,7 @@ namespace TestsTaluva
         [Test]
         public void TestAddChunk()
         {
-            DynamicMatrix<Cell> _map = _board.GetMatrix();
+            DynamicMatrix<Cell> _map = _board.WorldMap;
             
             Assert.IsFalse(_map.IsVoid(new(0,0)));
             Assert.IsFalse(_map.IsVoid(new(-1,-1)));
