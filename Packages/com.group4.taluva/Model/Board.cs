@@ -23,13 +23,12 @@ namespace Taluva.Model
             worldMap.Remove(p);
         }
 
-        public DynamicMatrix<Cell> GetMatrix()
-        {
-            return worldMap;
-        }
+        public DynamicMatrix<Cell> GetMatrix() => worldMap;
+        
 
         public List<Vector2Int> GetVillage(Vector2Int c)
         {
+            //The building at the c position is never a building.none
             List<Vector2Int> villagePositions = new();
 
             PlayerColor color = worldMap.GetValue(c).Owner;
