@@ -8,7 +8,7 @@ using UnityEngine;
 DynamicMatrix<String> matrix = new();
 Pile<Chunk> Pile = ListeChunk.Pile;
 Board b = new Board();
-
+Player p = new Player(PlayerColor.Red);
 //interpret commands
 Console.WriteLine("Enter a command : ");
 bool t = true;
@@ -32,7 +32,7 @@ void PlayParser(string[] s)
         pr = new PointRotation(new Vector2Int(x, y), r);
     }
             
-    Player p = new Player(PlayerColor.Red);
+    
     b.AddChunk(Pile.Draw(), p, pr);
     Console.WriteLine(b.worldMap);
             
@@ -53,7 +53,28 @@ void InterpretActions(string s)
             break;
         case "Play":
             PlayParser(splitted);
+            /*
+            PointRotation[] chunks = b.GetChunkSlots();
+            foreach (PointRotation p in chunks)
+            {
+                Console.WriteLine("x: " + p.point.x + ", y: " + p.point.y);
+                Console.WriteLine("Rotations possible pour ce point:");
+                for (int i = 0; i < p.rotations.Length; i++)
+                {
+                    if(p.rotations[i])
+                        Console.Write((Rotation)i + " ");
+                }
+                Console.WriteLine();
+            }
             Console.WriteLine("Play");
+            */
+            foreach (Cell c in b.worldMap)
+            {
+                Vector2Int tmp = b.GetCellCoord(c);
+                Console.WriteLine("Point : ");
+                Console.WriteLine(" x : " + tmp.x + " y : " + tmp.y);
+            }
+            Console.WriteLine("play");
             break;
         case "Quit":
             Console.WriteLine("Quit");
