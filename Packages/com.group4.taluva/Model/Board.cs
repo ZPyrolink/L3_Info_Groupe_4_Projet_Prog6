@@ -303,14 +303,16 @@ namespace Taluva.Model
         }
 
 
-        public void PlaceBuilding(Cell c, Vector2Int coord, Building b, Player player)
+        public void PlaceBuilding(Cell c, Building b, Player player)
         {
+            Vector2Int coord = GetCellCoord(c);
             switch (b) {
                 case Building.Barrack:
                     Vector2Int[] pointsB = GetBarrackSlots();
                     List<Vector2Int> dispoB = pointsB.ToList();
-                    if (dispoB.Contains(coord)) {
-                        worldMap.Add(c, coord);
+                    if (dispoB.Contains(coord))
+                    {
+                        worldMap.GetValue(coord).ActualBuildings = Building.Barrack;
                         player.nbBarrack--;
                     }
 
@@ -318,9 +320,10 @@ namespace Taluva.Model
                 case Building.Temple:
                     Vector2Int[] pointsTe = GetTempleSlot(player);
                     List<Vector2Int> dispoTe = pointsTe.ToList();
-                    if (dispoTe.Contains(coord)) {
-                        worldMap.Add(c, coord);
-                        player.nbTemple--;
+                    if (dispoTe.Contains(coord))
+                    {
+                        worldMap.GetValue(coord).ActualBuildings = Building.Temple;
+                        player.nbBarrack--;
                     }
 
                     break;
@@ -328,8 +331,8 @@ namespace Taluva.Model
                     Vector2Int[] pointsTo = GetTowerSlots(player);
                     List<Vector2Int> dispoTo = pointsTo.ToList();
                     if (dispoTo.Contains(coord)) {
-                        worldMap.Add(c, coord);
-                        player.nbTowers--;
+                        worldMap.GetValue(coord).ActualBuildings = Building.Tower;
+                        player.nbBarrack--;
                     }
 
                     break;
