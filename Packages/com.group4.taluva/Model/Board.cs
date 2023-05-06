@@ -180,65 +180,68 @@ namespace Taluva.Model
 
                 foreach (Vector2Int neighbor in neighbors) {
                     if (worldMap.IsVoid(neighbor)) {
-                        slots.Add(neighbor);
+                        if (!slots.Contains(neighbor))
+                            slots.Add(neighbor);
                         Vector2Int[] neighbors2 = GetNeighbors(neighbor);
                         foreach (Vector2Int neighbor2 in neighbors2)
                             if (worldMap.IsVoid(neighbor2))
-                                slots.Add(neighbor2);
+                                if (!slots.Contains(neighbor2))
+                                    slots.Add(neighbor2);
                     }
-                }
-
-                List<Vector2Int> distinctSlots = slots.Distinct().ToList();
-                List<Vector2Int> pointRemove = new();
-
-                //Recherche des points dans l'eau pouvant placer un chunk dans au moins une position
-                foreach (Vector2Int pt in distinctSlots) {
-                    if (!worldMap.IsVoid(pt))
-                        if (worldMap.GetValue(pt).ActualBiome == Biomes.Volcano)
-                            continue;
-                        else {
-                            pointRemove.Add(pt);
-                            continue;
-                        }
-
-
-                    bool[] rotations = GetPossibleRotation(pt);
-                    PointRotation pr = new(pt);
-
-                    for (int i = 0; i < rotations.Length; i++) {
-                        if (rotations[i])
-                            pr.AddRotation((Rotation)i);
-                    }
-                    chunkSlots.Add(pr);
-                    pointRemove.Add(pt);
-                }
-
-                foreach (Vector2Int pr in pointRemove) {
-                    distinctSlots.Remove(pr);
-                }
-
-                //Recherche des points qui sont des volcans et qui permettent une position pour ecraser la map
-                foreach (Vector2Int pt in distinctSlots) {
-
-                    neighbors = GetNeighbors(pt);
-                    PointRotation pr = new(pt);
-
-                    if (PossibleVolcano(neighbors[0], neighbors[1], Rotation.NE, pt))
-                        pr.AddRotation(Rotation.NE);
-                    if (PossibleVolcano(neighbors[1], neighbors[2], Rotation.SE, pt))
-                        pr.AddRotation(Rotation.SE);
-                    if (PossibleVolcano(neighbors[2], neighbors[3], Rotation.S, pt))
-                        pr.AddRotation(Rotation.S);
-                    if (PossibleVolcano(neighbors[3], neighbors[4], Rotation.SW, pt))
-                        pr.AddRotation(Rotation.SW);
-                    if (PossibleVolcano(neighbors[4], neighbors[5], Rotation.NW, pt))
-                        pr.AddRotation(Rotation.NW);
-                    if (PossibleVolcano(neighbors[5], neighbors[0], Rotation.N, pt))
-                        pr.AddRotation(Rotation.N);
-
-                    chunkSlots.Add(pr);
                 }
             }
+
+            List<Vector2Int> pointRemove = new();
+
+            //Recherche des points dans l'eau pouvant placer un chunk dans au moins une position
+            foreach (Vector2Int pt in slots) {
+                if (!worldMap.IsVoid(pt))
+                    if (worldMap.GetValue(pt).ActualBiome == Biomes.Volcano)
+                        continue;
+                    else {
+                        pointRemove.Add(pt);
+                        continue;
+                    }
+
+
+                bool[] rotations = GetPossibleRotation(pt);
+                PointRotation pr = new(pt);
+
+                for (int i = 0; i < rotations.Length; i++) {
+                    if (rotations[i])
+                        pr.AddRotation((Rotation)i);
+                }
+                chunkSlots.Add(pr);
+                pointRemove.Add(pt);
+            }
+
+            foreach (Vector2Int pr in pointRemove) {
+                slots.Remove(pr);
+            }
+
+            //Recherche des points qui sont des volcans et qui permettent une position pour ecraser la map
+            foreach (Vector2Int pt in slots) {
+
+                Vector2Int[] neighbors = GetNeighbors(pt);
+                PointRotation pr = new(pt);
+
+                if (PossibleVolcano(neighbors[0], neighbors[1], Rotation.NE, pt))
+                    pr.AddRotation(Rotation.NE);
+                if (PossibleVolcano(neighbors[1], neighbors[2], Rotation.SE, pt))
+                    pr.AddRotation(Rotation.SE);
+                if (PossibleVolcano(neighbors[2], neighbors[3], Rotation.S, pt))
+                    pr.AddRotation(Rotation.S);
+                if (PossibleVolcano(neighbors[3], neighbors[4], Rotation.SW, pt))
+                    pr.AddRotation(Rotation.SW);
+                if (PossibleVolcano(neighbors[4], neighbors[5], Rotation.NW, pt))
+                    pr.AddRotation(Rotation.NW);
+                if (PossibleVolcano(neighbors[5], neighbors[0], Rotation.N, pt))
+                    pr.AddRotation(Rotation.N);
+
+                if (pr.HaveRotation())
+                    chunkSlots.Add(pr);
+            }
+
 
             return chunkSlots.ToArray();
         }
@@ -367,7 +370,7 @@ namespace Taluva.Model
                                 if (worldMap.GetValue(village[0]).Owner == actualPlayer.ID)
                                     tower = CityHasTower(village);
                             }
-                            if(!tower)
+                            if (!tower)
                                 towerSlots.Add(p);
                         }
                     }

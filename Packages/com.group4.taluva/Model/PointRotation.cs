@@ -26,6 +26,23 @@ namespace Taluva.Model
 
         }
 
+        public bool RotationEquals(PointRotation rotations)
+        {
+            for(int i = 0;i < this.rotations.Length; i++) {
+                if (this.rotations[i] != rotations.rotations[i]) 
+                    return false;
+            }
+            return true;
+        }
+
+        public bool HaveRotation()
+        {
+            foreach(bool b in rotations)
+                if(b)
+                    return true;
+            return false;
+        }
+
         public void SetAllTrue()
         {
             for (int i = 0; i < rotations.Length; i++)
@@ -35,6 +52,36 @@ namespace Taluva.Model
         public void AddRotation(Rotation r)
         {
             rotations[(int)r] = true;
+        }
+
+        public string RotationString()
+        {
+            string s = "";
+            for(int i = 0; i < rotations.Length; i++)
+                if (rotations[i]) {
+                    switch ((Rotation)i) {
+                        case Rotation.N:
+                            s += "N";
+                            break;
+                        case Rotation.S:
+                            s += "S";
+                            break;
+                        case Rotation.NE:
+                            s += "NE";
+                            break;
+                        case Rotation.NW:
+                            s += "NW";
+                            break;
+                        case Rotation.SE:
+                            s += "SE";
+                            break;
+                        case Rotation.SW:
+                            s += "SW";
+                            break;
+                    }
+                    s += " ";
+                }
+            return s;    
         }
     }
 }

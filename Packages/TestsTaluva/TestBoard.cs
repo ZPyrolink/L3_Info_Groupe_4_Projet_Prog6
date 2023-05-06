@@ -61,28 +61,37 @@ namespace TestsTaluva
             {
                 new(new(-3, -2),new[]{false,false,true,true,false,false}),
                 new(new(-3, -1),new[]{false,false,true,true,true,false}),
-                new(new(-3, 0),new[]{false,false,true,true,true,false}),
-                new(new(-3, 1),new[]{false,false,false,true,true,false}),
-                
-                new(new(-2, -2),new[]{false,false,false,true,true,false}),
-                new(new(-2, 2),new[]{false,true,true,true,false,false}),
-                
+                new(new(-3, 0), new[]{false,false,true,true,true,false}),
+                new(new(-3, 1), new[]{false,false,false,true,true,false}),
+
+                new(new(-2, -2),new[]{false,true,true,true,false,false}),
+                new(new(-2, -1),new[]{true,true,false,false,true,true}),
+                new(new(-2, 0), new[]{true,true,false,false,false,true}),
+                new(new(-2, 1), new[]{true,true,true,false,false,true}),
+                new(new(-2, 2), new[]{false,false,false,true,true,true}),
+
                 new(new(-1, -3),new[]{false,true,true,false,false,false}),
-                new(new(-1, 2),new[]{false,false,false,false,true,true}),
-                
+                new(new(-1, -2),new[]{true,false,false,true,true,true}),
+                new(new(-1, 1), new[]{true,true,true,true,false,false}),
+                new(new(-1, 2), new[]{false,false,false,false,true,true}),
+
                 new(new(0, -2),new[]{true,true,true,false,false,false}),
-                new(new(0, 2),new[]{false,false,false,false,true,true}),
-                
+                new(new(0, -1),new[]{false,false,false,true,true,true}),
+                new(new(0, 1), new[]{false,true,true,true,false,false}),
+                new(new(0, 2), new[]{true,false,false,false,true,true}),
+
                 new(new(1, -2),new[]{true,true,true,false,false,false}),
-                new(new(1, 1),new[]{true,false,false,false,true,true}),
-                
+                new(new(1, -1),new[]{false,false,true,true,true,true}),
+                new(new(1, 0), new[]{false,true,true,true,true,false}),
+                new(new(1, 1), new[]{true,false,false,false,true,true}),
+
                 new(new(2, -1),new[]{true,true,false,false,false,false}),
-                new(new(2, 0),new[]{true,true,false,false,false,true}),
-                new(new(-2, 1),new[]{true,false,false,false,false,true})
+                new(new(2, 0), new[]{true,true,false,false,false,true}),
+                new(new(2, 1), new[]{true,false,false,false,false,true})
             };
             foreach (PointRotation pr in possible)
             {
-                Assert.IsTrue(neighbors.Exists(p => p.point.Equals(pr.point) && p.rotations.SequenceEqual(pr.rotations)));
+                Assert.IsTrue(neighbors.Exists(p => p.point.x == pr.point.x && p.point.y == p.point.y && p.RotationEquals(pr)));
             }
         }
         
