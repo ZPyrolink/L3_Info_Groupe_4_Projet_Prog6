@@ -6,7 +6,6 @@
         public Building ActualBuildings { get; set; }
         public PlayerColor Owner { get; set; }
 
-        public Village? actualVillage;
         public Chunk parentCunk;
 
         public Cell(Biomes biome, Chunk c)
@@ -32,7 +31,6 @@
         public void Build(Building building)
         {
             this.ActualBuildings = building;
-            this.actualVillage = new(this);
         }
         
         public override string ToString()
