@@ -71,10 +71,15 @@ namespace TestsTaluva
                     c.Build(Building.Barrack);
 
             foreach (Cell c in _cell) {
-                if (c.ActualBiome == Biomes.Volcano || c.ActualBiome == Biomes.None)
+                if (c.ActualBiome == Biomes.Volcano || c.ActualBiome == Biomes.None) {
                     Assert.AreEqual(c.ActualBuildings, Building.None);
-                else
+                    Assert.IsFalse(c.HaveBuilding());
+                }  
+                else {
                     Assert.AreEqual(c.ActualBuildings, Building.Barrack);
+                    Assert.IsTrue(c.HaveBuilding());
+                }   
+                Assert.IsFalse(c.IsBuildable);
             }
         }
 
@@ -89,10 +94,14 @@ namespace TestsTaluva
                     c.Build(Building.Tower);
 
             foreach (Cell c in _cell) {
-                if (c.ActualBiome == Biomes.Volcano || c.ActualBiome == Biomes.None)
+                if (c.ActualBiome == Biomes.Volcano || c.ActualBiome == Biomes.None) {
                     Assert.AreEqual(c.ActualBuildings, Building.None);
-                else
+                    Assert.IsFalse(c.HaveBuilding());
+                } else {
                     Assert.AreEqual(c.ActualBuildings, Building.Tower);
+                    Assert.IsTrue(c.HaveBuilding());
+                }
+                Assert.IsFalse(c.IsBuildable);
             }
         }
 
@@ -107,10 +116,14 @@ namespace TestsTaluva
                     c.Build(Building.Temple);
 
             foreach (Cell c in _cell) {
-                if (c.ActualBiome == Biomes.Volcano || c.ActualBiome == Biomes.None)
+                if (c.ActualBiome == Biomes.Volcano || c.ActualBiome == Biomes.None) {
                     Assert.AreEqual(c.ActualBuildings, Building.None);
-                else
+                    Assert.IsFalse(c.HaveBuilding());
+                } else {
                     Assert.AreEqual(c.ActualBuildings, Building.Temple);
+                    Assert.IsTrue(c.HaveBuilding());
+                }
+                Assert.IsFalse(c.IsBuildable);
             }
         }
     }
