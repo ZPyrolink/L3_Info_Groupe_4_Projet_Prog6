@@ -73,7 +73,8 @@ namespace Taluva.Model
             List<List<Vector2Int>> villages = new();
 
             for (int i = 0; i < neighbors.Length; i++) {
-                villages[i] = GetVillage(neighbors[i]);
+                if (!worldMap.IsVoid(neighbors[i]) && worldMap.GetValue(neighbors[i]).ActualBuildings != Building.None)
+                    villages.Add(GetVillage(neighbors[i]));
             }
             for (int i = 0; i < villages.Count; i++) {
                 for (int j = i; j < villages.Count; j++) {
