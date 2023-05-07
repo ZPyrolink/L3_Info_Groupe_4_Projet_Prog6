@@ -51,7 +51,7 @@ namespace UI
         [SerializeField]
         private GameObject menuCanva;
 
-        [Header("Debug keys")]
+        [Header("Debug")]
         [SerializeField]
         private KeyCode phase1 = KeyCode.Keypad1;
 
@@ -60,6 +60,12 @@ namespace UI
             nextPlayer = KeyCode.KeypadEnter,
             nextPhase = KeyCode.Return,
             menu = KeyCode.Escape;
+
+        [SerializeField]
+        private GameObject hexTile, boardParent;
+
+        [SerializeField]
+        private Vector3[] hexTilePositions;
 
         private sbyte _phase;
         private sbyte Phase
@@ -173,6 +179,10 @@ namespace UI
             builds.SetActive(true);
             NbTiles--;
             UpBuild(0);
+
+            ref Vector3 pos = ref hexTilePositions[Random.Range(0, hexTilePositions.Length)];
+            Instantiate(hexTile, pos, Quaternion.Euler(-90, 0, -90), boardParent.transform);
+            pos.y += 0.31f;
         }
 
         public void Undo() => Phase--;
