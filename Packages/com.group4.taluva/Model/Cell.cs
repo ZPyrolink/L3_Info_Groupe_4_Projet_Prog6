@@ -1,4 +1,6 @@
-﻿namespace Taluva.Model
+﻿using System;
+
+namespace Taluva.Model
 {
     public class Cell
     {
@@ -6,14 +8,13 @@
         public Building ActualBuildings { get; set; }
         public PlayerColor Owner { get; set; }
 
-        public Village? actualVillage;
-        public Chunk parentCunk;
+        public Chunk ParentCunk;
 
         public Cell(Biomes biome, Chunk c)
         {
             this.ActualBiome = biome;
             this.ActualBuildings = Building.None;
-            this.parentCunk = c;
+            this.ParentCunk = c;
         }
 
         public Cell(Biomes biome)
@@ -21,46 +22,26 @@
             this.ActualBiome = biome;
             this.ActualBuildings = Building.None;
         }
-
-        /// <summary>
-        /// <code>Playable => b;</code> reviens à écrire <code>Playable { get { return b } }</code>
-        /// </summary>
-        public bool IsPlayable =>
+        
+        public bool IsBuildable =>
             ActualBiome != Biomes.None && ActualBiome != Biomes.Volcano && ActualBuildings == Building.None;
-
-        public bool IsBuildable => ActualBiome != Biomes.Volcano && ActualBuildings == Building.None;
 
         public void Build(Building building)
         {
             this.ActualBuildings = building;
-            this.actualVillage = new(this);
         }
 
-        public string ToString(Cell c)
+        public override string ToString() => ActualBiome switch
         {
-            switch (c.ActualBiome)
-            {
-                case Biomes.Desert:
-                    return "D";
-                case Biomes.Forest:
-                    return "F";
-                case Biomes.Lake:
-                    return "L";
-                case Biomes.Mountain:
-                    return "M";
-                case Biomes.Plain:
-                    return "P";
-                case Biomes.Volcano:
-                    return "V";
-                default:
-                    return "";
-            }
-        }
+            Biomes.Desert => "D",
+            Biomes.Forest => "F",
+            Biomes.Lake => "L",
+            Biomes.Mountain => "M",
+            Biomes.Plain => "P",
+            Biomes.Volcano => "V",
+            _ => ""
+        };
 
-        public bool HaveBuilding() => !(this.ActualBuildings == Building.None);
-
-
-
-
+        public bool ContainsBuilding() => ActualBuildings != Building.None;
     }
 }
