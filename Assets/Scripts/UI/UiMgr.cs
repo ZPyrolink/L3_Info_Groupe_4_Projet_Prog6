@@ -15,6 +15,8 @@ namespace UI
 {
     public class UiMgr : MonoBehaviour
     {
+        public static UiMgr Instance { get; private set; }
+        
         [SerializeField]
         private Text uiNbTiles;
 
@@ -46,6 +48,8 @@ namespace UI
         [SerializeField]
         private GameObject tile, builds;
 
+        public GameObject CurrentTile => tile.transform.GetChild(0).gameObject;
+
         private float _defaultBuildsY;
 
         [SerializeField]
@@ -60,12 +64,6 @@ namespace UI
             nextPlayer = KeyCode.KeypadEnter,
             nextPhase = KeyCode.Return,
             menu = KeyCode.Escape;
-
-        [SerializeField]
-        private GameObject hexTile, boardParent;
-
-        [SerializeField]
-        private Vector3[] hexTilePositions;
 
         private sbyte _phase;
         private sbyte Phase
@@ -101,9 +99,10 @@ namespace UI
 
         private void Start()
         {
-            Phase = 1;
             NbTiles = nbTilesPerPlayers * PlayerMgr.Instance.Length;
+            Phase = 1;
             _defaultBuildsY = builds.transform.GetChild(0).GetComponent<RectTransform>().anchoredPosition.y;
+            Instance = this;
         }
 
         private void Update()
@@ -163,26 +162,30 @@ namespace UI
 
         private void Phase1()
         {
+            if (NbTiles == nbTilesPerPlayers * PlayerMgr.Instance.Length)
+                TilesMgr.Instance.SetFeedForward(Vector3.zero);
+            else
+                TilesMgr.Instance.SetFeedForward();
+            
             BiomeColor[] values = (BiomeColor[]) Enum.GetValues(typeof(BiomeColor));
+            CurrentTile.SetActive(true);
             MeshRenderer mr = tile.transform.GetComponentInChildren<MeshRenderer>();
 
             mr.materials[3].color = values[Random.Range(0, values.Length - 1)].GetColor();
             mr.materials[2].color = values[Random.Range(0, values.Length - 1)].GetColor();
             mr.materials[0].color = values[Random.Range(0, values.Length - 1)].GetColor();
+            
             tile.SetActive(true);
             builds.SetActive(false);
         }
 
         private void Phase2()
         {
+            TilesMgr.Instance.ValidateTile();
             tile.SetActive(false);
             builds.SetActive(true);
             NbTiles--;
             UpBuild(0);
-
-            ref Vector3 pos = ref hexTilePositions[Random.Range(0, hexTilePositions.Length)];
-            Instantiate(hexTile, pos, Quaternion.Euler(-90, 0, -90), boardParent.transform);
-            pos.y += 0.31f;
         }
 
         public void Undo() => Phase--;
