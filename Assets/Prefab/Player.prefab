@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 512997129364903729}
   - component: {fileID: 2790375412892592920}
   - component: {fileID: 1756097698435062568}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -91,7 +91,7 @@ GameObject:
   - component: {fileID: 6034335237928010246}
   - component: {fileID: 1207084672388277530}
   - component: {fileID: 1274358362212789084}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Img
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -167,7 +167,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1899254737164623308}
   - component: {fileID: 8645385487092596307}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: TempleNb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -215,7 +215,7 @@ GameObject:
   - component: {fileID: 6387768888558380325}
   - component: {fileID: 6809683749286500520}
   - component: {fileID: 2010151913240844695}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -295,7 +295,7 @@ GameObject:
   - component: {fileID: 7908465698594773765}
   - component: {fileID: 6594673885676550606}
   - component: {fileID: 1477137189849824139}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -374,7 +374,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4855242932706718270}
   - component: {fileID: 9086343150340555597}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: BarrackNb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -422,7 +422,7 @@ GameObject:
   - component: {fileID: 7431908513467563958}
   - component: {fileID: 6193358209330770462}
   - component: {fileID: 4448557422492072358}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Color
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -498,7 +498,7 @@ GameObject:
   - component: {fileID: 2227122050310641760}
   - component: {fileID: 5260193760224666536}
   - component: {fileID: 3693928142095257986}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -578,7 +578,7 @@ GameObject:
   - component: {fileID: 2247180971706378359}
   - component: {fileID: 4054104563303526870}
   - component: {fileID: 723581790912887848}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Img
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -654,7 +654,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1987992979825431146}
   - component: {fileID: 6470378821979855404}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: TowerNb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -702,7 +702,7 @@ GameObject:
   - component: {fileID: 6386601103297698455}
   - component: {fileID: 3573009511800064615}
   - component: {fileID: 9115425149625437803}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -783,7 +783,7 @@ GameObject:
   - component: {fileID: 947345234553759124}
   - component: {fileID: 8391487854862580465}
   - component: {fileID: 6212961074827886776}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Img
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -924,6 +924,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Tower
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 1bfe7bae8d80166468e94a363daf2bc5, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1bfe7bae8d80166468e94a363daf2bc5, type: 3}
 --- !u!4 &1369053349191134364 stripped
@@ -1036,6 +1040,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Hut
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 201d7437e6cfc2e43b34b300d8f41e34, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 201d7437e6cfc2e43b34b300d8f41e34, type: 3}
 --- !u!1 &2591823521855175409 stripped
@@ -1147,6 +1155,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 794f51dcf5464864e9689ecde6b5a02e, type: 3}
       propertyPath: m_Name
       value: Temple
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 794f51dcf5464864e9689ecde6b5a02e, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 794f51dcf5464864e9689ecde6b5a02e, type: 3}
