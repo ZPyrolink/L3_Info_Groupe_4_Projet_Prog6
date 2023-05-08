@@ -93,6 +93,8 @@ namespace TestsTaluva
             {
                 Assert.IsTrue(neighbors.Exists(p => p.point.x == pr.point.x && p.point.y == p.point.y && p.RotationEquals(pr)));
             }
+
+            Assert.AreEqual(neighbors.Count, possible.Length);
         }
         
     }

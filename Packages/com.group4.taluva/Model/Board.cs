@@ -214,7 +214,6 @@ namespace Taluva.Model
                     if (left < 0)
                         left = rotations.Length + left;
                     
-                    Debug.Log(left + " " + right);
                     
                     if (PossibleVolcano(neighbors[left], neighbors[right], r, pt))
                         pr.AddRotation(r);
