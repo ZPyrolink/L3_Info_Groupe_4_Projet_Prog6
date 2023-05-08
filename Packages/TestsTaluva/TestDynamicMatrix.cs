@@ -68,15 +68,15 @@ namespace TestsTaluva
         {
             DynamicMatrix<string> tmp = new();
 
-            Assert.IsTrue( tmp.IsEmpty());
+            Assert.IsTrue( tmp.Empty);
 
             tmp.Add("A", new Vector2Int(0, 0));
 
-            Assert.IsFalse( tmp.IsEmpty());
+            Assert.IsFalse( tmp.Empty);
 
             tmp.Remove(new Vector2Int(0, 0));
 
-            Assert.IsTrue(tmp.IsEmpty());
+            Assert.IsTrue(tmp.Empty);
         }
 
         [Test]
