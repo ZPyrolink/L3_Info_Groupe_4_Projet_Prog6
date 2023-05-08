@@ -50,9 +50,6 @@ public class PlayerMgr : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance is not null)
-            throw new();
-
         Instance = this;
     }
 }
