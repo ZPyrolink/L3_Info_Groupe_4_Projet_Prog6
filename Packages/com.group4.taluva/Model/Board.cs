@@ -270,7 +270,7 @@ namespace Taluva.Model
             void SetC()
             {
                 c.Owner = player.ID;
-                c.ActualBuildings = b;
+                c.Build(b);
             }
 
             switch (b)
