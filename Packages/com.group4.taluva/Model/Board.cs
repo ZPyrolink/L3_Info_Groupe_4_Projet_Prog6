@@ -234,7 +234,7 @@ namespace Taluva.Model
             WorldMap.Add(c.Coords[2], right);
         }
 
-        public void AddChunk(Chunk c, Player _, PointRotation p)
+        public void AddChunk(Chunk c, Player _, PointRotation p, Rotation r)
         {
             if (!GetChunkSlots()
                     .Where(pr => pr.point.Equals(p.point))
@@ -245,18 +245,20 @@ namespace Taluva.Model
 
             Vector2Int[] neighbors = GetNeighbors(p.point);
 
-            if (p.rotations[(int) Rotation.N])
+            if (p.rotations[(int) Rotation.N] && r == Rotation.N)
                 AddCell(c, p, neighbors[0], neighbors[5]);
-            else if (p.rotations[(int) Rotation.S])
+            else if (p.rotations[(int)Rotation.S] && r == Rotation.S)
                 AddCell(c, p, neighbors[3], neighbors[2]);
-            else if (p.rotations[(int) Rotation.NE])
+            else if (p.rotations[(int) Rotation.NE] && r == Rotation.NE)
                 AddCell(c, p, neighbors[1], neighbors[0]);
-            else if (p.rotations[(int) Rotation.SE])
+            else if (p.rotations[(int) Rotation.SE] && r == Rotation.SE)
                 AddCell(c, p, neighbors[2], neighbors[1]);
-            else if (p.rotations[(int) Rotation.SW])
+            else if (p.rotations[(int) Rotation.SW] && r == Rotation.SW)
                 AddCell(c, p, neighbors[4], neighbors[3]);
-            else if (p.rotations[(int) Rotation.NW])
+            else if (p.rotations[(int) Rotation.NW] && r == Rotation.NW)
                 AddCell(c, p, neighbors[5], neighbors[4]);
+
+            c.rotation = r;
         }
 
         public void PlaceBuilding(Cell c, Building b, Player player)
