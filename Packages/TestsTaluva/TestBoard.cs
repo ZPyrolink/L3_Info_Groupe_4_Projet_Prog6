@@ -23,7 +23,7 @@ namespace TestsTaluva
             _player2 = new(PlayerColor.Red);
             Chunk _chunk = new(1, new(Biomes.Desert), new(Biomes.Plain));
             PointRotation _pointRot = new(new(0,0),Rotation.N);
-            _board.AddChunk(_chunk,_player1,_pointRot);
+            _board.AddChunk(_chunk,_player1,_pointRot, Rotation.N);
         }
         
         [Test]
