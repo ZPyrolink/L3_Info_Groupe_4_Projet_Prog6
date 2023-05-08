@@ -202,6 +202,23 @@ namespace TestsTaluva
             possible = _board.GetTowerSlots(_player1);
             Assert.AreEqual(0, possible.Length);
         }
+
+        [Test]
+        public void TestGetCellCoord()
+        {
+            Cell c1 = new(Biomes.Forest);
+            Cell c2 = new(Biomes.Mountain);
+
+            Chunk _chunk = new(1, c1, c2);
+            PointRotation _pointRot = new(new(0, 1), Rotation.NE);
+            _board.AddChunk(_chunk, _player1, _pointRot, Rotation.NE);
+
+            Assert.AreEqual(0, _board.GetCellCoord(c1).x);
+            Assert.AreEqual(2, _board.GetCellCoord(c1).y);
+
+            Assert.AreEqual(-1, _board.GetCellCoord(c2).x);
+            Assert.AreEqual(1, _board.GetCellCoord(c2).y);
+        }
         
     }
 }

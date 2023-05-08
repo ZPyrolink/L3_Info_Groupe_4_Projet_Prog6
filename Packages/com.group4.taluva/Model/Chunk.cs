@@ -8,7 +8,7 @@ namespace Taluva.Model
         public Rotation rotation;
         public readonly int Level = 1;
 
-        [Obsolete("Never use this, instead in test!")]
+        [Obsolete("Use this for test and when there is no cell at this position!")]
         public Chunk(int l, Cell left, Cell right)
         {
             this.Coords = new Cell[3];
