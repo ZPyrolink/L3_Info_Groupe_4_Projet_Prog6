@@ -3,6 +3,7 @@
 using Imports.QuickOutline.Scripts;
 
 using Taluva.Model;
+using Taluva.Utils;
 
 using UI;
 
@@ -12,6 +13,7 @@ using Utils;
 
 public class TilesMgr : MonoBehaviour
 {
+    private const float xOffset = 1.5f, zOffset = 1.73205f;
     public static TilesMgr Instance { get; private set; }
 
     private Board _board;
@@ -99,16 +101,32 @@ public class TilesMgr : MonoBehaviour
 
     public void ValidateTile()
     {
-        foreach (Material mat in _current.GetComponent<MeshRenderer>().materials)
+        Material[] mats = _current.GetComponent<MeshRenderer>().materials;
+        foreach (Material mat in mats)
             mat.color = mat.color.With(a: 1);
 
-        Cell left = new(Biomes.Desert), right = new(Biomes.Desert);
-        
-        Chunk c = new(1, left, right);
-        _board.AddChunk(c, new(PlayerColor.Blue), new(Vector2Int.zero, Rotation.N));
+        Cell left = new(BiomeColorExt.Of(mats[0].color)), right = new(BiomeColorExt.Of(mats[3].color));
+
+        (Vector2Int pos, Rotation rot, int level) = GetPr();
+        Chunk c = new(level, left, right);
+        _board.AddChunk(c, new(PlayerColor.Blue), new(pos, rot), rot);
 
         _current = null;
         ClearFeedForward();
+    }
+
+    private (Vector2Int pos, Rotation rot, int level) GetPr()
+    {
+        Rotation rot = RotationExt.Of(_current.transform.rotation.eulerAngles.y);
+        Vector2Int pos = new() { x = (int) (_current.transform.position.x / xOffset) };
+        if (pos.x % 2 != 0)
+            pos.y = (int) ((_current.transform.position.z - zOffset / 2) / zOffset);
+        else
+            pos.y = (int) (_current.transform.position.z / zOffset);
+
+        print(pos);
+
+        return (pos, rot, (int) _current.transform.position.y);
     }
 
     private void RotateTile() => _current.transform.Rotate(new(0, 360f / 6, 0), Space.World);
@@ -116,7 +134,15 @@ public class TilesMgr : MonoBehaviour
     public void SetFeedForward()
     {
         foreach (PointRotation pr in _board.GetChunkSlots())
-            Debug.Log(pr);
+        {
+            Vector3 pos = new(pr.point.x, 0, pr.point.y);
+            if (!_board.WorldMap.IsVoid(pr.point))
+                pos.y = _board.WorldMap[pr.point].ParentCunk.Level + 1;
+            pos.Scale(new(xOffset, 1, zOffset));
+            if (pr.point.x % 2 != 0)
+                pos.z += zOffset / 2;
+            SetFeedForward(pos);
+        }
     }
 
     public void SetFeedForward(Vector3 pos) => Instantiate(feedForward, pos, Quaternion.identity, feedForwardParent);

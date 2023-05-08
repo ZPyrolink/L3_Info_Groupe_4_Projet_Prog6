@@ -9,6 +9,7 @@ namespace Taluva.Utils
         private const int _GREEN_SHIFT = 8;
         private const int _BLUE_SHIFT = 0;
         private static float ByteToFloat(byte b) => Mathf.InverseLerp(byte.MinValue, byte.MaxValue, b);
+        private static byte FloatToByte(float b) => (byte) Mathf.Lerp(byte.MinValue, byte.MaxValue, b);
 
         public static Color From(int c) => new()
         {
@@ -19,5 +20,8 @@ namespace Taluva.Utils
         };
 
         public static Color From(uint c) => From((int) c);
+
+        public static int ToInt(this Color c) => FloatToByte(c.a) << _ALPHA_SHIFT | FloatToByte(c.r) << _RED_SHIFT |
+                                                 FloatToByte(c.g) << _GREEN_SHIFT | FloatToByte(c.b) << _BLUE_SHIFT;
     }
 }

@@ -1,4 +1,4 @@
-using System;
+using static Taluva.Model.Rotation;
 
 namespace Taluva.Model
 {
@@ -14,7 +14,19 @@ namespace Taluva.Model
 
    public static class RotationExt
    {
-      public static float Degree(this Rotation value) =>
-         360f / Enum.GetValues(typeof(Rotation)).Length * (int) value;
+      // public static float Degree(this Rotation value) =>
+      //    360f / Enum.GetValues(typeof(Rotation)).Length * (int) value;
+
+      public static Rotation Of(float degree) => degree switch
+      {
+         270 => SW,
+         330 => NW,
+         30 => N,
+         90 => NE,
+         150 => SE,
+         210 => S,
+         
+         _ => throw new()
+      };
    }
 }

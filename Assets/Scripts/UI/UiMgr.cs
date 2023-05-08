@@ -171,9 +171,9 @@ namespace UI
             CurrentTile.SetActive(true);
             MeshRenderer mr = tile.transform.GetComponentInChildren<MeshRenderer>();
 
-            mr.materials[3].color = values[Random.Range(0, values.Length - 1)].GetColor();
-            mr.materials[2].color = values[Random.Range(0, values.Length - 1)].GetColor();
-            mr.materials[0].color = values[Random.Range(0, values.Length - 1)].GetColor();
+            mr.materials[3].color = values[Random.Range(0, values.Length - 2)].GetColor();
+            mr.materials[2].color = BiomeColor.Volcano.GetColor();
+            mr.materials[0].color = values[Random.Range(0, values.Length - 2)].GetColor();
             
             tile.SetActive(true);
             builds.SetActive(false);
