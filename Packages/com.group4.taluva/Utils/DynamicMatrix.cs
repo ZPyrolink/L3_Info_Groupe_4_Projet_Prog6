@@ -71,12 +71,7 @@ namespace Taluva.Utils
         public bool IsVoid(Vector2Int coordonnes) =>
             !_matrix.ContainsKey(coordonnes.x) || !_matrix[coordonnes.x].ContainsKey(coordonnes.y);
 
-        [Obsolete("Use the property instead !")]
-        public bool IsEmpty() => _matrix.Count == 0;
 
-        /// <summary>
-        /// ToDo: Remove the method and rename this property
-        /// </summary>
         public bool Empty => _matrix.Count == 0;
 
         public override string ToString()

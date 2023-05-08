@@ -125,16 +125,16 @@ namespace Taluva.Model
 
             Cell rightCell = WorldMap.GetValue(right);
 
-            if (!leftCell.HaveBuilding() && !rightCell.HaveBuilding())
+            if (!leftCell.ContainsBuilding() && !rightCell.ContainsBuilding())
                 return true;
 
-            if (leftCell.HaveBuilding() && !rightCell.HaveBuilding() && GetVillage(GetCellCoord(leftCell)).Count > 1)
+            if (leftCell.ContainsBuilding() && !rightCell.ContainsBuilding() && GetVillage(GetCellCoord(leftCell)).Count > 1)
                 return leftCell.ActualBuildings == Building.Barrack;
 
-            if (!leftCell.HaveBuilding() && rightCell.HaveBuilding() && GetVillage(GetCellCoord(rightCell)).Count > 1)
+            if (!leftCell.ContainsBuilding() && rightCell.ContainsBuilding() && GetVillage(GetCellCoord(rightCell)).Count > 1)
                 return rightCell.ActualBuildings == Building.Barrack;
 
-            if (leftCell.HaveBuilding() && rightCell.HaveBuilding() && GetVillage(GetCellCoord(leftCell)).Count > 2)
+            if (leftCell.ContainsBuilding() && rightCell.ContainsBuilding() && GetVillage(GetCellCoord(leftCell)).Count > 2)
                 return leftCell.ActualBuildings == Building.Barrack && rightCell.ActualBuildings == Building.Barrack;
 
             return false;
@@ -142,7 +142,7 @@ namespace Taluva.Model
 
         public PointRotation[] GetChunkSlots()
         {
-            if (WorldMap.IsEmpty())
+            if (WorldMap.Empty)
             {
                 PointRotation[] pr = new PointRotation[1];
                 pr[0] = new(new(0, 0));

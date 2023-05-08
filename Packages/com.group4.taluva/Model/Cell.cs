@@ -26,8 +26,6 @@ namespace Taluva.Model
         public bool IsBuildable =>
             ActualBiome != Biomes.None && ActualBiome != Biomes.Volcano && ActualBuildings == Building.None;
 
-
-        [Obsolete("Use the property instead!")]
         public void Build(Building building)
         {
             this.ActualBuildings = building;
@@ -43,9 +41,6 @@ namespace Taluva.Model
             Biomes.Volcano => "V",
             _ => ""
         };
-
-        [Obsolete("Use the property instead!")]
-        public bool HaveBuilding() => this.ActualBuildings != Building.None;
 
         public bool ContainsBuilding() => ActualBuildings != Building.None;
     }

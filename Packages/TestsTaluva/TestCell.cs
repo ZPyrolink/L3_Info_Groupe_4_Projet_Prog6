@@ -24,7 +24,7 @@ namespace TestsTaluva
         {
             for (int i = 0; i < _cell.Length; i++) {
                 Assert.AreEqual((Biomes)i, _cell[i].ActualBiome);
-                Assert.IsFalse(_cell[i].HaveBuilding());
+                Assert.IsFalse(_cell[i].ContainsBuilding());
                 if (_cell[i].ActualBiome == Biomes.Volcano || _cell[i].ActualBiome == Biomes.None) {
                     Assert.IsFalse(_cell[i].IsBuildable);
                 } else {
@@ -73,11 +73,11 @@ namespace TestsTaluva
             foreach (Cell c in _cell) {
                 if (c.ActualBiome == Biomes.Volcano || c.ActualBiome == Biomes.None) {
                     Assert.AreEqual(c.ActualBuildings, Building.None);
-                    Assert.IsFalse(c.HaveBuilding());
+                    Assert.IsFalse(c.ContainsBuilding());
                 }  
                 else {
                     Assert.AreEqual(c.ActualBuildings, Building.Barrack);
-                    Assert.IsTrue(c.HaveBuilding());
+                    Assert.IsTrue(c.ContainsBuilding());
                 }   
                 Assert.IsFalse(c.IsBuildable);
             }
@@ -96,10 +96,10 @@ namespace TestsTaluva
             foreach (Cell c in _cell) {
                 if (c.ActualBiome == Biomes.Volcano || c.ActualBiome == Biomes.None) {
                     Assert.AreEqual(c.ActualBuildings, Building.None);
-                    Assert.IsFalse(c.HaveBuilding());
+                    Assert.IsFalse(c.ContainsBuilding());
                 } else {
                     Assert.AreEqual(c.ActualBuildings, Building.Tower);
-                    Assert.IsTrue(c.HaveBuilding());
+                    Assert.IsTrue(c.ContainsBuilding());
                 }
                 Assert.IsFalse(c.IsBuildable);
             }
@@ -118,10 +118,10 @@ namespace TestsTaluva
             foreach (Cell c in _cell) {
                 if (c.ActualBiome == Biomes.Volcano || c.ActualBiome == Biomes.None) {
                     Assert.AreEqual(c.ActualBuildings, Building.None);
-                    Assert.IsFalse(c.HaveBuilding());
+                    Assert.IsFalse(c.ContainsBuilding());
                 } else {
                     Assert.AreEqual(c.ActualBuildings, Building.Temple);
-                    Assert.IsTrue(c.HaveBuilding());
+                    Assert.IsTrue(c.ContainsBuilding());
                 }
                 Assert.IsFalse(c.IsBuildable);
             }
