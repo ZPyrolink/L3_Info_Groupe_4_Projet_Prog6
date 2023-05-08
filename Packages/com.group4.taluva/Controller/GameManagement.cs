@@ -43,7 +43,7 @@ namespace Taluva.Controller
                 {
                     int completedBuildingTypes = 0;
 
-                    if (gameBoard.GetTempleSlot(p).Length == p.nbTemple)
+                    if (gameBoard.GetTempleSlots(p).Length == p.nbTemple)
                         completedBuildingTypes++;
 
                     if (gameBoard.GetBarrackSlots().Length == p.nbBarrack)

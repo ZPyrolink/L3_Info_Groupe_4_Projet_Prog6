@@ -102,7 +102,7 @@ namespace TestsTaluva
         {
             _board = new();
             Assert.AreEqual(0, _board.GetBarrackSlots().Length);
-            Assert.AreEqual(0, _board.GetTempleSlot(new(PlayerColor.Blue)).Length);
+            Assert.AreEqual(0, _board.GetTempleSlots(new(PlayerColor.Blue)).Length);
             Assert.AreEqual(0, _board.GetTowerSlots(new(PlayerColor.Blue)).Length);
         }
 
@@ -121,14 +121,61 @@ namespace TestsTaluva
         }
 
         [Test]
-        public void TestGetTempleSolts()
+        public void TestGetTempleSlots()
         {
             Chunk _chunk = new(1, new(Biomes.Desert), new(Biomes.Plain));
             PointRotation _pointRot = new(new(0, 1), Rotation.NE);
             _board.AddChunk(_chunk, _player2, _pointRot, Rotation.NE);
 
-            
-            //_board.PlaceBuilding();
+            DynamicMatrix<Cell> _matrix = _board.WorldMap;
+            _board.PlaceBuilding(_matrix.GetValue(new(-1,-1)), Building.Barrack, _player1);
+            _board.PlaceBuilding(_matrix.GetValue(new(-1, 0)), Building.Barrack, _player1);
+            _board.PlaceBuilding(_matrix.GetValue(new(-1, 1)), Building.Barrack, _player1);
+
+            Vector2Int[] possible = _board.GetTempleSlots(_player1);
+            Assert.AreEqual(1, possible.Length);
+            Assert.AreEqual(0, possible[0].x);
+            Assert.AreEqual(2, possible[0].y);
+
+            _board.PlaceBuilding(_matrix.GetValue(new(0, 2)), Building.Temple, _player1);
+            _chunk = new(1, new(Biomes.Desert), new(Biomes.Plain));
+            _pointRot = new(new(0, -1), Rotation.NW);
+            _board.AddChunk(_chunk, _player2, _pointRot, Rotation.NW);
+
+            possible = _board.GetTempleSlots(_player1);
+            Assert.AreEqual(0, possible.Length);
+        }
+
+        [Test]
+        public void TestGetTowerSlots()
+        {
+            Chunk _chunk = new(3, new(Biomes.Desert), new(Biomes.Plain));
+            PointRotation _pointRot = new(new(0, 1), Rotation.NE);
+            _board.AddChunk(_chunk, _player2, _pointRot, Rotation.NE);
+
+            DynamicMatrix<Cell> _matrix = _board.WorldMap;
+            _board.PlaceBuilding(_matrix.GetValue(new(-1, 0)), Building.Barrack, _player1);
+
+            Vector2Int[] possible = _board.GetTowerSlots(_player1);
+            Assert.AreEqual(1, possible.Length);
+            Assert.AreEqual(-1, possible[0].x);
+            Assert.AreEqual(1, possible[0].y);
+
+            _board.PlaceBuilding(_matrix.GetValue(possible[0]), Building.Tower, _player1);
+            _chunk = new(3, new(Biomes.Desert), new(Biomes.Plain));
+            _pointRot = new(new(-3, 0), Rotation.S);
+            _board.AddChunk(_chunk, _player2, _pointRot, Rotation.S);
+            _chunk = new(3, new(Biomes.Desert), new(Biomes.Plain));
+            _pointRot = new(new(-2, -2), Rotation.SE);
+            _board.AddChunk(_chunk, _player2, _pointRot, Rotation.SE);
+
+            possible = _board.GetTowerSlots(_player1);
+            Assert.AreEqual(0, possible.Length);
+
+            _board.PlaceBuilding(_matrix.GetValue(new(-2,-1)), Building.Barrack, _player1);
+            _board.PlaceBuilding(_matrix.GetValue(new(-1, -2)), Building.Barrack, _player1);
+            possible = _board.GetTowerSlots(_player1);
+            Assert.AreEqual(0, possible.Length);
         }
         
     }
