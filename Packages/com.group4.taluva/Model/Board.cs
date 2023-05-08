@@ -19,6 +19,12 @@ namespace Taluva.Model
 
         private void RemoveCell(Cell c) => WorldMap.Remove(GetCellCoord(c));
 
+        public void RemoveChunk(Chunk c)
+        {
+            foreach (Cell cell in c.Coords)
+                RemoveCell(cell);
+        }
+
         public List<Vector2Int> GetVillage(Vector2Int c)
         {
             PlayerColor color = WorldMap.GetValue(c).Owner;
@@ -290,12 +296,6 @@ namespace Taluva.Model
                 default:
                     return;
             }
-        }
-
-        public void RemoveChunk(Chunk c)
-        {
-            foreach (Cell cell in c.Coords)
-                WorldMap.Remove(GetCellCoord(cell));
         }
 
         public Vector2Int[] GetBarrackSlots() => WorldMap
