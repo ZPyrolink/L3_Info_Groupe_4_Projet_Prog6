@@ -96,6 +96,40 @@ namespace TestsTaluva
 
             Assert.AreEqual(neighbors.Count, possible.Length);
         }
+
+        [Test]
+        public void TestGetBuildingSlotsAfterInit()
+        {
+            _board = new();
+            Assert.AreEqual(0, _board.GetBarrackSlots().Length);
+            Assert.AreEqual(0, _board.GetTempleSlot(new(PlayerColor.Blue)).Length);
+            Assert.AreEqual(0, _board.GetTowerSlots(new(PlayerColor.Blue)).Length);
+        }
+
+        [Test]
+        public void TestGetBarrackSlots()
+        {
+            Vector2Int[] possibles = _board.GetBarrackSlots();
+            Vector2Int[] barrackSlots = new Vector2Int[2];
+
+            barrackSlots[0] = new(-1, -1);
+            barrackSlots[1] = new(-1, 0);
+
+            foreach (Vector2Int p in possibles) {
+                Assert.IsTrue(barrackSlots.Contains(p));
+            }
+        }
+
+        [Test]
+        public void TestGetTempleSolts()
+        {
+            Chunk _chunk = new(1, new(Biomes.Desert), new(Biomes.Plain));
+            PointRotation _pointRot = new(new(0, 1), Rotation.NE);
+            _board.AddChunk(_chunk, _player2, _pointRot, Rotation.NE);
+
+            
+            //_board.PlaceBuilding();
+        }
         
     }
 }
