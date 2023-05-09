@@ -2,6 +2,7 @@
 
 using Taluva.Model;
 using Taluva.Utils;
+using Taluva.Model.AI;
 using UnityEngine;
 
 namespace Taluva.Controller
@@ -9,7 +10,8 @@ namespace Taluva.Controller
     public class GameManagment
     {
         private Player[] players;
-        private Player actualPlayer { get; set; }
+        private Player actualPlayer;
+        private AI ActualAi => (AI)actualPlayer;
         public int NbPlayers { get; set; }
         public  int actualTurn { get; private set; }
         private int maxTurn;
@@ -18,6 +20,7 @@ namespace Taluva.Controller
         private Historic<Coup> historic;
         private Pile<Chunk> pile = ListeChunk.Pile;
         private Chunk actualChunk;
+        private bool AIRandom = false;
         
         public GameManagment(int nbPlayers, int maxTurn)
         {
@@ -26,11 +29,25 @@ namespace Taluva.Controller
             this.gameBoard = new();
             this.NbPlayers = nbPlayers;
             this.maxTurn = 12 * nbPlayers;
+            this.
             actualPlayer = players[0];
             for (int i = 0; i < this.NbPlayers; i++)
+            {
                 players[i] = new((PlayerColor) i);
+                if (this.AIRandom && i==1)
+                {
+                    players[i].playerIA = true;
+                    break;
+                }
+            }
+                
         }
 
+        public void setAI()
+        {
+            this.AIRandom = true;
+            this.NbPlayers = 2;
+        }
         private class Coup
         {
             //New Chunk or cells
@@ -277,9 +294,37 @@ namespace Taluva.Controller
             actualPlayer = players[actualTurn];
         }
 
+        public void PlayerMove()
+        {
+            if (actualPlayer is AI ai)
+            {
+                AIMove(ai);
+            }
+            else
+            {
+                // Move();
+            }
+        }
+        public void AIMove(AI ai)
+        {
+            PointRotation pr = ((AI)actualPlayer).PlayChunk();
+            ValidateTile(pr, 0);
+            // PlaceBuilding();
+        }
+
+        public void Move()
+        {
+            
+        }
+
         public void ValidateTile(PointRotation pr, Rotation r)     //Place
         {
             gameBoard.AddChunk(actualChunk, actualPlayer, pr, r);
+        }
+
+        public void PlaceBuilding(Cell c, Building b)
+        {   
+            gameBoard.PlaceBuilding(c, b, actualPlayer);
         }
 
         public Vector2Int[] BarracksSlots()
