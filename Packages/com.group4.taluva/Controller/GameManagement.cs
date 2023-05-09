@@ -48,7 +48,7 @@ namespace Taluva.Controller
                 this.player = actualPlayer;
             }
 
-            public Coup(Vector2Int[] positions, Rotation rotation, Player actualPlayer, Chunk chunk) : this(positions, rotation, actualPlayer)
+            public Coup(Vector2Int[] positions, Rotation rotation, Player actualPlayer, Chunk chunk, Cell[] cells) : this(positions, rotation, actualPlayer, cells)
             {
                 this.chunk = chunk;
             }
@@ -66,7 +66,15 @@ namespace Taluva.Controller
 
         public void AddHistoric(Vector2Int position, Rotation rotation, Chunk chunk)
         {
-            historic.Add(new(new[] { position }, rotation, actualPlayer, chunk));
+            Cell[] cells;
+            if (gameBoard.WorldMap.IsVoid(position))
+                cells = new Cell[0];
+            else {
+                cells = new Cell[3];
+                cells = gameBoard.WorldMap.GetValue(position).ParentCunk.Coords;
+            }
+
+            historic.Add(new(new[] { position }, rotation, actualPlayer, chunk, cells));
         }
 
         public void AddHistoric(Vector2Int[] positions, Cell[] cells)
@@ -76,24 +84,47 @@ namespace Taluva.Controller
 
         public void Undo()
         {
-            //ne pas oublier le changement de player
+            int nbActualPlayer = 0;
+            for(int i = 0; i < players.Length; i++) {
+                if (actualPlayer == players[i])
+                    nbActualPlayer = i;
+            }
+            actualPlayer = players[(nbActualPlayer + NbPlayers - 1) % NbPlayers];
+
             Coup c = historic.Undo();
             if(c.chunk == null && c.cells == null) {
                 foreach (Vector2Int position in c.positions)
                     gameBoard.WorldMap.Remove(position);
+            }else if(c.chunk != null) {
+                gameBoard.RemoveChunk(c.chunk);
+                for(int i = 0; i < c.cells.Length; i++)
+                    gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
+                //Ajouter la chunk a la pile
+            }else if(c.cells != null) {
+                for (int i = 0; i < c.cells.Length; i++) {
+                    gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
+                }
+                //compter les batiment et les rajouter au joueur
             }
         }
 
         public void Redo()
         {
+            //Si on est en phase 1 enlever la chunk de la pile autrement enlever le bon nombre de batiment
             Coup c = historic.Redo();
             if(c.chunk == null) {
                 for(int i = 0; i < c.cells.Length; i++) {
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
                 }
             } else {
-                gameBoard.AddChunk(c.chunk, c.player, new(c.positions[0]), c.rotation);
+                gameBoard.AddChunk(c.chunk, c.player, new(c.positions[0]),(Rotation) c.rotation);
             }
+            int nbActualPlayer = 0;
+            for (int i = 0; i < players.Length; i++) {
+                if (actualPlayer == players[i])
+                    nbActualPlayer = i;
+            }
+            actualPlayer = players[(nbActualPlayer + 1) % NbPlayers];
         }
 
         public Player? GetWinner()
