@@ -52,7 +52,22 @@ namespace Taluva.Model
 
         public (Building buil, Vector2Int? pos) PlayBuild()
         {
-            return (Building.None, null);
+            int rand = Random.Range(0,1000);
+            Vector2Int[] temples = board.GetTempleSlots(this);
+            if(temples.Length>0)
+            {
+                rand = Random.Range(0, temples.Length);
+                return (Building.Barrack,temples[rand]);
+            } 
+            Vector2Int[] towers = board.GetTowerSlots(this);
+            if(towers.Length>0)
+            {
+                rand = Random.Range(0, towers.Length);
+                return (Building.Tower,towers[rand]);
+            }
+            Vector2Int[] barracks = board.GetBarrackSlots();
+            rand = Random.Range(0, barracks.Length);
+            return (Building.Barrack,barracks[rand]);
         }
 
         
