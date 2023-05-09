@@ -1,18 +1,21 @@
 ﻿using System;
 
 using Taluva.Model;
+using Taluva.Utils;
+using UnityEngine;
 
 namespace Taluva.Controller
 {
     public class GameManagment
     {
         private Player[] players;
-        private Player actualPlayer;
+        private Player actualPlayer { get; }
         public int NbPlayers { get; set; }
         private int actualTurn;
         private int maxTurn;
         private Board gameBoard;
         private TurnPhase actualPhase;
+        private Historic<Coup> historic;
 
         public GameManagment(int nbPlayers, int maxTurn)
         {
@@ -24,6 +27,54 @@ namespace Taluva.Controller
             actualPlayer = players[0];
             for (int i = 0; i < this.NbPlayers; i++)
                 players[i] = new((PlayerColor) i);
+        }
+
+        private class Coup
+        {
+            //New Chunk
+            public Vector2Int position;
+            public Rotation rotation;
+
+            //Last Chunk or last cells
+            public Cell[] cells;
+            public Player player;
+
+            //Use it when there is nothing at the position
+            public Coup(Vector2Int position, Rotation rotation)
+            {
+                this.position = position;
+                this.rotation = rotation;
+                this.player = actualPlayer;
+            }
+
+            public Coup(Vector2Int position, Rotation rotation, Chunk cells) : this(position, rotation)
+            {
+                this.cells = (Cell[])cells.Coords.Clone();
+            }
+
+            public Coup(Vector2Int position, Rotation rotation, Cell[] cells) : this(position, rotation)
+            {
+                this.cells = cells;
+            }
+        }
+
+        public void Undo()
+        {
+            Coup c = historic.Undo();
+            Chunk chunk = gameBoard.WorldMap.GetValue(c.position).ParentCunk;
+            if (c.cells == null) {
+                gameBoard.RemoveChunk(chunk);
+                return;
+            }
+
+            gameBoard.AddChunk(chunk, c.player, new(c.position), c.rotation);
+        }
+
+        public void Redo()
+        {
+            Coup c = historic.Redo();
+            Chunk chunk = gameBoard.WorldMap.GetValue(c.position).ParentCunk;
+            gameBoard.AddChunk(chunk, c.player, new(c.position), c.rotation);
         }
 
         public Player? GetWinner()
