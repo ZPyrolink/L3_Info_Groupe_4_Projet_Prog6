@@ -3,7 +3,6 @@
 using Imports.QuickOutline.Scripts;
 
 using Taluva.Model;
-using Taluva.Utils;
 
 using UI;
 
@@ -13,7 +12,7 @@ using Utils;
 
 public class TilesMgr : MonoBehaviour
 {
-    private const float xOffset = 1.5f, yOffset = .246f, zOffset = 1.73205f;
+    private const float xOffset = 1.5f, yOffset = .3f, zOffset = 1.73205f;
     public static TilesMgr Instance { get; private set; }
 
     private Board _board;
@@ -90,7 +89,10 @@ public class TilesMgr : MonoBehaviour
             _current.transform.rotation = Quaternion.Euler(-90, 0, -90);
             _current.layer = LayerMask.NameToLayer("Default");
             foreach (Material mat in _current.GetComponent<MeshRenderer>().materials)
+            {
+                mat.SetRenderMode(MaterialExtensions.BlendMode.Transparent);
                 mat.color = mat.color.With(a: .5f);
+            }
         }
 
         if (_current.transform.position == pos)
@@ -103,7 +105,10 @@ public class TilesMgr : MonoBehaviour
     {
         Material[] mats = _current.GetComponent<MeshRenderer>().materials;
         foreach (Material mat in mats)
+        {
+            mat.SetRenderMode(MaterialExtensions.BlendMode.Opaque);
             mat.color = mat.color.With(a: 1);
+        }
 
         Cell left = new(BiomeColorExt.Of(mats[0].color)), right = new(BiomeColorExt.Of(mats[3].color));
 
@@ -143,7 +148,8 @@ public class TilesMgr : MonoBehaviour
         }
     }
 
-    public void SetFeedForward(Vector3 pos) => Instantiate(feedForward, pos, Quaternion.identity, feedForwardParent);
+    public void SetFeedForward(Vector3 pos) =>
+        Instantiate(feedForward, pos, Quaternion.Euler(-90, -90, 0), feedForwardParent);
 
     public void ClearFeedForward()
     {
