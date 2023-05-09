@@ -150,7 +150,7 @@ namespace TestsTaluva
         {
             Chunk _chunk = new(1, new(Biomes.Desert), new(Biomes.Plain));
             PointRotation _pointRot = new(new(0, 1), Rotation.NE);
-            _board.AddChunk(_chunk, _player2, _pointRot, Rotation.NE);
+            _board.AddChunk(_chunk,_player1,_pointRot, Rotation.NE);
 
             
             _board.PlaceBuilding(_matrix.GetValue(new(-1,-1)), Building.Barrack, _player1);

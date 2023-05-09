@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class Player
 {
-	Chunk lastChunk;
+    public Chunk lastChunk { get;  set ;  }
 	bool b_played;
     public PlayerColor ID { get; private set; }
     public int nbTowers = 2;

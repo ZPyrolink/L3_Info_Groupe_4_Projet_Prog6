@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Taluva.Model;
 using Taluva.Utils;
@@ -15,6 +16,7 @@ Player p3 = new Player(PlayerColor.Green);
 Console.WriteLine("Enter a command : ");
 Console.WriteLine("Redo : Not implemented yet\n" +
                   "Undo : Not implemented yet\n" +
+                  "Rotations : Exemple Play 0 0 1 (0 0 the coord of the volcano and 1 is the rotation) \n" +
                   "Play : Exemple Play 0 0 1 (0 0 the coord of the volcano and 1 is the rotation) \n" +
                   "Barracks : Return the available barracks\n" +
                   "Temples : Exemple Temples 1 (1 c'est le joueur)\n" +
@@ -35,45 +37,17 @@ void PlayParser(string[] s)
     PointRotation pr = null;
     Rotation r = 0;
     int z = 0;
-    if (rg.IsMatch(s[1]) && rg.IsMatch(s[2]) && rg.IsMatch(s[3]) && rg.IsMatch(s[4]))     //Coordinate conversion
+    if (rg.IsMatch(s[1]) && rg.IsMatch(s[2]) && rg.IsMatch(s[3]))     //Coordinate conversion
     {
         int x = int.Parse(s[1]);
-        int y = int.Parse(s[2]); 
-        z = int.Parse(s[4]);
+        int y = int.Parse(s[2]);
         r = (Rotation)int.Parse(s[3]); //verify in Rotations enum
         pr = new PointRotation(new Vector2Int(x, y), r);
     }
 
-    if (z == 1)
-    {
-        b.AddChunk(Pile.Draw(), p1, pr);
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine(b.worldMap);
-        Console.ResetColor();
-    }
-    else if (z == 2)
-    {
-        b.AddChunk(Pile.Draw(), p2, pr);
-        Console.ForegroundColor = ConsoleColor.Blue;
-        Console.WriteLine(b.worldMap);
-        Console.ResetColor();
-    }
-    else if (z == 3)
-    {
-        b.AddChunk(Pile.Draw(), p3, pr);
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine(b.worldMap);
-        Console.ResetColor();
-    }
-    
-}
-void Barracks()
-{
-    Vector2Int[] Barracks = b.GetBarrackSlots();
-        foreach (Vector2Int tmp in Barracks)
-        {
-            Console.WriteLine("Point : x : "+ tmp.x + " y : " + tmp.y );
-        }
+        b.AddChunk(Pile.Draw(), pr , r);
+        Console.WriteLine(b.WorldMap);
+
 }
 void Temples(string[] s)
 {
@@ -173,7 +147,7 @@ void Place(string[] s)
         z = int.Parse(s[3]);
         k = int.Parse(s[4]);
         Vector2Int p = new Vector2Int(x, y);
-        Cell c = b.worldMap.GetValue(p);
+        Cell c = b.WorldMap.GetValue(p);
         if (z == 0)
         {
             build = Building.None;
@@ -198,6 +172,16 @@ void Place(string[] s)
 
     }
 }
+
+void Barracks()
+{
+    Vector2Int[] barracks = b.GetBarrackSlots();
+    foreach (Vector2Int b in barracks)
+    {
+        Console.WriteLine("Point x : " + b.x + " y : " + b.y);
+    }
+}
+
 void InterpretActions(string s)
 {
     string[] splitted = s.Split(' ');
@@ -214,9 +198,18 @@ void InterpretActions(string s)
             Console.WriteLine("Done");
             Console.WriteLine("Enter a command");
             break;
+        case "Rotations" :
+            Console.WriteLine("Done");
+            Console.WriteLine("Enter a command");
+            break;
         case "Play":
             PlayParser(splitted);
             Console.WriteLine("Done");
+            PointRotation[] po = b.GetChunkSlots();
+            foreach (PointRotation tmp in po)
+            {
+                Console.WriteLine("Point x : "+ tmp.point.x + " y : " + tmp.point.y);
+            }
             Console.WriteLine("Enter a command");
             break;
         case "Barracks":

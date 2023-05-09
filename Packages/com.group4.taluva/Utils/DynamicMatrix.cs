@@ -18,19 +18,58 @@ namespace Taluva.Utils
             _matrix = new();
         }
 
+        /// <summary>
+        /// Line maximum in the matrix
+        /// </summary>
         public int MaxLine => _matrix.Keys.Order().ElementAt(_matrix.Keys.Count - 1);
 
+        /// <summary>
+        /// Line minimum in the matrix
+        /// </summary>
         public int MinLine => _matrix.Keys.Order().ToArray().First();
 
+        /// <summary>
+        /// Column maximum of the line
+        /// </summary>
+        /// <param name="line">Line whose want the max column</param>
+        /// <returns>Return the max column in the line</returns>
         public int MaxColumn(int line) => _matrix[line].Keys.Order().ElementAt(_matrix[line].Keys.Count - 1);
 
+        /// <summary>
+        /// Column minimum of the line
+        /// </summary>
+        /// <param name="line">Line whose want the min column</param>
+        /// <returns>Return the min column in the line</returns>
         public int MinColumn(int line) => _matrix[line].Keys.Order().First();
 
+        /// <summary>
+        /// Check if the matrix contains the line
+        /// </summary>
+        /// <param name="line">The line to test</param>
+        /// <returns>Return if the line exist in the matrix</returns>
         public bool ContainsLine(int line) => _matrix.ContainsKey(line);
 
+        /// <summary>
+        /// Check if the column exist for the line
+        /// </summary>
+        /// <param name="line">The line to test</param>
+        /// <param name="column">The column to test</param>
+        /// <returns>Return if the column exist for the this line</returns>
         public bool ContainsColumn(int line, int column) => _matrix[line].ContainsKey(column);
+
+        /// <summary>
+        /// Check if a point exist on the matrix
+        /// </summary>
+        /// <param name="p">The point to test</param>
+        /// <returns>Return if the point exist</returns>
         public bool ContainsColumn(Vector2Int p) => _matrix[p.x].ContainsKey(p.y);
 
+        /// <summary>
+        /// Add the value at the coordonees.
+        /// Be careful! If the position given isn't a void it will replace it.
+        /// </summary>
+        /// <param name="value">Value to add</param>
+        /// <param name="coordonees">Position whose we want to add</param>
         public void Add(T value, Vector2Int coordonees)
         {
             if (!_matrix.ContainsKey(coordonees.x))
@@ -45,6 +84,11 @@ namespace Taluva.Utils
                 _matrix[coordonees.x].Add(coordonees.y, value);
         }
 
+        /// <summary>
+        /// Check if we can remove a position ans remove if we can
+        /// </summary>
+        /// <param name="p">Position to remove</param>
+        /// <returns>Return if we have remove the object at the position</returns>
         public bool Remove(Vector2Int p)
         {
             bool remove = ContainsLine(p.x) && ContainsColumn(p) && _matrix[p.x].Remove(p.y);
@@ -55,10 +99,27 @@ namespace Taluva.Utils
             return remove;
         }
 
+        /// <summary>
+        /// Find a value in the matrix.
+        /// Be careful! We must check before if the position is a void or not.
+        /// We can't use this on a void.
+        /// </summary>
+        /// <param name="coordonnes">Coordonnes of the object</param>
+        /// <returns>Return the object at the position</returns>
         public T GetValue(Vector2Int coordonnes) => _matrix[coordonnes.x][coordonnes.y];
 
+        /// <summary>
+        /// New version of GetValue
+        /// </summary>
+        /// <param name="co">Coordonnes of the object</param>
+        /// <returns>Return the object at the position</returns>
         public T this[Vector2Int co] => _matrix[co.x][co.y];
 
+        /// <summary>
+        /// Enumerator of the matrix.
+        /// It will browse the map line by line
+        /// </summary>
+        /// <returns>An enumerator for the map</returns>
         public IEnumerator<T> GetEnumerator() => _matrix
             .OrderBy(x => x.Key)
             .SelectMany(x => x.Value
@@ -67,10 +128,17 @@ namespace Taluva.Utils
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        /// <summary>
+        /// Check if there is something at the position
+        /// </summary>
+        /// <param name="coordonnes">The position to test</param>
+        /// <returns>Return if there is something at the coordonnes</returns>
         public bool IsVoid(Vector2Int coordonnes) =>
             !_matrix.ContainsKey(coordonnes.x) || !_matrix[coordonnes.x].ContainsKey(coordonnes.y);
 
-
+        /// <summary>
+        /// Check if the matrix is empty
+        /// </summary>
         public bool Empty => _matrix.Count == 0;
 
         public override string ToString()
