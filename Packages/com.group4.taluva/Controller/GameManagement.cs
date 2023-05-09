@@ -73,7 +73,7 @@ namespace Taluva.Controller
         public void Redo()
         {
             Coup c = historic.Redo();
-            Chunk chunk = gameBoard.WorldMap.GetValue(c.position).ParentCunk;
+            Chunk chunk = new(c.cells[1], c.cells[2]);
             gameBoard.AddChunk(chunk, c.player, new(c.position), c.rotation);
         }
 
