@@ -1,8 +1,13 @@
-﻿using UnityEngine;
+﻿using System;
+
+using UnityEngine;
 using UnityEngine.UI;
 
 public class DebugScreen : MonoBehaviour
 {
+    [SerializeField]
+    private GameObject hexTile;
+    
     [SerializeField]
     private Text fps;
     private float _dt;

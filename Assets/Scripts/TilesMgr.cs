@@ -13,7 +13,7 @@ using Utils;
 
 public class TilesMgr : MonoBehaviour
 {
-    private const float xOffset = 1.5f, zOffset = 1.73205f;
+    private const float xOffset = 1.5f, yOffset = .246f, zOffset = 1.73205f;
     public static TilesMgr Instance { get; private set; }
 
     private Board _board;
@@ -114,19 +114,17 @@ public class TilesMgr : MonoBehaviour
         _current = null;
         ClearFeedForward();
     }
-
+    
     private (Vector2Int pos, Rotation rot, int level) GetPr()
     {
-        Rotation rot = RotationExt.Of(_current.transform.rotation.eulerAngles.y);
+        Rotation rot = RotationExt.Of(Mathf.Round(_current.transform.rotation.eulerAngles.y));
         Vector2Int pos = new() { x = (int) (_current.transform.position.x / xOffset) };
         if (pos.x % 2 != 0)
             pos.y = (int) ((_current.transform.position.z - zOffset / 2) / zOffset);
         else
             pos.y = (int) (_current.transform.position.z / zOffset);
 
-        print(pos);
-
-        return (pos, rot, (int) _current.transform.position.y);
+        return (pos, rot, (int) (_current.transform.position.y / yOffset));
     }
 
     private void RotateTile() => _current.transform.Rotate(new(0, 360f / 6, 0), Space.World);
@@ -137,7 +135,7 @@ public class TilesMgr : MonoBehaviour
         {
             Vector3 pos = new(pr.point.x, 0, pr.point.y);
             if (!_board.WorldMap.IsVoid(pr.point))
-                pos.y = _board.WorldMap[pr.point].ParentCunk.Level + 1;
+                pos.y = (_board.WorldMap[pr.point].ParentCunk.Level + 1) * yOffset;
             pos.Scale(new(xOffset, 1, zOffset));
             if (pr.point.x % 2 != 0)
                 pos.z += zOffset / 2;
