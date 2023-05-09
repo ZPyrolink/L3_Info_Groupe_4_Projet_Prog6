@@ -9,15 +9,15 @@ namespace Taluva.Controller
     public class GameManagment
     {
         private Player[] players;
-        private Player actualPlayer { get; }
+        private Player actualPlayer { get; set; }
         public int NbPlayers { get; set; }
         public  int actualTurn { get; private set; }
         private int maxTurn;
-        private Board gameBoard;
+        public Board gameBoard;
         private TurnPhase actualPhase;
         private Historic<Coup> historic;
         private Pile<Chunk> pile = ListeChunk.Pile;
-        private Chunk actualChunk;
+        public Chunk actualChunk;
 
         public GameManagment(int nbPlayers)
         {
@@ -27,9 +27,9 @@ namespace Taluva.Controller
             this.gameBoard = new();
             this.NbPlayers = nbPlayers;
             this.maxTurn = 12 * nbPlayers;
-            actualPlayer = players[0];
             for (int i = 0; i < this.NbPlayers; i++)
                 players[i] = new((PlayerColor) i);
+            actualPlayer = players[0];
         }
 
         public class Coup
@@ -48,6 +48,13 @@ namespace Taluva.Controller
                 this.positions = positions;
                 this.rotation = rotation;
                 this.player = actualPlayer;
+            }
+
+            public Coup(Vector2Int[] positions, Rotation rotation, Player actualPlayer, Chunk chunk) : this(positions, rotation, actualPlayer)
+            {
+                this.chunk = chunk;
+                this.cells = new Cell[1];
+                cells[0] = null;
             }
 
             public Coup(Vector2Int[] positions, Rotation rotation, Player actualPlayer, Chunk chunk, Cell[] cells) : this(positions, rotation, actualPlayer, cells)
@@ -81,15 +88,13 @@ namespace Taluva.Controller
         /// <param name="chunk">The chunk played at the round</param>
         public void AddHistoric(Vector2Int position, Rotation rotation, Chunk chunk)
         {
-            Cell[] cells;
-            if (gameBoard.WorldMap.IsVoid(position))
-                cells = new Cell[0];
-            else {
-                cells = new Cell[3];
-                cells = gameBoard.WorldMap.GetValue(position).ParentCunk.Coords;
+            if (!gameBoard.WorldMap.IsVoid(position))
+            {
+                historic.Add(new(new[] { position }, rotation, actualPlayer, chunk, gameBoard.WorldMap.GetValue(position).ParentCunk.Coords));
+            } else {
+                historic.Add(new(new[] { position }, rotation, actualPlayer, chunk));
             }
-
-            historic.Add(new(new[] { position }, rotation, actualPlayer, chunk, cells));
+                
         }
 
         /// <summary>
@@ -118,10 +123,11 @@ namespace Taluva.Controller
             Coup c = historic.Undo();
             if(c.chunk != null) {
                 gameBoard.RemoveChunk(c.chunk);
-                for(int i = 0; i < c.cells.Length; i++)
-                    gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
-                //Ajouter la chunk a la pile
-            }else if(c.cells != null) {
+                if(c.cells[0] != null)
+                    for(int i = 0; i < c.cells.Length; i++)
+                        gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
+                pile.Stack(c.chunk);
+            }else {
                 for (int i = 0; i < c.cells.Length; i++) {
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
                     switch (c.cells[i].ActualBuildings) {
@@ -166,7 +172,7 @@ namespace Taluva.Controller
                 }
             } else {
                 gameBoard.AddChunk(c.chunk, c.player, new(c.positions[0]),(Rotation) c.rotation);
-                //Enlever la chunk de la pile 
+                pile.Draw();
             }
             int nbActualPlayer = 0;
             for (int i = 0; i < players.Length; i++) {
@@ -296,10 +302,12 @@ namespace Taluva.Controller
             }
         }
 
-        void ValidateTile(PointRotation pr, Rotation r)     //Place
+        public void ValidateTile(PointRotation pr, Rotation r)     //Place
         {
-            Chunk c = pile.Draw();
-            gameBoard.AddChunk(c, actualPlayer, pr, r);
+            actualChunk = pile.Draw();
+
+            AddHistoric(pr.point, r, actualChunk);
+            gameBoard.AddChunk(actualChunk, actualPlayer, pr, r);
         }
 
         public int NumberOfAI
