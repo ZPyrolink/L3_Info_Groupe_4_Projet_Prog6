@@ -9,7 +9,7 @@ namespace Taluva.Controller
     public class GameManagment
     {
         private Player[] players;
-        private Player actualPlayer { get; }
+        private Player actualPlayer { get; set; }
         public int NbPlayers { get; set; }
         public  int actualTurn { get; private set; }
         private int maxTurn;
@@ -18,7 +18,7 @@ namespace Taluva.Controller
         private Historic<Coup> historic;
         private Pile<Chunk> pile = ListeChunk.Pile;
         private Chunk actualChunk;
-
+        
         public GameManagment(int nbPlayers, int maxTurn)
         {
             this.players = new Player[nbPlayers];
@@ -268,28 +268,50 @@ namespace Taluva.Controller
 
         public void InitPlay()
         {
-            while (actualTurn <= maxTurn)
+            actualTurn++;
+            this.actualChunk = pile.Draw();
+            if (actualTurn + 1 > NbPlayers)
             {
-                actualPhase = TurnPhase.PlaceBuilding;
-                actualPhase = TurnPhase.RotateCell;
-                actualPhase = TurnPhase.SelectCells;
-
-                actualTurn++;
-                if (actualTurn > NbPlayers)
-                {
-                    actualTurn = 1;
-                }
-
-                actualPlayer = players[actualTurn - 1];
+                actualTurn = 0;
             }
+            actualPlayer = players[actualTurn];
         }
 
-        void ValidateTile(PointRotation pr, Rotation r)     //Place
+        public void ValidateTile(PointRotation pr, Rotation r)     //Place
         {
-            Chunk c = pile.Draw();
-            gameBoard.AddChunk(c, actualPlayer, pr, r);
+            gameBoard.AddChunk(actualChunk, actualPlayer, pr, r);
         }
 
+        public Vector2Int[] BarracksSlots()
+        {
+            return gameBoard.GetBarrackSlots();
+        }
+
+        public Vector2Int[] TowerSlots(Player actualPlayer)
+        {
+            return gameBoard.GetTowerSlots(actualPlayer);
+        }
+        
+        public Vector2Int[] TempleSlots(Player actualPlayer)
+        {
+            return gameBoard.GetTempleSlots(actualPlayer);
+        }
+
+        public PointRotation[] ChunkSlots()
+        {
+            return gameBoard.GetChunkSlots();
+        }
+
+        public void SetChunkLevel(PointRotation pr)
+        {
+            gameBoard.SetChunkLevel(pr);
+        }
+
+        bool IsVoid(PointRotation pr)
+        {
+            return gameBoard.WorldMap.IsVoid(pr.point);
+        }
+        
         public int NumberOfAI
         {
             set { throw new NotImplementedException(); }
