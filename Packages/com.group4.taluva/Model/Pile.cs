@@ -24,5 +24,11 @@ namespace Taluva.Model
             _played.Add(c);
             return c;
         }
+
+        public void Stack(T chunk)
+        {
+            _stack.Push(chunk);
+            _played.Remove(chunk);
+        }
     }
 }

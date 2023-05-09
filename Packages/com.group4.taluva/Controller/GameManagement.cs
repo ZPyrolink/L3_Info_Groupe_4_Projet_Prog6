@@ -40,8 +40,7 @@ namespace Taluva.Controller
             public Chunk chunk;
             public Player player;
 
-            //Use it when there is nothing at the position
-            public Coup(Vector2Int[] positions, Rotation? rotation, Player actualPlayer)
+            private Coup(Vector2Int[] positions, Rotation? rotation, Player actualPlayer)
             {
                 this.positions = positions;
                 this.rotation = rotation;
@@ -59,11 +58,13 @@ namespace Taluva.Controller
             }
         }
 
-        public void AddHistoric(Vector2Int[] positions, Rotation rotation)
-        {
-            historic.Add(new(positions, rotation, actualPlayer));
-        }
-
+        /// <summary>
+        /// Use this when you're in phase 1 during the placement of the chunk.
+        /// It will also store the possible cells under the chunk.
+        /// </summary>
+        /// <param name="position">Position of the chunk</param>
+        /// <param name="rotation">Rotation of the chunk</param>
+        /// <param name="chunk">The chunk played at the round</param>
         public void AddHistoric(Vector2Int position, Rotation rotation, Chunk chunk)
         {
             Cell[] cells;
@@ -77,6 +78,12 @@ namespace Taluva.Controller
             historic.Add(new(new[] { position }, rotation, actualPlayer, chunk, cells));
         }
 
+        /// <summary>
+        /// Use this when you're in phase 2 during the placement of a building.
+        /// It will store the different information on the cells.
+        /// </summary>
+        /// <param name="positions">Buildings positions</param>
+        /// <param name="cells">Cells with the buildings</param>
         public void AddHistoric(Vector2Int[] positions, Cell[] cells)
         {
             historic.Add(new(positions, null, actualPlayer, cells));
@@ -84,6 +91,9 @@ namespace Taluva.Controller
 
         public void Undo()
         {
+            if (!historic.CanUndo)
+                return;
+
             int nbActualPlayer = 0;
             for(int i = 0; i < players.Length; i++) {
                 if (actualPlayer == players[i])
@@ -92,10 +102,7 @@ namespace Taluva.Controller
             actualPlayer = players[(nbActualPlayer + NbPlayers - 1) % NbPlayers];
 
             Coup c = historic.Undo();
-            if(c.chunk == null && c.cells == null) {
-                foreach (Vector2Int position in c.positions)
-                    gameBoard.WorldMap.Remove(position);
-            }else if(c.chunk != null) {
+            if(c.chunk != null) {
                 gameBoard.RemoveChunk(c.chunk);
                 for(int i = 0; i < c.cells.Length; i++)
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
@@ -103,21 +110,49 @@ namespace Taluva.Controller
             }else if(c.cells != null) {
                 for (int i = 0; i < c.cells.Length; i++) {
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
+                    switch (c.cells[i].ActualBuildings) {
+                        case Building.None:
+                            break;
+                        case Building.Temple:
+                            actualPlayer.nbTemple++; ;
+                            break;
+                        case Building.Tower:
+                            actualPlayer.nbTowers++;
+                            break;
+                        case Building.Barrack:
+                            actualPlayer.nbBarrack += gameBoard.WorldMap.GetValue(c.positions[i]).ParentCunk.Level;
+                            break;
+                    }
                 }
-                //compter les batiment et les rajouter au joueur
             }
         }
 
         public void Redo()
         {
-            //Si on est en phase 1 enlever la chunk de la pile autrement enlever le bon nombre de batiment
+            if (!historic.CanRedo)
+                return;
+
             Coup c = historic.Redo();
             if(c.chunk == null) {
                 for(int i = 0; i < c.cells.Length; i++) {
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
+                    switch (c.cells[i].ActualBuildings) {
+                        case Building.None:
+                            break;
+                        case Building.Temple:
+                            actualPlayer.nbTemple--; ;
+                            break;
+                        case Building.Tower:
+                            actualPlayer.nbTowers--;
+                            break;
+                        case Building.Barrack:
+                            actualPlayer.nbBarrack -= gameBoard.WorldMap.GetValue(c.positions[i]).ParentCunk.Level;
+                            break;
+                    }
                 }
             } else {
                 gameBoard.AddChunk(c.chunk, c.player, new(c.positions[0]),(Rotation) c.rotation);
+                //Enlever la chunk de la pile 
             }
             int nbActualPlayer = 0;
             for (int i = 0; i < players.Length; i++) {
