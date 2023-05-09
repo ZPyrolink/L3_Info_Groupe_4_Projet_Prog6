@@ -239,7 +239,7 @@ namespace Taluva.Model
             WorldMap.Add(c.Coords[2], right);
         }
 
-        public void AddChunk(Chunk c, Player _, PointRotation p, Rotation r)
+        public void AddChunk(Chunk c,Player player, PointRotation p, Rotation r)
         {
             if (!GetChunkSlots()
                     .Where(pr => pr.point.Equals(p.point))
@@ -247,6 +247,8 @@ namespace Taluva.Model
             {
                 return;
             }
+
+            player.lastChunk = c;
 
             Vector2Int[] neighbors = GetNeighbors(p.point);
 

@@ -9,9 +9,9 @@ namespace Taluva.Controller
     public class GameManagment
     {
         private Player[] players;
-        private Player actualPlayer;
+        private static Player actualPlayer { get; set; }
         public int NbPlayers { get; set; }
-        private int actualTurn;
+        public  int actualTurn { get; private set; }
         private int maxTurn;
         private Board gameBoard;
         private TurnPhase actualPhase;
