@@ -19,6 +19,12 @@ namespace Taluva.Model
 
         private void RemoveCell(Cell c) => WorldMap.Remove(GetCellCoord(c));
 
+        public void RemoveChunk(Chunk c)
+        {
+            foreach (Cell cell in c.Coords)
+                RemoveCell(cell);
+        }
+
         public List<Vector2Int> GetVillage(Vector2Int c)
         {
             PlayerColor color = WorldMap.GetValue(c).Owner;
@@ -52,21 +58,20 @@ namespace Taluva.Model
         {
             Vector2Int[] neighbors = GetNeighbors(c);
 
-            List<List<Vector2Int>> allVillages = new();
             List<List<Vector2Int>> villages = neighbors
                 .Where(neighbor =>
                     !WorldMap.IsVoid(neighbor) && WorldMap.GetValue(neighbor).ActualBuildings != Building.None)
                 .Select(GetVillage).ToList();
 
-            for (int i = 0; i < villages.Count; i++)
-                for (int j = i; j < villages.Count; j++)
+            for (int i = 0; i < villages.Count - 1; i++)
+                for (int j = i + 1; j < villages.Count; j++)
                     if (villages[i].Contains(villages[j][0]))
                     {
                         villages.RemoveAt(j);
                         j--;
                     }
 
-            return allVillages;
+            return villages;
         }
 
         public static Vector2Int[] GetNeighbors(Vector2Int p)
@@ -271,7 +276,7 @@ namespace Taluva.Model
             void SetC()
             {
                 c.Owner = player.ID;
-                c.ActualBuildings = b;
+                c.Build(b);
             }
 
             switch (b)
@@ -280,7 +285,7 @@ namespace Taluva.Model
                     SetC();
                     player.nbBarrack--;
                     break;
-                case Building.Temple when GetTempleSlot(player).Contains(coord):
+                case Building.Temple when GetTempleSlots(player).Contains(coord):
                     SetC();
                     player.nbTemple--;
                     break;
@@ -293,12 +298,6 @@ namespace Taluva.Model
             }
         }
 
-        public void RemoveChunk(Chunk c)
-        {
-            foreach (Cell cell in c.Coords)
-                WorldMap.Remove(GetCellCoord(cell));
-        }
-
         public Vector2Int[] GetBarrackSlots() => WorldMap
             .Select(GetCellCoord)
             .Where(p => !WorldMap.IsVoid(p) && WorldMap.GetValue(p).ActualBuildings == Building.None &&
@@ -307,7 +306,7 @@ namespace Taluva.Model
 
         public Vector2Int[] GetTowerSlots(Player actualPlayer) => WorldMap
             .Select(GetCellCoord)
-            .Where(p => !WorldMap.IsVoid(p) && WorldMap.GetValue(p).ActualBuildings == Building.None)
+            .Where(p => !WorldMap.IsVoid(p) && WorldMap.GetValue(p).ActualBuildings == Building.None && WorldMap.GetValue(p).IsBuildable)
             .Where(p => WorldMap.GetValue(p).ParentCunk.Level >= 3)
             .Where(p => IsAdjacentToCity(p, actualPlayer))
             .Where(p => !GetAllVillage(p)
@@ -324,13 +323,13 @@ namespace Taluva.Model
         public bool CityHasTower(List<Vector2Int> village) =>
             village.Any(vp => WorldMap.GetValue(vp).ActualBuildings == Building.Tower);
 
-        public Vector2Int[] GetTempleSlot(Player actualPlayer) => WorldMap
+        public Vector2Int[] GetTempleSlots(Player actualPlayer) => WorldMap
             .Where(cell => CanBuildTemple(cell, actualPlayer))
             .Select(GetCellCoord)
             .ToArray();
 
         public bool CanBuildTemple(Cell cell, Player actualPlayer) =>
-            cell.ActualBuildings == Building.None &&
+            cell.ActualBuildings == Building.None && cell.IsBuildable && IsAdjacentToCity(GetCellCoord(cell), actualPlayer) && 
             GetAllVillage(GetCellCoord(cell))
                 .All(village =>
                     WorldMap.GetValue(village[0]).Owner == actualPlayer.ID && !CityHasTemple(village) &&

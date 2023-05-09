@@ -55,7 +55,6 @@ namespace Taluva.Utils
             return remove;
         }
 
-        [Obsolete("Use the indexer instead!")]
         public T GetValue(Vector2Int coordonnes) => _matrix[coordonnes.x][coordonnes.y];
 
         public T this[Vector2Int co] => _matrix[co.x][co.y];
