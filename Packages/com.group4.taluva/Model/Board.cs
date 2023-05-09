@@ -467,5 +467,10 @@ namespace Taluva.Model
 
             throw new($"Cell {c} not found!");
         }
+        public void SetChunkLevel(PointRotation pr)
+        {
+            this.WorldMap.GetValue(pr.point).ParentCunk.Level++;
+        }
     }
+    
 }

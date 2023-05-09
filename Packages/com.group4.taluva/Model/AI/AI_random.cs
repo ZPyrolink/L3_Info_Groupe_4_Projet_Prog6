@@ -1,15 +1,9 @@
-using System.Collections.Generic;
-using System.Transactions;
 using UnityEngine;
 
-namespace Taluva.Model
+namespace Taluva.Model.AI
 {
     public class AIRandom : AI
     {
-        public AIRandom(PlayerColor id) : base(id)
-        {
-            
-        }
         public AIRandom(PlayerColor id,Board board) : base(id)
         {
             

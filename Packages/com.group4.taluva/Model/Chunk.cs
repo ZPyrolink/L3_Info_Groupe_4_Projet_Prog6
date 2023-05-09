@@ -6,7 +6,7 @@ namespace Taluva.Model
     {
         public Cell[] Coords { get; private set; }
         public Rotation rotation;
-        public readonly int Level = 1;
+        public int Level = 1;
 
         public Chunk(int l, Cell left, Cell right)
         {

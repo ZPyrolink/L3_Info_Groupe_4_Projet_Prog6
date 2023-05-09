@@ -12,6 +12,7 @@ public class Player
     public int nbTowers = 2;
 	public int nbTemple = 3;
 	public int nbBarrack = 20;
+    public bool playerIA = false;
 
     public Player(PlayerColor id)
     {

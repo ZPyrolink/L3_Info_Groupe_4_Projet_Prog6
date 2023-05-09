@@ -1,7 +1,6 @@
-using UnityEditor.Build.Player;
 using UnityEngine;
 
-namespace Taluva.Model
+namespace Taluva.Model.AI
 {
     public class AI : Player
     {

@@ -2,6 +2,7 @@
 
 using Taluva.Model;
 using Taluva.Utils;
+using Taluva.Model.AI;
 using UnityEngine;
 
 namespace Taluva.Controller
@@ -9,7 +10,8 @@ namespace Taluva.Controller
     public class GameManagment
     {
         private Player[] players;
-        private Player actualPlayer { get; set; }
+        private Player actualPlayer;
+        private AI ActualAi => (AI)actualPlayer;
         public int NbPlayers { get; set; }
         public  int actualTurn { get; private set; }
         private int maxTurn;
@@ -17,9 +19,10 @@ namespace Taluva.Controller
         private TurnPhase actualPhase;
         private Historic<Coup> historic;
         private Pile<Chunk> pile = ListeChunk.Pile;
-        public Chunk actualChunk;
-
-        public GameManagment(int nbPlayers)
+        private Chunk actualChunk;
+        private bool AIRandom = false;
+        
+        public GameManagment(int nbPlayers, int maxTurn)
         {
             historic = new();
             this.players = new Player[nbPlayers];
@@ -27,12 +30,26 @@ namespace Taluva.Controller
             this.gameBoard = new();
             this.NbPlayers = nbPlayers;
             this.maxTurn = 12 * nbPlayers;
-            for (int i = 0; i < this.NbPlayers; i++)
-                players[i] = new((PlayerColor) i);
+            this.
             actualPlayer = players[0];
+            for (int i = 0; i < this.NbPlayers; i++)
+            {
+                players[i] = new((PlayerColor) i);
+                if (this.AIRandom && i==1)
+                {
+                    players[i].playerIA = true;
+                    break;
+                }
+            }
+                
         }
 
-        public class Coup
+        public void setAI()
+        {
+            this.AIRandom = true;
+            this.NbPlayers = 2;
+        }
+        private class Coup
         {
             //New Chunk or cells
             public Vector2Int[] positions;
@@ -286,30 +303,79 @@ namespace Taluva.Controller
 
         public void InitPlay()
         {
-            while (actualTurn <= maxTurn)
+            actualTurn++;
+            this.actualChunk = pile.Draw();
+            if (actualTurn + 1 > NbPlayers)
             {
-                actualPhase = TurnPhase.PlaceBuilding;
-                actualPhase = TurnPhase.RotateCell;
-                actualPhase = TurnPhase.SelectCells;
-
-                actualTurn++;
-                if (actualTurn > NbPlayers)
-                {
-                    actualTurn = 1;
-                }
-
-                actualPlayer = players[actualTurn - 1];
+                actualTurn = 0;
             }
+            actualPlayer = players[actualTurn];
+        }
+
+        public void PlayerMove()
+        {
+            if (actualPlayer is AI ai)
+            {
+                AIMove(ai);
+            }
+            else
+            {
+                // Move();
+            }
+        }
+        public void AIMove(AI ai)
+        {
+            PointRotation pr = ((AI)actualPlayer).PlayChunk();
+            ValidateTile(pr, 0);
+            // PlaceBuilding();
+        }
+
+        public void Move()
+        {
+            
         }
 
         public void ValidateTile(PointRotation pr, Rotation r)     //Place
         {
-            actualChunk = pile.Draw();
-
             AddHistoric(pr.point, r, actualChunk);
             gameBoard.AddChunk(actualChunk, actualPlayer, pr, r);
         }
 
+        public void PlaceBuilding(Cell c, Building b)
+        {   
+            gameBoard.PlaceBuilding(c, b, actualPlayer);
+        }
+
+        public Vector2Int[] BarracksSlots()
+        {
+            return gameBoard.GetBarrackSlots();
+        }
+
+        public Vector2Int[] TowerSlots(Player actualPlayer)
+        {
+            return gameBoard.GetTowerSlots(actualPlayer);
+        }
+        
+        public Vector2Int[] TempleSlots(Player actualPlayer)
+        {
+            return gameBoard.GetTempleSlots(actualPlayer);
+        }
+
+        public PointRotation[] ChunkSlots()
+        {
+            return gameBoard.GetChunkSlots();
+        }
+
+        public void SetChunkLevel(PointRotation pr)
+        {
+            gameBoard.SetChunkLevel(pr);
+        }
+
+        bool IsVoid(PointRotation pr)
+        {
+            return gameBoard.WorldMap.IsVoid(pr.point);
+        }
+        
         public int NumberOfAI
         {
             set { throw new NotImplementedException(); }
