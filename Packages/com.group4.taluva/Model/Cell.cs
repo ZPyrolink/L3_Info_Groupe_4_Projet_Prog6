@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Taluva.Model
+﻿namespace Taluva.Model
 {
     public class Cell
     {

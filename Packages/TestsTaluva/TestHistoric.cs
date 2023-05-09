@@ -1,9 +1,7 @@
 ﻿using NUnit.Framework;
-using UnityEngine;
 
 using Taluva.Controller;
 using Taluva.Model;
-using Taluva.Utils;
 
 namespace TestsTaluva
 {
@@ -64,10 +62,10 @@ namespace TestsTaluva
             Assert.IsTrue(_gm.IsVoid(new(-1, -1)));
 
             _gm.ValidateTile(new(new(0, 0), new[] { true, false, false, false, false, false }), Rotation.N);
-            _gm.PlaceBuilding(_gm.gameBoard.WorldMap.GetValue(new(-1, 0)), Building.Barrack);
+            _gm.PlaceBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
 
             _gm.Undo();
-            Assert.IsTrue(_gm.gameBoard.WorldMap.GetValue(new(-1, 0)).ActualBuildings == Building.None);
+            Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.None);
         }
 
         [Test]
@@ -80,11 +78,11 @@ namespace TestsTaluva
             Assert.IsFalse(_gm.IsVoid(new(-1, 0)));
             Assert.IsFalse(_gm.IsVoid(new(-1, -1)));
 
-            _gm.PlaceBuilding(_gm.gameBoard.WorldMap.GetValue(new(-1, 0)), Building.Barrack);
+            _gm.PlaceBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
 
             _gm.Undo();
             _gm.Redo();
-            Assert.IsTrue(_gm.gameBoard.WorldMap.GetValue(new(-1, 0)).ActualBuildings == Building.Barrack);
+            Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.Barrack);
         }
     }
 }

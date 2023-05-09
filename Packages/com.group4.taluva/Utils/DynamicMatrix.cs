@@ -13,10 +13,7 @@ namespace Taluva.Utils
         private readonly Dictionary<int, Dictionary<int, T>> _matrix;
         // Dans la théorie, cette liste devra ajouter 0.5 à ces coordonées en Y quand X % 2 == 1
 
-        public DynamicMatrix()
-        {
-            _matrix = new();
-        }
+        public DynamicMatrix() => _matrix = new();
 
         /// <summary>
         /// Line maximum in the matrix
@@ -26,7 +23,7 @@ namespace Taluva.Utils
         /// <summary>
         /// Line minimum in the matrix
         /// </summary>
-        public int MinLine => _matrix.Keys.Order().ToArray().First();
+        public int MinLine => _matrix.Keys.Order().First();
 
         /// <summary>
         /// Column maximum of the line
@@ -62,7 +59,7 @@ namespace Taluva.Utils
         /// </summary>
         /// <param name="p">The point to test</param>
         /// <returns>Return if the point exist</returns>
-        public bool ContainsColumn(Vector2Int p) => _matrix[p.x].ContainsKey(p.y);
+        public bool ContainsColumn(Vector2Int p) => ContainsColumn(p.x, p.y);
 
         /// <summary>
         /// Add the value at the coordonees.
@@ -106,14 +103,31 @@ namespace Taluva.Utils
         /// </summary>
         /// <param name="coordonnes">Coordonnes of the object</param>
         /// <returns>Return the object at the position</returns>
-        public T GetValue(Vector2Int coordonnes) => _matrix[coordonnes.x][coordonnes.y];
+        [Obsolete("Use the getter of the indexer instead!")]
+        public T GetValue(Vector2Int coordonnes) => this[coordonnes];
 
         /// <summary>
-        /// New version of GetValue
+        /// New version of GetValue and SetValue
         /// </summary>
         /// <param name="co">Coordonnes of the object</param>
         /// <returns>Return the object at the position</returns>
-        public T this[Vector2Int co] => _matrix[co.x][co.y];
+        public T this[Vector2Int co]
+        {
+            get => _matrix[co.x][co.y];
+            set
+            {
+                if (!_matrix.ContainsKey(co.x))
+                {
+                    _matrix.Add(co.x, new() { { co.y, value } });
+                    return;
+                }
+
+                if (_matrix[co.x].ContainsKey(co.y))
+                    _matrix[co.x][co.y] = value;
+                else
+                    _matrix[co.x].Add(co.y, value);
+            }
+        }
 
         /// <summary>
         /// Enumerator of the matrix.
@@ -123,7 +137,7 @@ namespace Taluva.Utils
         public IEnumerator<T> GetEnumerator() => _matrix
             .OrderBy(x => x.Key)
             .SelectMany(x => x.Value
-                .OrderBy(y => y.Key), (x, y) => y.Value)
+                .OrderBy(y => y.Key), (_, y) => y.Value)
             .GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

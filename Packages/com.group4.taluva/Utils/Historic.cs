@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Taluva.Model;
-using UnityEngine;
 
 namespace Taluva.Utils
 {
