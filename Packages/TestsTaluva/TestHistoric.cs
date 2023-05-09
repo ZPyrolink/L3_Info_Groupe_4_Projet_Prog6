@@ -53,5 +53,11 @@ namespace TestsTaluva
             Assert.IsFalse(_gm.CanRedo);
         }
 
+        [Test]
+        public void TestUndo()
+        {
+            _gm.ValidateTile(new(new(0, 0), new[] { true, false, false, false, false, false }), Rotation.N);
+            _gm.Undo();
+        }
     }
 }
