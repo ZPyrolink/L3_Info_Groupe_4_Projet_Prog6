@@ -20,9 +20,9 @@ namespace Taluva.Model.AI
         {
             return null;}
 
-        public (Building buil, Vector2Int? pos) PlayBuild()
+        public (Building buil, Vector2Int pos) PlayBuild()
         {
-            return (Building.None, null);
+            return (Building.None, new());
         }
 
     }

@@ -308,13 +308,22 @@ namespace Taluva.Controller
         public void AIMove(AI ai)
         {
             PointRotation pr = ((AI)actualPlayer).PlayChunk();
-            ValidateTile(pr, 0);
-            // PlaceBuilding();
+            Rotation r = Rotation.N;
+            for (int i = 0; i < 6; i++)
+            {
+                if (pr.rotations[i])
+                    r = (Rotation)i;
+            }
+            ValidateTile(pr, r);
+            (Building b, Vector2Int pos) = ((AI)actualPlayer).PlayBuild();
+            PointRotation p = new PointRotation(pos);
+            Cell c = gameBoard.WorldMap.GetValue(p.point);
+            PlaceBuilding(c,b);
         }
 
         public void Move()
         {
-            
+            //TODO 
         }
 
         public void ValidateTile(PointRotation pr, Rotation r)     //Place
