@@ -18,7 +18,7 @@ namespace Taluva.Utils
         }
 
         public bool CanUndo => Index != -1;
-        public bool CanRedo => Index != Count;
+        public bool CanRedo => Index != Count - 1;
 
         public new void Add(T element)
         {

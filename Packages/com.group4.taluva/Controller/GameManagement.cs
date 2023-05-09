@@ -17,8 +17,9 @@ namespace Taluva.Controller
         private TurnPhase actualPhase;
         private Historic<Coup> historic;
 
-        public GameManagment(int nbPlayers, int maxTurn)
+        public GameManagment(int nbPlayers)
         {
+            historic = new();
             this.players = new Player[nbPlayers];
             this.actualTurn = 1;
             this.gameBoard = new();
@@ -29,7 +30,7 @@ namespace Taluva.Controller
                 players[i] = new((PlayerColor) i);
         }
 
-        private class Coup
+        public class Coup
         {
             //New Chunk or cells
             public Vector2Int[] positions;
@@ -57,6 +58,17 @@ namespace Taluva.Controller
                 this.cells = cells;
             }
         }
+
+        /// <summary>
+        /// Check if we can undo
+        /// </summary>
+        public bool CanUndo => historic.CanUndo;
+
+        /// <summary>
+        /// Check if we can redo
+        /// </summary>
+        public bool CanRedo => historic.CanRedo;
+        
 
         /// <summary>
         /// Use this when you're in phase 1 during the placement of the chunk.
