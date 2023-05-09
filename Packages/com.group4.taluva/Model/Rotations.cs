@@ -28,5 +28,17 @@ namespace Taluva.Model
          
          _ => throw new()
       };
+
+      public static float YDegree(this Rotation rot) => rot switch
+      {
+         SW => 270,
+         NW => 330,
+         N => 30,
+         NE => 90,
+         SE => 150,
+         S => 210,
+
+         _ => throw new()
+      };
    }
 }

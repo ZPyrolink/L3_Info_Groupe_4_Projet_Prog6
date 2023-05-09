@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using Imports.QuickOutline.Scripts;
 
@@ -12,7 +14,7 @@ using Utils;
 
 public class TilesMgr : MonoBehaviour
 {
-    private const float xOffset = 1.5f, yOffset = .3f, zOffset = 1.73205f;
+    private const float xOffset = 1.5f, yOffset = .41f, zOffset = 1.73205f;
     public static TilesMgr Instance { get; private set; }
 
     private Board _board;
@@ -20,13 +22,15 @@ public class TilesMgr : MonoBehaviour
     [SerializeField]
     private Transform boardParent;
 
-    private GameObject _current;
+    private GameObject _current, _currentFf;
 
     [SerializeField]
     private GameObject feedForward;
 
     [SerializeField]
     private Transform feedForwardParent;
+
+    private Dictionary<GameObject, PointRotation> _gos;
 
     private void Start()
     {
@@ -59,6 +63,7 @@ public class TilesMgr : MonoBehaviour
                 OutlineGo(hit.transform.gameObject);
                 break;
             case "Feed Forward":
+                _currentFf = hit.transform.gameObject;
                 PutTile(hit.transform.position);
                 break;
 
@@ -86,7 +91,6 @@ public class TilesMgr : MonoBehaviour
             _current = Instantiate(tmp, boardParent);
             tmp.SetActive(false);
             _current.transform.localScale = new(100, 100, 100);
-            _current.transform.rotation = Quaternion.Euler(-90, 0, -90);
             _current.layer = LayerMask.NameToLayer("Default");
             foreach (Material mat in _current.GetComponent<MeshRenderer>().materials)
             {
@@ -98,7 +102,12 @@ public class TilesMgr : MonoBehaviour
         if (_current.transform.position == pos)
             RotateTile();
         else
+        {
             _current.transform.position = pos;
+            _current.transform.rotation = Quaternion.Euler(270,
+                _gos == null ? 270 : ((Rotation) Array.IndexOf(_gos[_currentFf].rotations, true)).YDegree(),
+                0);
+        }
     }
 
     public void ValidateTile()
@@ -119,7 +128,7 @@ public class TilesMgr : MonoBehaviour
         _current = null;
         ClearFeedForward();
     }
-    
+
     private (Vector2Int pos, Rotation rot, int level) GetPr()
     {
         Rotation rot = RotationExt.Of(Mathf.Round(_current.transform.rotation.eulerAngles.y));
@@ -132,10 +141,20 @@ public class TilesMgr : MonoBehaviour
         return (pos, rot, (int) (_current.transform.position.y / yOffset));
     }
 
-    private void RotateTile() => _current.transform.Rotate(new(0, 360f / 6, 0), Space.World);
+    private void RotateTile()
+    {
+        Rotation rot;
+
+        do
+        {
+            _current.transform.Rotate(new(0, 360f / 6, 0), Space.World);
+            rot = RotationExt.Of(Mathf.Round(_current.transform.rotation.eulerAngles.y));
+        } while (_gos?[_currentFf]?.rotations?[(int) rot] == false);
+    }
 
     public void SetFeedForward()
     {
+        _gos = new();
         foreach (PointRotation pr in _board.GetChunkSlots())
         {
             Vector3 pos = new(pr.point.x, 0, pr.point.y);
@@ -144,15 +163,20 @@ public class TilesMgr : MonoBehaviour
             pos.Scale(new(xOffset, 1, zOffset));
             if (pr.point.x % 2 != 0)
                 pos.z += zOffset / 2;
-            SetFeedForward(pos);
+            _gos[SetFeedForward(pos)] = pr;
         }
     }
 
-    public void SetFeedForward(Vector3 pos) =>
-        Instantiate(feedForward, pos, Quaternion.Euler(-90, -90, 0), feedForwardParent);
+    public GameObject SetFeedForward(Vector3 pos)
+    {
+        GameObject go = Instantiate(feedForward, pos, Quaternion.Euler(-90, -90, 0), feedForwardParent);
+        go.GetComponent<MeshRenderer>().materials[1].color = PlayerMgr.Instance.Current.Color;
+        return go;
+    }
 
     public void ClearFeedForward()
     {
+        _gos = new();
         foreach (Transform t in feedForwardParent)
             Destroy(t.gameObject);
     }
