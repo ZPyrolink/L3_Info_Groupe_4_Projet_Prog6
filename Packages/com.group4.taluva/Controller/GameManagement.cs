@@ -9,13 +9,15 @@ namespace Taluva.Controller
     public class GameManagment
     {
         private Player[] players;
-        private Player actualPlayer { get; }
+        private Player actualPlayer;
         public int NbPlayers { get; set; }
         private int actualTurn;
         private int maxTurn;
         private Board gameBoard;
         private TurnPhase actualPhase;
         private Historic<Coup> historic;
+        private Pile<Chunk> pile = ListeChunk.Pile;
+        private Chunk actualChunk;
 
         public GameManagment(int nbPlayers, int maxTurn)
         {
@@ -195,6 +197,12 @@ namespace Taluva.Controller
 
                 actualPlayer = players[actualTurn - 1];
             }
+        }
+
+        void ValidateTile(PointRotation pr, Rotation r)     //Place
+        {
+            Chunk c = pile.Draw();
+            gameBoard.AddChunk(c, actualPlayer, pr, r);
         }
 
         public int NumberOfAI
