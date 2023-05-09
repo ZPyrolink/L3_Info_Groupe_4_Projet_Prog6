@@ -22,7 +22,7 @@ namespace Taluva.Controller
         private Chunk actualChunk;
         private bool AIRandom = false;
         
-        public GameManagment(int nbPlayers, int maxTurn)
+        public GameManagment(int nbPlayers)
         {
             historic = new();
             this.players = new Player[nbPlayers];
@@ -30,8 +30,6 @@ namespace Taluva.Controller
             this.gameBoard = new();
             this.NbPlayers = nbPlayers;
             this.maxTurn = 12 * nbPlayers;
-            this.
-            actualPlayer = players[0];
             for (int i = 0; i < this.NbPlayers; i++)
             {
                 players[i] = new((PlayerColor) i);
@@ -41,7 +39,7 @@ namespace Taluva.Controller
                     break;
                 }
             }
-                
+            actualPlayer = players[0];
         }
 
         public void setAI()
@@ -337,12 +335,15 @@ namespace Taluva.Controller
 
         public void ValidateTile(PointRotation pr, Rotation r)     //Place
         {
+            //Ajouter les cells si elles existent
             AddHistoric(pr.point, r, actualChunk);
             gameBoard.AddChunk(actualChunk, actualPlayer, pr, r);
         }
 
         public void PlaceBuilding(Cell c, Building b)
-        {   
+        {
+            Cell cell = new(c);
+            AddHistoric(new[] { gameBoard.GetCellCoord(c) }, new[] { cell });
             gameBoard.PlaceBuilding(c, b, actualPlayer);
         }
 
@@ -371,10 +372,12 @@ namespace Taluva.Controller
             gameBoard.SetChunkLevel(pr);
         }
 
-        bool IsVoid(PointRotation pr)
+        public bool IsVoid(Vector2Int p)
         {
-            return gameBoard.WorldMap.IsVoid(pr.point);
+            return gameBoard.WorldMap.IsVoid(p);
         }
+
+        
         
         public int NumberOfAI
         {

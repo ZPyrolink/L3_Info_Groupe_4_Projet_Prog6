@@ -16,6 +16,13 @@ namespace Taluva.Model
             this.ActualBuildings = Building.None;
             this.ParentCunk = c;
         }
+        public Cell(Cell c)
+        {
+            this.ActualBiome = c.ActualBiome;
+            this.ActualBuildings = c.ActualBuildings;
+            this.Owner = c.Owner;
+            this.ParentCunk = c.ParentCunk;
+        }
 
         public Cell(Biomes biome)
         {

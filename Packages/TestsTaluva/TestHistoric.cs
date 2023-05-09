@@ -16,6 +16,7 @@ namespace TestsTaluva
         public void Init()
         {
             _gm = new(2);
+            _gm.InitPlay();
         }
 
         [Test]
@@ -58,6 +59,32 @@ namespace TestsTaluva
         {
             _gm.ValidateTile(new(new(0, 0), new[] { true, false, false, false, false, false }), Rotation.N);
             _gm.Undo();
+            Assert.IsTrue(_gm.IsVoid(new(0, 0)));
+            Assert.IsTrue(_gm.IsVoid(new(-1, 0)));
+            Assert.IsTrue(_gm.IsVoid(new(-1, -1)));
+
+            _gm.ValidateTile(new(new(0, 0), new[] { true, false, false, false, false, false }), Rotation.N);
+            _gm.PlaceBuilding(_gm.gameBoard.WorldMap.GetValue(new(-1, 0)), Building.Barrack);
+
+            _gm.Undo();
+            Assert.IsTrue(_gm.gameBoard.WorldMap.GetValue(new(-1, 0)).ActualBuildings == Building.None);
+        }
+
+        [Test]
+        public void TestRedo()
+        {
+            _gm.ValidateTile(new(new(0, 0), new[] { true, false, false, false, false, false }), Rotation.N);
+            _gm.Undo();
+            _gm.Redo();
+            Assert.IsFalse(_gm.IsVoid(new(0, 0)));
+            Assert.IsFalse(_gm.IsVoid(new(-1, 0)));
+            Assert.IsFalse(_gm.IsVoid(new(-1, -1)));
+
+            _gm.PlaceBuilding(_gm.gameBoard.WorldMap.GetValue(new(-1, 0)), Building.Barrack);
+
+            _gm.Undo();
+            _gm.Redo();
+            Assert.IsTrue(_gm.gameBoard.WorldMap.GetValue(new(-1, 0)).ActualBuildings == Building.Barrack);
         }
     }
 }
