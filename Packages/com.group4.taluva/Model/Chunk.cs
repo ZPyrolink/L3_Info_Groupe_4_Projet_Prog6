@@ -19,6 +19,8 @@ namespace Taluva.Model
             this.Level = l;
 
         }
+        
+        
 
         void RotateChunk()
         {
@@ -29,5 +31,7 @@ namespace Taluva.Model
         {
             throw new NotImplementedException();
         }
+        
+        
     }
 }
