@@ -379,20 +379,19 @@ namespace Taluva.Model
 
         public List<Vector2Int> FindBiomesAroundVillage(Vector2Int cell, Player player)
         {
-            return new List<Vector2Int>();
             List<List<Vector2Int>> allVillages = GetAllVillage(cell);
             List<Vector2Int> sameBiome = new() { cell };
-            Biomes biomes = WorldMap.GetValue(cell).ActualBiome;
+            Biomes biomes = WorldMap[cell].ActualBiome;
 
             foreach (List<Vector2Int> villages in allVillages) {
-                if (WorldMap.GetValue(villages[0]).Owner != player.ID)
+                if (WorldMap[villages[0]].Owner != player.ID)
                     continue;
                 foreach (Vector2Int c in villages) {
                     Vector2Int[] neighbors = GetNeighbors(c);
                     foreach (Vector2Int neighbor in neighbors) {
-                        if (WorldMap.GetValue(neighbor).ActualBuildings != Building.None) continue;
+                        if (WorldMap[neighbor].ActualBuildings != Building.None) continue;
 
-                        if (WorldMap.GetValue(neighbor).ActualBiome == biomes)
+                        if (WorldMap[neighbor].ActualBiome == biomes)
                             if (!sameBiome.Contains(neighbor))
                                 sameBiome.Add(neighbor);
                     }
