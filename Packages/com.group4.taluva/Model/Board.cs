@@ -35,6 +35,16 @@ namespace Taluva.Model
         }
 
         /// <summary>
+        /// Check if the position contains any build
+        /// </summary>
+        /// <param name="pos">A cell position</param>
+        /// <returns>
+        ///     <see langword="true"/> if the position is not a void and his build is not <see cref="Building.None"/>
+        /// </returns>
+        private bool ContainsBuild(Vector2Int pos) => !WorldMap.IsVoid(pos) &&
+                                                      WorldMap[pos].ActualBuildings != Building.None;
+
+        /// <summary>
         /// Find all the position of the village.
         /// Be careful! The position given has a building on it.
         /// </summary>
@@ -42,11 +52,10 @@ namespace Taluva.Model
         /// <returns>Return all the position of the village.</returns>
         public List<Vector2Int> GetVillage(Vector2Int c)
         {
-            PlayerColor color = WorldMap.GetValue(c).Owner;
+            PlayerColor color = WorldMap[c].Owner;
 
             bool TestNeighbor(Vector2Int neighbor) =>
-                !WorldMap.IsVoid(neighbor) && WorldMap.GetValue(neighbor).ActualBuildings != Building.None &&
-                WorldMap.GetValue(neighbor).Owner == color;
+                ContainsBuild(neighbor) && WorldMap[neighbor].Owner == color;
 
             Vector2Int[] neighbors = GetNeighbors(c);
             List<Vector2Int> cells = neighbors.Where(TestNeighbor).ToList();
@@ -78,10 +87,7 @@ namespace Taluva.Model
         {
             Vector2Int[] neighbors = GetNeighbors(c);
 
-            List<List<Vector2Int>> villages = neighbors
-                .Where(neighbor =>
-                    !WorldMap.IsVoid(neighbor) && WorldMap.GetValue(neighbor).ActualBuildings != Building.None)
-                .Select(GetVillage).ToList();
+            List<List<Vector2Int>> villages = neighbors.Where(ContainsBuild).Select(GetVillage).ToList();
 
             for (int i = 0; i < villages.Count - 1; i++)
                 for (int j = i + 1; j < villages.Count; j++)
@@ -163,31 +169,34 @@ namespace Taluva.Model
         /// <returns>Return if we can put a chunk at the pt position with r rotation</returns>
         public bool PossibleVolcano(Vector2Int left, Vector2Int right, Rotation r, Vector2Int pt)
         {
-            int level = WorldMap.GetValue(pt).ParentCunk.Level;
+            int level = WorldMap[pt].ParentCunk.Level;
 
             if (WorldMap.IsVoid(left) || WorldMap.IsVoid(right))
                 return false;
 
-            Cell leftCell = WorldMap.GetValue(left);
+            Cell leftCell = WorldMap[left];
 
             if (leftCell.ParentCunk.Level != level || leftCell.ParentCunk.Level != level)
                 return false;
 
-            if (WorldMap.GetValue(pt).ParentCunk.rotation == r)
+            if (WorldMap[pt].ParentCunk.rotation == r)
                 return false;
 
-            Cell rightCell = WorldMap.GetValue(right);
+            Cell rightCell = WorldMap[right];
 
             if (!leftCell.ContainsBuilding() && !rightCell.ContainsBuilding())
                 return true;
 
-            if (leftCell.ContainsBuilding() && !rightCell.ContainsBuilding() && GetVillage(GetCellCoord(leftCell)).Count > 1)
+            if (leftCell.ContainsBuilding() && !rightCell.ContainsBuilding() &&
+                GetVillage(GetCellCoord(leftCell)).Count > 1)
                 return leftCell.ActualBuildings == Building.Barrack;
 
-            if (!leftCell.ContainsBuilding() && rightCell.ContainsBuilding() && GetVillage(GetCellCoord(rightCell)).Count > 1)
+            if (!leftCell.ContainsBuilding() && rightCell.ContainsBuilding() &&
+                GetVillage(GetCellCoord(rightCell)).Count > 1)
                 return rightCell.ActualBuildings == Building.Barrack;
 
-            if (leftCell.ContainsBuilding() && rightCell.ContainsBuilding() && GetVillage(GetCellCoord(leftCell)).Count > 2)
+            if (leftCell.ContainsBuilding() && rightCell.ContainsBuilding() &&
+                GetVillage(GetCellCoord(leftCell)).Count > 2)
                 return leftCell.ActualBuildings == Building.Barrack && rightCell.ActualBuildings == Building.Barrack;
 
             return false;
@@ -235,9 +244,9 @@ namespace Taluva.Model
             {
                 if (!WorldMap.IsVoid(pt))
                 {
-                    if (WorldMap.GetValue(pt).ActualBiome == Biomes.Volcano)
+                    if (WorldMap[pt].ActualBiome == Biomes.Volcano)
                         continue;
-                    
+
                     pointRemove.Add(pt);
                     continue;
                 }
@@ -254,7 +263,7 @@ namespace Taluva.Model
                 pointRemove.Add(pt);
             }
 
-            foreach (Vector2Int pr in pointRemove) 
+            foreach (Vector2Int pr in pointRemove)
                 slots.Remove(pr);
 
             //Recherche des points qui sont des volcans et qui permettent une position pour ecraser la map
@@ -270,8 +279,8 @@ namespace Taluva.Model
                     int right = (int) r, left = right - 1;
                     if (left < 0)
                         left = rotations.Length + left;
-                    
-                    
+
+
                     if (PossibleVolcano(neighbors[left], neighbors[right], r, pt))
                         pr.AddRotation(r);
                 }
@@ -279,7 +288,6 @@ namespace Taluva.Model
                 if (pr.HaveRotation())
                     chunkSlots.Add(pr);
             }
-
 
             return chunkSlots.ToArray();
         }
@@ -305,7 +313,7 @@ namespace Taluva.Model
         /// <param name="player">Actual player</param>
         /// <param name="p">Position chosen in the GetChunkSlots</param>
         /// <param name="r">Rotation chosen</param>
-        public void AddChunk(Chunk c,Player player, PointRotation p, Rotation r)
+        public void AddChunk(Chunk c, Player player, PointRotation p, Rotation r)
         {
             if (!GetChunkSlots()
                     .Where(pr => pr.point.Equals(p.point))
@@ -320,7 +328,7 @@ namespace Taluva.Model
 
             if (p.rotations[(int) Rotation.N] && r == Rotation.N)
                 AddCell(c, p, neighbors[0], neighbors[5]);
-            else if (p.rotations[(int)Rotation.S] && r == Rotation.S)
+            else if (p.rotations[(int) Rotation.S] && r == Rotation.S)
                 AddCell(c, p, neighbors[3], neighbors[2]);
             else if (p.rotations[(int) Rotation.NE] && r == Rotation.NE)
                 AddCell(c, p, neighbors[1], neighbors[0]);
@@ -383,8 +391,8 @@ namespace Taluva.Model
         /// <returns>Return the possible possition for the barrack</returns>
         public Vector2Int[] GetBarrackSlots() => WorldMap
             .Select(GetCellCoord)
-            .Where(p => !WorldMap.IsVoid(p) && WorldMap.GetValue(p).ActualBuildings == Building.None &&
-                        WorldMap.GetValue(p).ActualBiome != Biomes.Volcano)
+            .Where(p => !WorldMap.IsVoid(p) && WorldMap[p].ActualBuildings == Building.None &&
+                        WorldMap[p].ActualBiome != Biomes.Volcano)
             .ToArray();
 
         /// <summary>
@@ -394,11 +402,11 @@ namespace Taluva.Model
         /// <returns>Return the possible position for a tower for the player actualPlayer</returns>
         public Vector2Int[] GetTowerSlots(Player actualPlayer) => WorldMap
             .Select(GetCellCoord)
-            .Where(p => !WorldMap.IsVoid(p) && WorldMap.GetValue(p).ActualBuildings == Building.None && WorldMap.GetValue(p).IsBuildable)
-            .Where(p => WorldMap.GetValue(p).ParentCunk.Level >= 3)
+            .Where(p => !WorldMap.IsVoid(p) && WorldMap[p].ActualBuildings == Building.None && WorldMap[p].IsBuildable)
+            .Where(p => WorldMap[p].ParentCunk.Level >= 3)
             .Where(p => IsAdjacentToCity(p, actualPlayer))
             .Where(p => !GetAllVillage(p)
-                .Where(village => WorldMap.GetValue(village[0]).Owner == actualPlayer.ID)
+                .Where(village => WorldMap[village[0]].Owner == actualPlayer.ID)
                 .Any(CityHasTower)).ToArray();
 
         /// <summary>
@@ -411,7 +419,7 @@ namespace Taluva.Model
         {
             List<List<Vector2Int>> allvillage = GetAllVillage(cellCoord);
             return allvillage.Count > 0 &&
-                   allvillage.Any(village => WorldMap.GetValue(village[0]).Owner == actualPlayer.ID);
+                   allvillage.Any(village => WorldMap[village[0]].Owner == actualPlayer.ID);
         }
 
         /// <summary>
@@ -420,7 +428,7 @@ namespace Taluva.Model
         /// <param name="village">Position of the different building of the village</param>
         /// <returns>Return if the village has a tower</returns>
         public bool CityHasTower(List<Vector2Int> village) =>
-            village.Any(vp => WorldMap.GetValue(vp).ActualBuildings == Building.Tower);
+            village.Any(vp => WorldMap[vp].ActualBuildings == Building.Tower);
 
         /// <summary>
         /// Find all the slots for the temple
@@ -439,10 +447,11 @@ namespace Taluva.Model
         /// <param name="actualPlayer">Actual Player</param>
         /// <returns>Return if we can build a temple on the cell cell for the player actualPlayer</returns>
         public bool CanBuildTemple(Cell cell, Player actualPlayer) =>
-            cell.ActualBuildings == Building.None && cell.IsBuildable && IsAdjacentToCity(GetCellCoord(cell), actualPlayer) && 
+            cell.ActualBuildings == Building.None && cell.IsBuildable &&
+            IsAdjacentToCity(GetCellCoord(cell), actualPlayer) &&
             GetAllVillage(GetCellCoord(cell))
                 .All(village =>
-                    WorldMap.GetValue(village[0]).Owner == actualPlayer.ID && !CityHasTemple(village) &&
+                    WorldMap[village[0]].Owner == actualPlayer.ID && !CityHasTemple(village) &&
                     village.Count >= 3);
 
         /// <summary>
@@ -451,7 +460,7 @@ namespace Taluva.Model
         /// <param name="village">Position of the different building of the village</param>
         /// <returns>Return if the city has a temple</returns>
         public bool CityHasTemple(List<Vector2Int> village) =>
-            village.Any(vp => WorldMap.GetValue(vp).ActualBuildings == Building.Temple);
+            village.Any(vp => WorldMap[vp].ActualBuildings == Building.Temple);
 
         /// <summary>
         /// Find the position of a cell.
@@ -466,16 +475,16 @@ namespace Taluva.Model
                     continue;
 
                 for (int j = WorldMap.MinColumn(i); j <= WorldMap.MaxColumn(i); j++)
-                    if (WorldMap.ContainsColumn(i, j) && WorldMap.GetValue(new(i, j)) == c)
+                    if (WorldMap.ContainsColumn(i, j) && WorldMap[new(i, j)] == c)
                         return new(i, j);
             }
 
             throw new($"Cell {c} not found!");
         }
+
         public void SetChunkLevel(PointRotation pr)
         {
-            this.WorldMap.GetValue(pr.point).ParentCunk.Level++;
+            WorldMap[pr.point].ParentCunk.Level++;
         }
     }
-    
 }

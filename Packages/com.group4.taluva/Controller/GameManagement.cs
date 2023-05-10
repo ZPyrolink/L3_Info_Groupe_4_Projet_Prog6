@@ -15,22 +15,21 @@ namespace Taluva.Controller
         public int NbPlayers { get; set; }
         public  int actualTurn { get; private set; }
         private int maxTurn;
-        private Board gameBoard;
+        public Board gameBoard;
         private TurnPhase actualPhase;
         private Historic<Coup> historic;
         private Pile<Chunk> pile = ListeChunk.Pile;
         private Chunk actualChunk;
         private bool AIRandom = false;
         
-        public GameManagment(int nbPlayers, int maxTurn)
+        public GameManagment(int nbPlayers)
         {
+            historic = new();
             this.players = new Player[nbPlayers];
             this.actualTurn = 1;
             this.gameBoard = new();
             this.NbPlayers = nbPlayers;
             this.maxTurn = 12 * nbPlayers;
-            this.
-            actualPlayer = players[0];
             for (int i = 0; i < this.NbPlayers; i++)
             {
                 players[i] = new((PlayerColor) i);
@@ -40,7 +39,7 @@ namespace Taluva.Controller
                     break;
                 }
             }
-                
+            actualPlayer = players[0];
         }
 
         public void setAI()
@@ -66,6 +65,13 @@ namespace Taluva.Controller
                 this.player = actualPlayer;
             }
 
+            public Coup(Vector2Int[] positions, Rotation rotation, Player actualPlayer, Chunk chunk) : this(positions, rotation, actualPlayer)
+            {
+                this.chunk = chunk;
+                this.cells = new Cell[1];
+                cells[0] = null;
+            }
+
             public Coup(Vector2Int[] positions, Rotation rotation, Player actualPlayer, Chunk chunk, Cell[] cells) : this(positions, rotation, actualPlayer, cells)
             {
                 this.chunk = chunk;
@@ -78,6 +84,17 @@ namespace Taluva.Controller
         }
 
         /// <summary>
+        /// Check if we can undo
+        /// </summary>
+        public bool CanUndo => historic.CanUndo;
+
+        /// <summary>
+        /// Check if we can redo
+        /// </summary>
+        public bool CanRedo => historic.CanRedo;
+        
+
+        /// <summary>
         /// Use this when you're in phase 1 during the placement of the chunk.
         /// It will also store the possible cells under the chunk.
         /// </summary>
@@ -86,15 +103,13 @@ namespace Taluva.Controller
         /// <param name="chunk">The chunk played at the round</param>
         public void AddHistoric(Vector2Int position, Rotation rotation, Chunk chunk)
         {
-            Cell[] cells;
-            if (gameBoard.WorldMap.IsVoid(position))
-                cells = new Cell[0];
-            else {
-                cells = new Cell[3];
-                cells = gameBoard.WorldMap.GetValue(position).ParentCunk.Coords;
+            if (!gameBoard.WorldMap.IsVoid(position))
+            {
+                historic.Add(new(new[] { position }, rotation, actualPlayer, chunk, gameBoard.WorldMap.GetValue(position).ParentCunk.Coords));
+            } else {
+                historic.Add(new(new[] { position }, rotation, actualPlayer, chunk));
             }
-
-            historic.Add(new(new[] { position }, rotation, actualPlayer, chunk, cells));
+                
         }
 
         /// <summary>
@@ -123,10 +138,11 @@ namespace Taluva.Controller
             Coup c = historic.Undo();
             if(c.chunk != null) {
                 gameBoard.RemoveChunk(c.chunk);
-                for(int i = 0; i < c.cells.Length; i++)
-                    gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
-                //Ajouter la chunk a la pile
-            }else if(c.cells != null) {
+                if(c.cells[0] != null)
+                    for(int i = 0; i < c.cells.Length; i++)
+                        gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
+                pile.Stack(c.chunk);
+            }else {
                 for (int i = 0; i < c.cells.Length; i++) {
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
                     switch (c.cells[i].ActualBuildings) {
@@ -171,7 +187,7 @@ namespace Taluva.Controller
                 }
             } else {
                 gameBoard.AddChunk(c.chunk, c.player, new(c.positions[0]),(Rotation) c.rotation);
-                //Enlever la chunk de la pile 
+                pile.Draw();
             }
             int nbActualPlayer = 0;
             for (int i = 0; i < players.Length; i++) {
@@ -319,11 +335,15 @@ namespace Taluva.Controller
 
         public void ValidateTile(PointRotation pr, Rotation r)     //Place
         {
+            //Ajouter les cells si elles existent
+            AddHistoric(pr.point, r, actualChunk);
             gameBoard.AddChunk(actualChunk, actualPlayer, pr, r);
         }
 
         public void PlaceBuilding(Cell c, Building b)
-        {   
+        {
+            Cell cell = new(c);
+            AddHistoric(new[] { gameBoard.GetCellCoord(c) }, new[] { cell });
             gameBoard.PlaceBuilding(c, b, actualPlayer);
         }
 
@@ -352,10 +372,12 @@ namespace Taluva.Controller
             gameBoard.SetChunkLevel(pr);
         }
 
-        bool IsVoid(PointRotation pr)
+        public bool IsVoid(Vector2Int p)
         {
-            return gameBoard.WorldMap.IsVoid(pr.point);
+            return gameBoard.WorldMap.IsVoid(p);
         }
+
+        
         
         public int NumberOfAI
         {
