@@ -127,7 +127,7 @@ namespace Taluva.Controller
         public Coup Undo()
         {
             if (!historic.CanUndo)
-                return;
+                return null;
 
             int nbActualPlayer = 0;
             for(int i = 0; i < players.Length; i++) {
@@ -167,7 +167,7 @@ namespace Taluva.Controller
         public Coup Redo()
         {
             if (!historic.CanRedo)
-                return;
+                return null;
 
             Coup c = historic.Redo();
             if(c.chunk == null) {
@@ -314,6 +314,10 @@ namespace Taluva.Controller
             actualPlayer = players[actualTurn];
         }
 
+        public void Play(PointRotation pr, Rotation r)
+        {
+            
+        }
         public void PlayerMove()
         {
             if (actualPlayer is AI ai)
@@ -325,6 +329,7 @@ namespace Taluva.Controller
                 // Move();
             }
         }
+        
         public void AIMove(AI ai)
         {
             PointRotation pr = ((AI)actualPlayer).PlayChunk();
@@ -336,7 +341,7 @@ namespace Taluva.Controller
         {
             
         }
-
+        
         public List<Vector2Int> FindBiomesAroundVillage(Vector2Int cell) => gameBoard.FindBiomesAroundVillage(cell, actualPlayer);
 
 

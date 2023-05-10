@@ -173,14 +173,14 @@ namespace Taluva.Model
                 return false;
 
             Cell leftCell = WorldMap[left];
-
-            if (leftCell.ParentCunk.Level != level || leftCell.ParentCunk.Level != level)
+            Cell rightCell = WorldMap[right];
+            if (leftCell.ParentCunk.Level != level || rightCell.ParentCunk.Level != level)
                 return false;
 
             if (WorldMap[pt].ParentCunk.rotation == r)
                 return false;
 
-            Cell rightCell = WorldMap[right];
+            
 
             if (!leftCell.ContainsBuilding() && !rightCell.ContainsBuilding())
                 return true;
@@ -378,6 +378,7 @@ namespace Taluva.Model
 
         public List<Vector2Int> FindBiomesAroundVillage(Vector2Int cell, Player player)
         {
+            return new List<Vector2Int>();
             List<List<Vector2Int>> allVillages = GetAllVillage(cell);
             List<Vector2Int> sameBiome = new() { cell };
             Biomes biomes = WorldMap.GetValue(cell).ActualBiome;
