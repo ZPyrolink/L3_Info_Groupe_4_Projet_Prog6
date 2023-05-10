@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Taluva.Model
 {
     public static class ListeChunk
-    {
+    {   
         private static readonly List<Chunk> Chunks = new();
 
         private static readonly int[,] OcurrenceMatrix =
@@ -30,7 +30,9 @@ namespace Taluva.Model
                     {
                         Cell c1 = new((Biomes) (i + 1));
                         Cell c2 = new((Biomes) (j + 1));
-                        Chunk c = new(0, c1, c2);
+                        Chunk c = new(1, c1, c2);
+                        c1.ParentCunk = c;
+                        c2.ParentCunk = c;
                         Chunks.Add(c);
                         reps++;
                     }

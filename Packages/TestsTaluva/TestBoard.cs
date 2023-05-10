@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+
 using NUnit.Framework;
+
 using UnityEngine;
 
 using Taluva.Model;
@@ -24,17 +26,17 @@ namespace TestsTaluva
             _player1 = new(PlayerColor.Blue);
             _player2 = new(PlayerColor.Red);
             Chunk _chunk = new(1, new(Biomes.Desert), new(Biomes.Plain));
-            PointRotation _pointRot = new(new(0,0),Rotation.N);
-            _board.AddChunk(_chunk,_player1,_pointRot, Rotation.N);
+            PointRotation _pointRot = new(new(0, 0), Rotation.N);
+            _board.AddChunk(_chunk, _player1, _pointRot, Rotation.N);
         }
-        
+
         [Test]
         public void TestChunkSlotAfterInit()
         {
             _board = new();
-            PointRotation[] possible= _board.GetChunkSlots();
-            Assert.AreEqual(0,possible[0].point.x);
-            Assert.AreEqual(0,possible[0].point.y);
+            PointRotation[] possible = _board.GetChunkSlots();
+            Assert.AreEqual(0, possible[0].point.x);
+            Assert.AreEqual(0, possible[0].point.y);
             foreach (bool rot in possible[0].rotations)
             {
                 Assert.IsTrue(rot);
@@ -45,55 +47,56 @@ namespace TestsTaluva
         public void TestAddChunk()
         {
             DynamicMatrix<Cell> _map = _board.WorldMap;
-            
-            Assert.IsFalse(_map.IsVoid(new(0,0)));
-            Assert.IsFalse(_map.IsVoid(new(-1,-1)));
-            Assert.IsFalse(_map.IsVoid(new(-1,0)));
-            
-            Assert.AreEqual(Biomes.Volcano, _map.GetValue(new(0,0)).ActualBiome);
-            Assert.AreEqual(Biomes.Plain, _map.GetValue(new(-1,-1)).ActualBiome);
-            Assert.AreEqual(Biomes.Desert, _map.GetValue(new(-1,0)).ActualBiome);
+
+            Assert.IsFalse(_map.IsVoid(new(0, 0)));
+            Assert.IsFalse(_map.IsVoid(new(-1, -1)));
+            Assert.IsFalse(_map.IsVoid(new(-1, 0)));
+
+            Assert.AreEqual(Biomes.Volcano, _map[new(0, 0)].ActualBiome);
+            Assert.AreEqual(Biomes.Plain, _map[new(-1, -1)].ActualBiome);
+            Assert.AreEqual(Biomes.Desert, _map[new(-1, 0)].ActualBiome);
         }
-        
+
         [Test]
         public void TestChunkSlotAfterOneChunk()
         {
-            PointRotation[] possible= _board.GetChunkSlots();
+            PointRotation[] possible = _board.GetChunkSlots();
             List<PointRotation> neighbors = new()
             {
-                new(new(-3, -2),new[]{false,false,true,true,false,false}),
-                new(new(-3, -1),new[]{false,false,true,true,true,false}),
-                new(new(-3, 0), new[]{false,false,true,true,true,false}),
-                new(new(-3, 1), new[]{false,false,false,true,true,false}),
+                new(new(-3, -2), new[] { false, false, true, true, false, false }),
+                new(new(-3, -1), new[] { false, false, true, true, true, false }),
+                new(new(-3, 0), new[] { false, false, true, true, true, false }),
+                new(new(-3, 1), new[] { false, false, false, true, true, false }),
 
-                new(new(-2, -2),new[]{false,true,true,true,false,false}),
-                new(new(-2, -1),new[]{true,true,false,false,true,true}),
-                new(new(-2, 0), new[]{true,true,false,false,false,true}),
-                new(new(-2, 1), new[]{true,true,true,false,false,true}),
-                new(new(-2, 2), new[]{false,false,false,true,true,true}),
+                new(new(-2, -2), new[] { false, true, true, true, false, false }),
+                new(new(-2, -1), new[] { true, true, false, false, true, true }),
+                new(new(-2, 0), new[] { true, true, false, false, false, true }),
+                new(new(-2, 1), new[] { true, true, true, false, false, true }),
+                new(new(-2, 2), new[] { false, false, false, true, true, true }),
 
-                new(new(-1, -3),new[]{false,true,true,false,false,false}),
-                new(new(-1, -2),new[]{true,false,false,true,true,true}),
-                new(new(-1, 1), new[]{true,true,true,true,false,false}),
-                new(new(-1, 2), new[]{false,false,false,false,true,true}),
+                new(new(-1, -3), new[] { false, true, true, false, false, false }),
+                new(new(-1, -2), new[] { true, false, false, true, true, true }),
+                new(new(-1, 1), new[] { true, true, true, true, false, false }),
+                new(new(-1, 2), new[] { false, false, false, false, true, true }),
 
-                new(new(0, -2),new[]{true,true,true,false,false,false}),
-                new(new(0, -1),new[]{false,false,false,true,true,true}),
-                new(new(0, 1), new[]{false,true,true,true,false,false}),
-                new(new(0, 2), new[]{true,false,false,false,true,true}),
+                new(new(0, -2), new[] { true, true, true, false, false, false }),
+                new(new(0, -1), new[] { false, false, false, true, true, true }),
+                new(new(0, 1), new[] { false, true, true, true, false, false }),
+                new(new(0, 2), new[] { true, false, false, false, true, true }),
 
-                new(new(1, -2),new[]{true,true,true,false,false,false}),
-                new(new(1, -1),new[]{false,false,true,true,true,true}),
-                new(new(1, 0), new[]{false,true,true,true,true,false}),
-                new(new(1, 1), new[]{true,false,false,false,true,true}),
+                new(new(1, -2), new[] { true, true, true, false, false, false }),
+                new(new(1, -1), new[] { false, false, true, true, true, true }),
+                new(new(1, 0), new[] { false, true, true, true, true, false }),
+                new(new(1, 1), new[] { true, false, false, false, true, true }),
 
-                new(new(2, -1),new[]{true,true,false,false,false,false}),
-                new(new(2, 0), new[]{true,true,false,false,false,true}),
-                new(new(2, 1), new[]{true,false,false,false,false,true})
+                new(new(2, -1), new[] { true, true, false, false, false, false }),
+                new(new(2, 0), new[] { true, true, false, false, false, true }),
+                new(new(2, 1), new[] { true, false, false, false, false, true })
             };
             foreach (PointRotation pr in possible)
             {
-                Assert.IsTrue(neighbors.Exists(p => p.point.x == pr.point.x && p.point.y == p.point.y && p.RotationEquals(pr)));
+                Assert.IsTrue(neighbors.Exists(p =>
+                    p.point.x == pr.point.x && p.point.y == p.point.y && p.RotationEquals(pr)));
             }
 
             Assert.AreEqual(neighbors.Count, possible.Length);
@@ -102,24 +105,24 @@ namespace TestsTaluva
         [Test]
         public void TestPlaceBuilding()
         {
-            _board.PlaceBuilding(_matrix.GetValue(new(-1,-1)), Building.Barrack, _player1);
-            Assert.AreEqual(Building.Barrack, _matrix.GetValue(new(-1, -1)).ActualBuildings);
+            _board.PlaceBuilding(_matrix[new(-1, -1)], Building.Barrack, _player1);
+            Assert.AreEqual(Building.Barrack, _matrix[new(-1, -1)].ActualBuildings);
 
             Chunk _chunk = new(1, new(Biomes.Desert), new(Biomes.Plain));
             PointRotation _pointRot = new(new(-3, 0), Rotation.S);
             _board.AddChunk(_chunk, _player2, _pointRot, Rotation.S);
-            _board.PlaceBuilding(_matrix.GetValue(new(-2, -0)), Building.Barrack, _player1);
-            _board.PlaceBuilding(_matrix.GetValue(new(-2, 1)), Building.Barrack, _player1);
+            _board.PlaceBuilding(_matrix[new(-2, -0)], Building.Barrack, _player1);
+            _board.PlaceBuilding(_matrix[new(-2, 1)], Building.Barrack, _player1);
 
-            _board.PlaceBuilding(_matrix.GetValue(new(-1, 0)), Building.Temple, _player1);
-            Assert.AreEqual(Building.Temple, _matrix.GetValue(new(-1, 0)).ActualBuildings);
+            _board.PlaceBuilding(_matrix[new(-1, 0)], Building.Temple, _player1);
+            Assert.AreEqual(Building.Temple, _matrix[new(-1, 0)].ActualBuildings);
 
             _chunk = new(3, new(Biomes.Desert), new(Biomes.Plain));
             _pointRot = new(new(0, 1), Rotation.NE);
             _board.AddChunk(_chunk, _player2, _pointRot, Rotation.NE);
 
-            _board.PlaceBuilding(_matrix.GetValue(new(-1, 1)), Building.Tower, _player1);
-            Assert.AreEqual(Building.Tower, _matrix.GetValue(new(-1, 1)).ActualBuildings);
+            _board.PlaceBuilding(_matrix[new(-1, 1)], Building.Tower, _player1);
+            Assert.AreEqual(Building.Tower, _matrix[new(-1, 1)].ActualBuildings);
         }
 
         [Test]
@@ -140,7 +143,8 @@ namespace TestsTaluva
             barrackSlots[0] = new(-1, -1);
             barrackSlots[1] = new(-1, 0);
 
-            foreach (Vector2Int p in possibles) {
+            foreach (Vector2Int p in possibles)
+            {
                 Assert.IsTrue(barrackSlots.Contains(p));
             }
         }
@@ -150,19 +154,19 @@ namespace TestsTaluva
         {
             Chunk _chunk = new(1, new(Biomes.Desert), new(Biomes.Plain));
             PointRotation _pointRot = new(new(0, 1), Rotation.NE);
-            _board.AddChunk(_chunk, _player2, _pointRot, Rotation.NE);
+            _board.AddChunk(_chunk, _player1, _pointRot, Rotation.NE);
 
-            
-            _board.PlaceBuilding(_matrix.GetValue(new(-1,-1)), Building.Barrack, _player1);
-            _board.PlaceBuilding(_matrix.GetValue(new(-1, 0)), Building.Barrack, _player1);
-            _board.PlaceBuilding(_matrix.GetValue(new(-1, 1)), Building.Barrack, _player1);
+
+            _board.PlaceBuilding(_matrix[new(-1, -1)], Building.Barrack, _player1);
+            _board.PlaceBuilding(_matrix[new(-1, 0)], Building.Barrack, _player1);
+            _board.PlaceBuilding(_matrix[new(-1, 1)], Building.Barrack, _player1);
 
             Vector2Int[] possible = _board.GetTempleSlots(_player1);
             Assert.AreEqual(1, possible.Length);
             Assert.AreEqual(0, possible[0].x);
             Assert.AreEqual(2, possible[0].y);
 
-            _board.PlaceBuilding(_matrix.GetValue(new(0, 2)), Building.Temple, _player1);
+            _board.PlaceBuilding(_matrix[new(0, 2)], Building.Temple, _player1);
             _chunk = new(1, new(Biomes.Desert), new(Biomes.Plain));
             _pointRot = new(new(0, -1), Rotation.NW);
             _board.AddChunk(_chunk, _player2, _pointRot, Rotation.NW);
@@ -179,14 +183,14 @@ namespace TestsTaluva
             _board.AddChunk(_chunk, _player2, _pointRot, Rotation.NE);
 
             DynamicMatrix<Cell> _matrix = _board.WorldMap;
-            _board.PlaceBuilding(_matrix.GetValue(new(-1, 0)), Building.Barrack, _player1);
+            _board.PlaceBuilding(_matrix[new(-1, 0)], Building.Barrack, _player1);
 
             Vector2Int[] possible = _board.GetTowerSlots(_player1);
             Assert.AreEqual(1, possible.Length);
             Assert.AreEqual(-1, possible[0].x);
             Assert.AreEqual(1, possible[0].y);
 
-            _board.PlaceBuilding(_matrix.GetValue(possible[0]), Building.Tower, _player1);
+            _board.PlaceBuilding(_matrix[possible[0]], Building.Tower, _player1);
             _chunk = new(3, new(Biomes.Desert), new(Biomes.Plain));
             _pointRot = new(new(-3, 0), Rotation.S);
             _board.AddChunk(_chunk, _player2, _pointRot, Rotation.S);
@@ -197,8 +201,8 @@ namespace TestsTaluva
             possible = _board.GetTowerSlots(_player1);
             Assert.AreEqual(0, possible.Length);
 
-            _board.PlaceBuilding(_matrix.GetValue(new(-2,-1)), Building.Barrack, _player1);
-            _board.PlaceBuilding(_matrix.GetValue(new(-1, -2)), Building.Barrack, _player1);
+            _board.PlaceBuilding(_matrix[new(-2, -1)], Building.Barrack, _player1);
+            _board.PlaceBuilding(_matrix[new(-1, -2)], Building.Barrack, _player1);
             possible = _board.GetTowerSlots(_player1);
             Assert.AreEqual(0, possible.Length);
         }
@@ -219,6 +223,5 @@ namespace TestsTaluva
             Assert.AreEqual(-1, _board.GetCellCoord(c2).x);
             Assert.AreEqual(1, _board.GetCellCoord(c2).y);
         }
-        
     }
 }

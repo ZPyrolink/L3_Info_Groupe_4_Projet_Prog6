@@ -6,9 +6,8 @@ namespace Taluva.Model
     {
         public Cell[] Coords { get; private set; }
         public Rotation rotation;
-        public readonly int Level = 1;
+        public int Level = 1;
 
-        [Obsolete("Use this for test and when there is no cell at this position!")]
         public Chunk(int l, Cell left, Cell right)
         {
             this.Coords = new Cell[3];
@@ -20,8 +19,7 @@ namespace Taluva.Model
             this.Level = l;
 
         }
-
-        public Chunk(Cell left, Cell right) : this(right.ParentCunk.Level + 1, left, right) { }
+        
         
 
         void RotateChunk()
@@ -33,5 +31,7 @@ namespace Taluva.Model
         {
             throw new NotImplementedException();
         }
+        
+        
     }
 }

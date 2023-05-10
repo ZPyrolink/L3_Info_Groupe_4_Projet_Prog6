@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Taluva.Model
+﻿namespace Taluva.Model
 {
     public class Cell
     {
@@ -15,6 +13,13 @@ namespace Taluva.Model
             this.ActualBiome = biome;
             this.ActualBuildings = Building.None;
             this.ParentCunk = c;
+        }
+        public Cell(Cell c)
+        {
+            this.ActualBiome = c.ActualBiome;
+            this.ActualBuildings = c.ActualBuildings;
+            this.Owner = c.Owner;
+            this.ParentCunk = c.ParentCunk;
         }
 
         public Cell(Biomes biome)
