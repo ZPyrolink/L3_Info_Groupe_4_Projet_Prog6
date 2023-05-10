@@ -62,7 +62,7 @@ namespace TestsTaluva
             Assert.IsTrue(_gm.IsVoid(new(-1, -1)));
 
             _gm.ValidateTile(new(new(0, 0), new[] { true, false, false, false, false, false }), Rotation.N);
-            _gm.PlaceBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
+            _gm.ValidateBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
 
             _gm.Undo();
             Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.None);
@@ -78,7 +78,7 @@ namespace TestsTaluva
             Assert.IsFalse(_gm.IsVoid(new(-1, 0)));
             Assert.IsFalse(_gm.IsVoid(new(-1, -1)));
 
-            _gm.PlaceBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
+            _gm.ValidateBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
 
             _gm.Undo();
             _gm.Redo();
