@@ -25,31 +25,15 @@ public class Player
     }
 
 
-    public void Play(TurnPhase phase, Board gameBoard, Vector2Int p, Building b, Chunk chunk, Cell c)
+    
+    //Player play function
+    public void PlaceChunk(Board gameBoard, Vector2Int p, Chunk chunk)
     {
-        if (this is AI)
-        {
-            PointRotation pro = ((AI)this).PlayChunk();
-            if (phase == TurnPhase.SelectCells)
-                gameBoard.AddChunk(chunk, this, pro, chunk.rotation);
-            else if (phase == TurnPhase.PlaceBuilding)
-            {
-                Building bAI;
-                Vector2Int vAI;
-                (bAI, vAI) = ((AI)this).PlayBuild();
-                Cell cAI = gameBoard.WorldMap.GetValue(vAI);
-                gameBoard.PlaceBuilding(cAI, bAI, this);
-            }
-        }
-        else
-        {
-            if (phase == TurnPhase.SelectCells)
-                gameBoard.AddChunk(chunk, this, new PointRotation(p), chunk.rotation);
-            else if (phase == TurnPhase.PlaceBuilding)
-            {
-                gameBoard.PlaceBuilding(c, b, this);
-            }
-        }
-
+        gameBoard.AddChunk(chunk, this, new PointRotation(p), chunk.rotation);
+        
+    }
+    public void PlaceBuilding(Board gameBoard, Cell c, Building b)
+    {
+        gameBoard.PlaceBuilding(c, b, this);
     }
 }
