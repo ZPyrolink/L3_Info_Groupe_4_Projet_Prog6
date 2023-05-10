@@ -4,6 +4,7 @@ using Taluva.Model;
 using Taluva.Utils;
 using Taluva.Model.AI;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Taluva.Controller
 {
@@ -332,6 +333,9 @@ namespace Taluva.Controller
         {
             
         }
+
+        public List<Vector2Int> FindBiomesAroundVillage(Vector2Int cell) => gameBoard.FindBiomesAroundVillage(cell, actualPlayer);
+
 
         public void ValidateTile(PointRotation pr, Rotation r)     //Place
         {
