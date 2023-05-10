@@ -379,7 +379,6 @@ namespace Taluva.Model
 
         public List<Vector2Int> FindBiomesAroundVillage(Vector2Int cell, Player player)
         {
-            return new List<Vector2Int>();
             List<List<Vector2Int>> allVillages = GetAllVillage(cell);
             List<Vector2Int> sameBiome = new() { cell };
             Biomes biomes = WorldMap.GetValue(cell).ActualBiome;
