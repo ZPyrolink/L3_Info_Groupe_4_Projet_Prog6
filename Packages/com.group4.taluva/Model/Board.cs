@@ -64,7 +64,8 @@ namespace Taluva.Model
             List<Vector2Int> villagePositions = new() { c };
             List<Vector2Int> visited = new() { c };
 
-            while (cells.Count > 0) {
+            while (cells.Count > 0)
+            {
                 Vector2Int cellP = cells[0];
                 cells.Remove(cellP);
                 visited.Add(cellP);
@@ -90,7 +91,8 @@ namespace Taluva.Model
 
             for (int i = 0; i < villages.Count - 1; i++)
                 for (int j = i + 1; j < villages.Count; j++)
-                    if (villages[i].Contains(villages[j][0])) {
+                    if (villages[i].Contains(villages[j][0]))
+                    {
                         villages.RemoveAt(j);
                         j--;
                     }
@@ -139,7 +141,8 @@ namespace Taluva.Model
             int i = 0;
             Vector2Int previous = neighbors[5];
             bool[] possible = new bool[6];
-            foreach (Vector2Int neighbor in neighbors) {
+            foreach (Vector2Int neighbor in neighbors)
+            {
                 possible[i] = WorldMap.IsVoid(previous) && WorldMap.IsVoid(neighbor) &&
                               (IsConnected(neighbor) || IsConnected(previous) || IsConnected(p));
                 previous = neighbor;
@@ -180,7 +183,6 @@ namespace Taluva.Model
             if (WorldMap[pt].ParentCunk.rotation == r)
                 return false;
 
-            
 
             if (!leftCell.ContainsBuilding() && !rightCell.ContainsBuilding())
                 return true;
@@ -206,7 +208,8 @@ namespace Taluva.Model
         /// <returns>Return the different position allowed for a chunk</returns>
         public PointRotation[] GetChunkSlots()
         {
-            if (WorldMap.Empty) {
+            if (WorldMap.Empty)
+            {
                 PointRotation[] pr = new PointRotation[1];
                 pr[0] = new(new(0, 0));
                 pr[0].SetAllTrue();
@@ -216,14 +219,16 @@ namespace Taluva.Model
             List<Vector2Int> slots = new();
             List<PointRotation> chunkSlots = new();
 
-            foreach (Cell c in WorldMap) {
+            foreach (Cell c in WorldMap)
+            {
                 Vector2Int p = GetCellCoord(c);
                 if (c.ActualBiome == Biomes.Volcano)
                     slots.Add(p);
 
                 Vector2Int[] neighbors = GetNeighbors(p);
 
-                foreach (Vector2Int neighbor in neighbors.Where(n => WorldMap.IsVoid(n))) {
+                foreach (Vector2Int neighbor in neighbors.Where(n => WorldMap.IsVoid(n)))
+                {
                     if (!slots.Contains(neighbor))
                         slots.Add(neighbor);
 
@@ -235,8 +240,10 @@ namespace Taluva.Model
             List<Vector2Int> pointRemove = new();
 
             //Recherche des points dans l'eau pouvant placer un chunk dans au moins une position
-            foreach (Vector2Int pt in slots) {
-                if (!WorldMap.IsVoid(pt)) {
+            foreach (Vector2Int pt in slots)
+            {
+                if (!WorldMap.IsVoid(pt))
+                {
                     if (WorldMap[pt].ActualBiome == Biomes.Volcano)
                         continue;
 
@@ -250,7 +257,7 @@ namespace Taluva.Model
 
                 for (int i = 0; i < rotations.Length; i++)
                     if (rotations[i])
-                        pr.AddRotation((Rotation)i);
+                        pr.AddRotation((Rotation) i);
 
                 chunkSlots.Add(pr);
                 pointRemove.Add(pt);
@@ -260,14 +267,16 @@ namespace Taluva.Model
                 slots.Remove(pr);
 
             //Recherche des points qui sont des volcans et qui permettent une position pour ecraser la map
-            foreach (Vector2Int pt in slots) {
+            foreach (Vector2Int pt in slots)
+            {
                 Vector2Int[] neighbors = GetNeighbors(pt);
                 PointRotation pr = new(pt);
 
-                Rotation[] rotations = (Rotation[])Enum.GetValues(typeof(Rotation));
+                Rotation[] rotations = (Rotation[]) Enum.GetValues(typeof(Rotation));
 
-                foreach (Rotation r in rotations) {
-                    int right = (int)r, left = right - 1;
+                foreach (Rotation r in rotations)
+                {
+                    int right = (int) r, left = right - 1;
                     if (left < 0)
                         left = rotations.Length + left;
 
@@ -308,7 +317,8 @@ namespace Taluva.Model
         {
             if (!GetChunkSlots()
                     .Where(pr => pr.point.Equals(p.point))
-                    .Any(pr => pr.rotations.Where((t, i) => t == p.rotations[i]).Any())) {
+                    .Any(pr => pr.rotations.Where((t, i) => t == p.rotations[i]).Any()))
+            {
                 return false;
             }
 
@@ -316,17 +326,17 @@ namespace Taluva.Model
 
             Vector2Int[] neighbors = GetNeighbors(p.point);
 
-            if (p.rotations[(int)Rotation.N] && r == Rotation.N)
+            if (p.rotations[(int) Rotation.N] && r == Rotation.N)
                 AddCell(c, p, neighbors[0], neighbors[5]);
-            else if (p.rotations[(int)Rotation.S] && r == Rotation.S)
+            else if (p.rotations[(int) Rotation.S] && r == Rotation.S)
                 AddCell(c, p, neighbors[3], neighbors[2]);
-            else if (p.rotations[(int)Rotation.NE] && r == Rotation.NE)
+            else if (p.rotations[(int) Rotation.NE] && r == Rotation.NE)
                 AddCell(c, p, neighbors[1], neighbors[0]);
-            else if (p.rotations[(int)Rotation.SE] && r == Rotation.SE)
+            else if (p.rotations[(int) Rotation.SE] && r == Rotation.SE)
                 AddCell(c, p, neighbors[2], neighbors[1]);
-            else if (p.rotations[(int)Rotation.SW] && r == Rotation.SW)
+            else if (p.rotations[(int) Rotation.SW] && r == Rotation.SW)
                 AddCell(c, p, neighbors[4], neighbors[3]);
-            else if (p.rotations[(int)Rotation.NW] && r == Rotation.NW)
+            else if (p.rotations[(int) Rotation.NW] && r == Rotation.NW)
                 AddCell(c, p, neighbors[5], neighbors[4]);
 
             c.rotation = r;
@@ -363,6 +373,7 @@ namespace Taluva.Model
                         SetC();
                         player.nbBarrack -= c.ParentCunk.Level;
                     }
+
                     break;
                 case Building.Temple when GetTempleSlots(player).Contains(coord):
                     SetC();
@@ -385,20 +396,19 @@ namespace Taluva.Model
             List<Vector2Int> sameBiome = new() { cell };
             Biomes biomes = WorldMap[cell].ActualBiome;
 
-            foreach (List<Vector2Int> villages in allVillages) {
-                if (WorldMap[villages[0]].Owner != player.ID)
-                    continue;
-                foreach (Vector2Int c in villages) {
-                    Vector2Int[] neighbors = GetNeighbors(c);
-                    foreach (Vector2Int neighbor in neighbors) {
-                        if (WorldMap[neighbor].ActualBuildings != Building.None) continue;
+            sameBiome.AddRange(allVillages
+                // On ne garde que les villages du joueur
+                .Where(villages => WorldMap[villages[0]].Owner == player.ID)
+                // On récupère la liste de tous les villages de chaques voisins
+                .SelectMany(villages => villages, (_, c) => GetNeighbors(c))
+                // On récupère la liste de tous les voisins qui ne sont pas vides et n'ont pas de builds
+                .SelectMany(
+                    neighbors => neighbors
+                        .Where(n => !WorldMap.IsVoid(n) && WorldMap[n].ActualBuildings == Building.None),
+                    (_, neighbor) => neighbor)
+                // On ne garde que les villages qui ont le bon biome et qui n'est pas déjà enregistré
+                .Where(n => WorldMap[n].ActualBiome == biomes && !sameBiome.Contains(n)));
 
-                        if (WorldMap[neighbor].ActualBiome == biomes)
-                            if (!sameBiome.Contains(neighbor))
-                                sameBiome.Add(neighbor);
-                    }
-                }
-            }
             return sameBiome;
         }
 
@@ -486,7 +496,8 @@ namespace Taluva.Model
         /// <returns>Return the position (x,y) of the cell</returns>
         public Vector2Int GetCellCoord(Cell c)
         {
-            for (int i = WorldMap.MinLine; i <= WorldMap.MaxLine; i++) {
+            for (int i = WorldMap.MinLine; i <= WorldMap.MaxLine; i++)
+            {
                 if (!WorldMap.ContainsLine(i))
                     continue;
 
