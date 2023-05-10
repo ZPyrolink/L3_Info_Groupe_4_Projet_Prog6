@@ -5,22 +5,24 @@ using Taluva.Utils;
 using Taluva.Model.AI;
 using UnityEngine;
 using System.Collections.Generic;
+using Codice.Client.Common.FsNodeReaders;
+using UnityEngine.UIElements;
 
 namespace Taluva.Controller
 {
     public class GameManagment
     {
         private Player[] players;
-        private Player actualPlayer;
+        public Player actualPlayer;
         private AI ActualAi => (AI)actualPlayer;
         public int NbPlayers { get; set; }
         public  int actualTurn { get; private set; }
-        private int maxTurn;
+        public int maxTurn;
         public Board gameBoard;
         private TurnPhase actualPhase;
         private Historic<Coup> historic;
-        private Pile<Chunk> pile = ListeChunk.Pile;
-        private Chunk actualChunk;
+        public Pile<Chunk> pile = ListeChunk.Pile;
+        public Chunk actualChunk;
         private bool AIRandom = false;
         
         public GameManagment(int nbPlayers)
@@ -58,6 +60,7 @@ namespace Taluva.Controller
             public Cell[] cells;
             public Chunk chunk;
             public Player player;
+            public Building[] building;
 
             private Coup(Vector2Int[] positions, Rotation? rotation, Player actualPlayer)
             {
@@ -73,14 +76,15 @@ namespace Taluva.Controller
                 cells[0] = null;
             }
 
-            public Coup(Vector2Int[] positions, Rotation rotation, Player actualPlayer, Chunk chunk, Cell[] cells) : this(positions, rotation, actualPlayer, cells)
+            public Coup(Vector2Int[] positions, Rotation rotation, Player actualPlayer, Chunk chunk, Cell[] cells, Building[] b) : this(positions, rotation, actualPlayer, cells, b)
             {
                 this.chunk = chunk;
             }
 
-            public Coup(Vector2Int[] positions, Rotation? rotation, Player actualPlayer, Cell[] cells) : this(positions, rotation, actualPlayer)
+            public Coup(Vector2Int[] positions, Rotation? rotation, Player actualPlayer, Cell[] cells, Building[] b) : this(positions, rotation, actualPlayer)
             {
                 this.cells = cells;
+                building = b;
             }
         }
 
@@ -106,9 +110,16 @@ namespace Taluva.Controller
         {
             if (!gameBoard.WorldMap.IsVoid(position))
             {
-                historic.Add(new(new[] { position }, rotation, actualPlayer, chunk, gameBoard.WorldMap.GetValue(position).ParentCunk.Coords));
+                Vector2Int[] positions = gameBoard.GetChunksCoords(position, rotation);
+                Cell[] newCells = new Cell[gameBoard.WorldMap[position].ParentCunk.Coords.Length];
+                Building[] buildings = new Building[gameBoard.WorldMap[position].ParentCunk.Coords.Length];
+                for (int i = 0; i < gameBoard.WorldMap[position].ParentCunk.Coords.Length; i++) {
+                    newCells[i] = new(gameBoard.WorldMap[positions[i]].ParentCunk.Coords[i]);
+                    buildings[i] = gameBoard.WorldMap[positions[i]].ActualBuildings;
+                }
+                historic.Add(new(gameBoard.GetChunksCoords(position, rotation), rotation, actualPlayer, chunk, newCells, buildings));
             } else {
-                historic.Add(new(new[] { position }, rotation, actualPlayer, chunk));
+                historic.Add(new(new[] { position }, rotation, actualPlayer, new(chunk)));
             }
                 
         }
@@ -119,9 +130,15 @@ namespace Taluva.Controller
         /// </summary>
         /// <param name="positions">Buildings positions</param>
         /// <param name="cells">Cells with the buildings</param>
-        public void AddHistoric(Vector2Int[] positions, Cell[] cells)
+        public void AddHistoric(Vector2Int[] positions, Cell[] cells, Building b)
         {
-            historic.Add(new(positions, null, actualPlayer, cells));
+            Cell[] newCells = new Cell[cells.Length];
+            Building[] buildings = new Building[cells.Length];
+            for (int i = 0; i < cells.Length; i++) {
+                newCells[i] = new(cells[i]);
+                buildings[i] = b;
+            }
+            historic.Add(new(positions, null, actualPlayer, newCells, buildings));
         }
 
         public Coup Undo()
@@ -129,24 +146,20 @@ namespace Taluva.Controller
             if (!historic.CanUndo)
                 return null;
 
-            int nbActualPlayer = 0;
-            for(int i = 0; i < players.Length; i++) {
-                if (actualPlayer == players[i])
-                    nbActualPlayer = i;
-            }
-            actualPlayer = players[(nbActualPlayer + NbPlayers - 1) % NbPlayers];
-
             Coup c = historic.Undo();
             if(c.chunk != null) {
                 gameBoard.RemoveChunk(c.chunk);
-                if(c.cells[0] != null)
-                    for(int i = 0; i < c.cells.Length; i++)
+                if(c.cells[0] != null) {
+                    for (int i = 0; i < c.cells.Length; i++) {
                         gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
+                        gameBoard.PlaceBuilding(c.cells[i], c.building[i], actualPlayer);
+                    }
+                }
                 pile.Stack(c.chunk);
             }else {
+                actualPlayer = c.player;
                 for (int i = 0; i < c.cells.Length; i++) {
-                    gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
-                    switch (c.cells[i].ActualBuildings) {
+                    switch (c.building[i]) {
                         case Building.None:
                             break;
                         case Building.Temple:
@@ -156,9 +169,10 @@ namespace Taluva.Controller
                             actualPlayer.nbTowers++;
                             break;
                         case Building.Barrack:
-                            actualPlayer.nbBarrack += gameBoard.WorldMap.GetValue(c.positions[i]).ParentCunk.Level;
+                            actualPlayer.nbBarrack += gameBoard.WorldMap[c.positions[i]].ParentCunk.Level;
                             break;
                     }
+                    gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
                 }
             }
             return c;
@@ -171,33 +185,17 @@ namespace Taluva.Controller
 
             Coup c = historic.Redo();
             if(c.chunk == null) {
-                for(int i = 0; i < c.cells.Length; i++) {
+                for (int i = 0; i < c.cells.Length; i++) {
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
-                    switch (c.cells[i].ActualBuildings) {
-                        case Building.None:
-                            break;
-                        case Building.Temple:
-                            actualPlayer.nbTemple--; ;
-                            break;
-                        case Building.Tower:
-                            actualPlayer.nbTowers--;
-                            break;
-                        case Building.Barrack:
-                            actualPlayer.nbBarrack -= gameBoard.WorldMap.GetValue(c.positions[i]).ParentCunk.Level;
-                            break;
-                    }
+                    gameBoard.PlaceBuilding(c.cells[i], c.building[i], actualPlayer);
                 }
             } else {
-                gameBoard.AddChunk(c.chunk, c.player, new(c.positions[0]),(Rotation) c.rotation);
+                gameBoard.AddChunk(c.chunk, c.player, new(c.positions[0],(Rotation) c.rotation),(Rotation) c.rotation);
                 pile.Draw();
             }
-            int nbActualPlayer = 0;
-            for (int i = 0; i < players.Length; i++) {
-                if (actualPlayer == players[i])
-                    nbActualPlayer = i;
-            }
-            actualPlayer = players[(nbActualPlayer + 1) % NbPlayers];
-
+            for(int i = 0; i < NbPlayers; i++)
+                if(actualPlayer == players[i])
+                    actualPlayer = players[i % NbPlayers];
             return c;
         }
 
@@ -345,18 +343,24 @@ namespace Taluva.Controller
         public List<Vector2Int> FindBiomesAroundVillage(Vector2Int cell) => gameBoard.FindBiomesAroundVillage(cell, actualPlayer);
 
 
-        public void ValidateTile(PointRotation pr, Rotation r)     //Place
+        public void ValidateTile(PointRotation pr, Rotation r)
         {
-            //Ajouter les cells si elles existent
             AddHistoric(pr.point, r, actualChunk);
             gameBoard.AddChunk(actualChunk, actualPlayer, pr, r);
         }
 
         public void PlaceBuilding(Cell c, Building b)
         {
-            Cell cell = new(c);
-            AddHistoric(new[] { gameBoard.GetCellCoord(c) }, new[] { cell });
+            List<Cell> cells = new();
+            List<Vector2Int> sameBiomes = FindBiomesAroundVillage(gameBoard.GetCellCoord(c));
+            if (sameBiomes.Count > 0) {
+                foreach (Vector2Int cell in sameBiomes) {
+                    cells.Add(new(gameBoard.WorldMap[cell]));
+                }
+            }
+            AddHistoric(sameBiomes.Count > 0 ? sameBiomes.ToArray() : new[] { gameBoard.GetCellCoord(c) }, cells.Count > 0 ? cells.ToArray() : new[] { c }, b);
             gameBoard.PlaceBuilding(c, b, actualPlayer);
+
         }
 
         public Vector2Int[] BarracksSlots()

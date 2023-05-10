@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
-
 using Taluva.Controller;
 using Taluva.Model;
+using UnityEngine;
 
 namespace TestsTaluva
 {
@@ -60,12 +60,26 @@ namespace TestsTaluva
             Assert.IsTrue(_gm.IsVoid(new(0, 0)));
             Assert.IsTrue(_gm.IsVoid(new(-1, 0)));
             Assert.IsTrue(_gm.IsVoid(new(-1, -1)));
-
+            Assert.AreEqual(48, _gm.pile._stack.Count);
+            _gm.actualChunk = _gm.pile.Draw();
             _gm.ValidateTile(new(new(0, 0), new[] { true, false, false, false, false, false }), Rotation.N);
             _gm.PlaceBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
 
             _gm.Undo();
             Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.None);
+            Assert.AreEqual(20, _gm.actualPlayer.nbBarrack);
+
+            _gm.actualChunk = _gm.pile.Draw();
+            _gm.ValidateTile(new(new(0, 1), new[] { false, false, false, true, false, false }), Rotation.S);
+            _gm.PlaceBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
+            _gm.PlaceBuilding(_gm.gameBoard.WorldMap[new(-1, -1)], Building.Barrack);
+            _gm.actualChunk = _gm.pile.Draw();
+            _gm.ValidateTile(new(new(0, 1), new[] { false, false, false, false, false, true }), Rotation.NW);
+
+            _gm.Undo();
+            Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.Barrack);
+
+            
         }
 
         [Test]
@@ -73,16 +87,32 @@ namespace TestsTaluva
         {
             _gm.ValidateTile(new(new(0, 0), new[] { true, false, false, false, false, false }), Rotation.N);
             _gm.Undo();
+            Assert.IsTrue(_gm.IsVoid(new(0, 0)));
             _gm.Redo();
             Assert.IsFalse(_gm.IsVoid(new(0, 0)));
             Assert.IsFalse(_gm.IsVoid(new(-1, 0)));
             Assert.IsFalse(_gm.IsVoid(new(-1, -1)));
+            Assert.AreEqual(47, _gm.pile._stack.Count);
 
             _gm.PlaceBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
 
             _gm.Undo();
             _gm.Redo();
+
             Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.Barrack);
+            Assert.AreEqual(19, _gm.actualPlayer.nbBarrack);
+
+            _gm.actualChunk = _gm.pile.Draw();
+            _gm.ValidateTile(new(new(0, 1), new[] { false, false, false, true, false, false }), Rotation.S);
+            _gm.PlaceBuilding(_gm.gameBoard.WorldMap[new(-1, -1)], Building.Barrack);
+            _gm.actualChunk = _gm.pile.Draw();
+            _gm.ValidateTile(new(new(0, 1), new[] { false, false, false, false, false, true }), Rotation.NW);
+
+            _gm.Undo();  
+            _gm.Redo();
+            Assert.IsFalse(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.Barrack);
+            Assert.AreEqual(45, _gm.pile._stack.Count);
+            Assert.AreEqual(18, _gm.actualPlayer.nbBarrack);
         }
     }
 }
