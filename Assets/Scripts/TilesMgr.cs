@@ -92,10 +92,11 @@ public class TilesMgr : MonoBehaviour
             tmp.SetActive(false);
             _current.transform.localScale = new(100, 100, 100);
             _current.layer = LayerMask.NameToLayer("Default");
-            foreach (Material mat in _current.GetComponent<MeshRenderer>().materials)
+            Material[] mats = _current.GetComponent<MeshRenderer>().materials;
+            foreach (Material mat in mats.Where((_, i) => i != 1))
             {
                 mat.SetRenderMode(MaterialExtensions.BlendMode.Transparent);
-                mat.color = mat.color.With(a: .5f);
+                mat.color = mat.color.With(a: .75f);
             }
         }
 
@@ -113,7 +114,7 @@ public class TilesMgr : MonoBehaviour
     public void ValidateTile()
     {
         Material[] mats = _current.GetComponent<MeshRenderer>().materials;
-        foreach (Material mat in mats)
+        foreach (Material mat in mats.Where((_, i) => i != 1))
         {
             mat.SetRenderMode(MaterialExtensions.BlendMode.Opaque);
             mat.color = mat.color.With(a: 1);
@@ -122,6 +123,7 @@ public class TilesMgr : MonoBehaviour
         Cell left = new(BiomeColorExt.Of(mats[0].color)), right = new(BiomeColorExt.Of(mats[3].color));
 
         (Vector2Int pos, Rotation rot, int level) = GetPr();
+        Debug.Log($"Validate tile on {pos} with {rot} rotation at level {level}");
         Chunk c = new(level, left, right);
         _board.AddChunk(c, new(PlayerColor.Blue), new(pos, rot), rot);
 
@@ -138,7 +140,7 @@ public class TilesMgr : MonoBehaviour
         else
             pos.y = (int) (_current.transform.position.z / zOffset);
 
-        return (pos, rot, (int) (_current.transform.position.y / yOffset));
+        return (pos, rot, (int) (_current.transform.position.y / yOffset) + 1);
     }
 
     private void RotateTile()
@@ -152,19 +154,31 @@ public class TilesMgr : MonoBehaviour
         } while (_gos?[_currentFf]?.rotations?[(int) rot] == false);
     }
 
-    public void SetFeedForward()
+    public void SetFeedForwards1()
     {
         _gos = new();
         foreach (PointRotation pr in _board.GetChunkSlots())
         {
             Vector3 pos = new(pr.point.x, 0, pr.point.y);
             if (!_board.WorldMap.IsVoid(pr.point))
-                pos.y = (_board.WorldMap[pr.point].ParentCunk.Level + 1) * yOffset;
+                pos.y = _board.WorldMap[pr.point].ParentCunk.Level * yOffset;
             pos.Scale(new(xOffset, 1, zOffset));
             if (pr.point.x % 2 != 0)
                 pos.z += zOffset / 2;
             _gos[SetFeedForward(pos)] = pr;
         }
+    }
+
+    public void SetFeedForwards2()
+    {
+        // foreach (Vector2Int pos in _board.GetBarrackSlots())
+        //     print(pos);
+        //
+        // foreach (Vector2Int pos in _board.GetTowerSlots(new(PlayerColor.Blue)))
+        //     print(pos);
+        //
+        // foreach (Vector2Int pos in _board.GetTempleSlots(new(PlayerColor.Blue)))
+        //     print(pos);
     }
 
     public GameObject SetFeedForward(Vector3 pos)

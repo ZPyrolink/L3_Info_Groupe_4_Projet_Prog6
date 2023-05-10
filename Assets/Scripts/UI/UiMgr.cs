@@ -128,10 +128,27 @@ namespace UI
         {
             for (int i = 0; i < PlayerMgr.Instance.Length; i++)
             {
-                _guis[i] ??= Instantiate(playerPrefab, transform);
+                if (_guis[i] is null)
+                {
+                    _guis[i] = Instantiate(playerPrefab, transform);
+                    foreach (MeshRenderer mr in _guis[i].GetComponentsInChildren<MeshRenderer>())
+                        mr.material.color = PlayerMgr.Instance[i].Color;
+                }
 
                 _guis[i].GetComponent<Image>().color =
                     i == PlayerMgr.Instance.CurrentIndex ? Color.white : new(.75f, .75f, .75f);
+
+                foreach (Animator anim in _guis[i].GetComponentsInChildren<Animator>())
+                    if (PlayerMgr.Instance.CurrentIndex == i)
+                    {
+                        anim.enabled = true;
+                    }
+                    else
+                    {
+                        anim.enabled = false;
+                        anim.transform.localRotation = Quaternion.Euler(-90, 0, 0);
+                    }
+
 
                 _guis[i].transform.GetChild(0).GetComponent<Text>().text = PlayerMgr.Instance[i].Name;
                 _guis[i].transform.GetChild(1).GetComponent<Image>().color = PlayerMgr.Instance[i].Color;
@@ -165,15 +182,15 @@ namespace UI
             if (NbTiles == nbTilesPerPlayers * PlayerMgr.Instance.Length)
                 TilesMgr.Instance.SetFeedForward(Vector3.zero);
             else
-                TilesMgr.Instance.SetFeedForward();
+                TilesMgr.Instance.SetFeedForwards1();
             
             BiomeColor[] values = (BiomeColor[]) Enum.GetValues(typeof(BiomeColor));
             CurrentTile.SetActive(true);
             MeshRenderer mr = tile.transform.GetComponentInChildren<MeshRenderer>();
 
-            mr.materials[3].color = values[Random.Range(0, values.Length - 2)].GetColor();
+            mr.materials[3].color = values[Random.Range(1, values.Length)].GetColor();
             mr.materials[2].color = BiomeColor.Volcano.GetColor();
-            mr.materials[0].color = values[Random.Range(0, values.Length - 2)].GetColor();
+            mr.materials[0].color = values[Random.Range(1, values.Length)].GetColor();
             
             tile.SetActive(true);
             builds.SetActive(false);
@@ -182,6 +199,8 @@ namespace UI
         private void Phase2()
         {
             TilesMgr.Instance.ValidateTile();
+            TilesMgr.Instance.SetFeedForwards2();
+            
             tile.SetActive(false);
             builds.SetActive(true);
             NbTiles--;
