@@ -44,7 +44,7 @@ namespace Taluva.Model.AI
             
             return null;}
 
-        public (Building buil, Vector2Int? pos) PlayBuild()
+        public (Building buil, Vector2Int pos) PlayBuild()
         {
             int rand = Random.Range(0,1000);
             Vector2Int[] temples = board.GetTempleSlots(this);

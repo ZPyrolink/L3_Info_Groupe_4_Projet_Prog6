@@ -15,7 +15,7 @@ namespace Taluva.Model
             _stack = new(list.Length);
             _played = new();
 
-            _stack = new(list.OrderBy(x => random.Next()));
+            _stack = new(list.OrderBy(_ => random.Next()));
         }
 
         public T Draw()
