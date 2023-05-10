@@ -76,8 +76,8 @@ public class CameraMgr : MonoBehaviour
 
         if (Input.GetMouseButton(1))
             RightClickMove(mouseMove);
-        else
-            OutsideWindowMove(mouseMove);
+        // else
+        //     OutsideWindowMove(mouseMove);
     }
 
     private Vector3 ScreenToHorizontalPlane(Vector3 origin, Vector3 direction)
@@ -88,26 +88,26 @@ public class CameraMgr : MonoBehaviour
 
     private void RightClickMove(Vector2 mouseMove) => Move(-mouseMove);
 
-    private void OutsideWindowMove(Vector2 mouseMove)
-    {
-        Vector2 mousePosition = Input.mousePosition;
-        Vector2 screenSize = new(Screen.width, Screen.height);
-
-        Vector3 movement = new();
-        if (mousePosition.x <= screenDetectionOffset && mouseMove.x < 0 ||
-            mousePosition.x >= screenSize.x - screenDetectionOffset && mouseMove.x > 0)
-        {
-            movement.x = mouseMove.x;
-        }
-
-        if (mousePosition.y <= screenDetectionOffset && mouseMove.y < 0 ||
-            mousePosition.y >= screenSize.y - screenDetectionOffset && mouseMove.y > 0)
-        {
-            movement.y = mouseMove.y;
-        }
-
-        Move(movement);
-    }
+    // private void OutsideWindowMove(Vector2 mouseMove)
+    // {
+    //     Vector2 mousePosition = Input.mousePosition;
+    //     Vector2 screenSize = new(Screen.width, Screen.height);
+    //
+    //     Vector3 movement = new();
+    //     if (mousePosition.x <= screenDetectionOffset && mouseMove.x < 0 ||
+    //         mousePosition.x >= screenSize.x - screenDetectionOffset && mouseMove.x > 0)
+    //     {
+    //         movement.x = mouseMove.x;
+    //     }
+    //
+    //     if (mousePosition.y <= screenDetectionOffset && mouseMove.y < 0 ||
+    //         mousePosition.y >= screenSize.y - screenDetectionOffset && mouseMove.y > 0)
+    //     {
+    //         movement.y = mouseMove.y;
+    //     }
+    //
+    //     Move(movement);
+    // }
 
     private void Move(Vector3 direction) => _cam.transform.Translate(direction * moveFactor);
 
