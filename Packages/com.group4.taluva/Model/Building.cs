@@ -3,8 +3,8 @@
     public enum Building
     {
         None,
-        Temple,
+        Barrack,
         Tower,
-        Barrack
+        Temple
     }
 }

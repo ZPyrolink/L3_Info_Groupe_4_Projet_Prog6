@@ -30,6 +30,18 @@ public class TilesMgr : MonoBehaviour
     [SerializeField]
     private Transform feedForwardParent;
 
+    [SerializeField]
+    private GameObject barrack, tower, temple;
+
+    private Building _currentBuild;
+
+    private Dictionary<Building, Vector3> _buildsScale = new()
+    {
+        [Building.Barrack] = new(23, 27, 15),
+        [Building.Tower] = new(120, 120, 29),
+        [Building.Temple] = new(38, 27, 23)
+    };
+
     private Dictionary<GameObject, PointRotation> _gos;
 
     private void Start()
@@ -45,26 +57,25 @@ public class TilesMgr : MonoBehaviour
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        if (!Physics.Raycast(ray, out RaycastHit hit))
+        if (!Physics.Raycast(ray, out RaycastHit hit, float.PositiveInfinity,
+                LayerMask.GetMask("Feed Forward")))
         {
             Debug.Log("Don't touch anything!");
             return;
         }
 
-        if (hit.transform == _current?.transform)
-        {
-            RotateTile();
-            return;
-        }
-
         switch (hit.transform.tag)
         {
-            case "Tile":
-                OutlineGo(hit.transform.gameObject);
-                break;
+            // case "Tile":
+            //     OutlineGo(hit.transform.gameObject);
+            //     break;
             case "Feed Forward":
                 _currentFf = hit.transform.gameObject;
-                PutTile(hit.transform.position);
+                (UiMgr.Instance.Phase switch
+                {
+                    1 => (Action<Vector3>) PutTile,
+                    2 => PutBuild
+                }).Invoke(hit.transform.position);
                 break;
 
             default:
@@ -123,11 +134,57 @@ public class TilesMgr : MonoBehaviour
         Cell left = new(BiomeColorExt.Of(mats[0].color)), right = new(BiomeColorExt.Of(mats[3].color));
 
         (Vector2Int pos, Rotation rot, int level) = GetPr();
-        Debug.Log($"Validate tile on {pos} with {rot} rotation at level {level}");
         Chunk c = new(level, left, right);
         _board.AddChunk(c, new(PlayerColor.Blue), new(pos, rot), rot);
+        
+        ClearFeedForward();
+    }
 
-        _current = null;
+    private void PutBuild(Vector3 pos)
+    {
+        if (_current is null)
+        {
+            _current = Instantiate(_currentBuild switch
+            {
+                Building.Barrack => barrack,
+                Building.Tower => tower,
+                Building.Temple => temple
+            }, boardParent);
+            
+            _current.transform.localScale = _buildsScale[_currentBuild];
+            Material[] mats = _current.GetComponent<MeshRenderer>().materials;
+            foreach (Material mat in mats)
+            {
+                mat.SetRenderMode(MaterialExtensions.BlendMode.Transparent);
+                mat.color = PlayerMgr.Instance.Current.Color.With(a: .75f);
+            }
+        }
+
+        if (_current.transform.position == pos)
+            return;
+        
+        _current.transform.position = pos;
+    }
+
+    public void ValidateBuild()
+    {
+        Material[] mats = _current.GetComponent<MeshRenderer>().materials;
+        foreach (Material mat in mats.Where((_, i) => i != 1))
+        {
+            mat.SetRenderMode(MaterialExtensions.BlendMode.Opaque);
+            mat.color = mat.color.With(a: 1);
+        }
+        
+        Vector2Int pos = new() { x = (int) (_current.transform.position.x / xOffset) };
+        if (pos.x % 2 != 0)
+            pos.y = (int) ((_current.transform.position.z - zOffset / 2) / zOffset);
+        else
+            pos.y = (int) (_current.transform.position.z / zOffset);
+        
+        Debug.Log((pos, (int) (_current.transform.position.y / yOffset)));
+        
+        _board.PlaceBuilding(_board.WorldMap[pos], _currentBuild, new(PlayerColor.Blue));
+        
         ClearFeedForward();
     }
 
@@ -156,7 +213,7 @@ public class TilesMgr : MonoBehaviour
 
     public void SetFeedForwards1()
     {
-        _gos = new();
+        ClearFeedForward();
         foreach (PointRotation pr in _board.GetChunkSlots())
         {
             Vector3 pos = new(pr.point.x, 0, pr.point.y);
@@ -169,16 +226,27 @@ public class TilesMgr : MonoBehaviour
         }
     }
 
-    public void SetFeedForwards2()
+    public void SetFeedForwards2(Building build)
     {
-        // foreach (Vector2Int pos in _board.GetBarrackSlots())
-        //     print(pos);
-        //
-        // foreach (Vector2Int pos in _board.GetTowerSlots(new(PlayerColor.Blue)))
-        //     print(pos);
-        //
-        // foreach (Vector2Int pos in _board.GetTempleSlots(new(PlayerColor.Blue)))
-        //     print(pos);
+        ClearFeedForward();
+        _currentBuild = build;
+        Vector2Int[] poss = build switch
+        {
+            Building.Barrack => _board.GetBarrackSlots(),
+            Building.Tower => _board.GetTowerSlots(new(PlayerColor.Blue)),
+            Building.Temple => _board.GetTempleSlots(new(PlayerColor.Blue))
+        };
+
+        foreach (Vector2Int p in poss)
+        {
+            Vector3 pos = new(p.x, 0, p.y);
+            if (!_board.WorldMap.IsVoid(p))
+                pos.y = _board.WorldMap[p].ParentCunk.Level * yOffset;
+            pos.Scale(new(xOffset, 1, zOffset));
+            if (p.x % 2 != 0)
+                pos.z += zOffset / 2;
+            _gos[SetFeedForward(pos)] = new(p);
+        }
     }
 
     public GameObject SetFeedForward(Vector3 pos)
@@ -191,6 +259,7 @@ public class TilesMgr : MonoBehaviour
     public void ClearFeedForward()
     {
         _gos = new();
+        _current = null;
         foreach (Transform t in feedForwardParent)
             Destroy(t.gameObject);
     }

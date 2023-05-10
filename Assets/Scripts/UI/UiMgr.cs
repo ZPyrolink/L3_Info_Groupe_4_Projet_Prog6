@@ -66,10 +66,10 @@ namespace UI
             menu = KeyCode.Escape;
 
         private sbyte _phase;
-        private sbyte Phase
+        public sbyte Phase
         {
             get => _phase;
-            set
+            private set
             {
                 switch (value)
                 {
@@ -175,7 +175,16 @@ namespace UI
 
         #endregion
 
-        public void Next() => Phase++;
+        public void Next()
+        {
+            (Phase switch
+            {
+                1 => (Action) TilesMgr.Instance.ValidateTile,
+                2 => TilesMgr.Instance.ValidateBuild
+            }).Invoke();
+            
+            Phase++;
+        }
 
         private void Phase1()
         {
@@ -198,9 +207,6 @@ namespace UI
 
         private void Phase2()
         {
-            TilesMgr.Instance.ValidateTile();
-            TilesMgr.Instance.SetFeedForwards2();
-            
             tile.SetActive(false);
             builds.SetActive(true);
             NbTiles--;
@@ -227,6 +233,8 @@ namespace UI
                 child.anchoredPosition = child.anchoredPosition.With(y: _defaultBuildsY);
                 t.GetComponentInChildren<Outline>().enabled = false;
             }
+            
+            TilesMgr.Instance.SetFeedForwards2((Building) i + 1);
 
             child = builds.transform.GetChild(i).GetComponent<RectTransform>();
             child.anchoredPosition = child.anchoredPosition.With(y: 20);
