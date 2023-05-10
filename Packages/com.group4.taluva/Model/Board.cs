@@ -357,7 +357,7 @@ namespace Taluva.Model
             {
                 case Building.Barrack when GetBarrackSlots().Contains(coord):
                     SetC();
-                    player.nbBarrack--;
+                    player.nbBarrack-= c.ParentCunk.Level;
                     break;
                 case Building.Temple when GetTempleSlots(player).Contains(coord):
                     SetC();
@@ -370,6 +370,11 @@ namespace Taluva.Model
                 default:
                     return;
             }
+        }
+
+        public List<Vector2Int> FindBiomesAroundVillage()
+        {
+
         }
 
         /// <summary>
