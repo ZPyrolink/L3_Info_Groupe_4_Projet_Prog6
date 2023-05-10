@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Taluva.Model.AI
 {
-    public class AI : Player
+    public abstract class AI : Player
     {
         //ArrayList<Village> Villages;
         protected Board board;
@@ -16,14 +16,8 @@ namespace Taluva.Model.AI
             this.board = board;
         }
 
-        public PointRotation PlayChunk()
-        {
-            return null;}
+        public abstract PointRotation PlayChunk();
 
-        public (Building buil, Vector2Int pos) PlayBuild()
-        {
-            return (Building.None, new Vector2Int(0,0));
-        }
-
+        public abstract (Building buil, Vector2Int pos) PlayBuild();
     }
 }

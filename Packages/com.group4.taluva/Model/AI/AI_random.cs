@@ -9,7 +9,7 @@ namespace Taluva.Model.AI
             
         }
 
-        public PointRotation PlayChunk()
+        public override PointRotation PlayChunk()
         {
             int rand;
             int max = 0;
@@ -44,7 +44,7 @@ namespace Taluva.Model.AI
             
             return null;}
 
-        public (Building buil, Vector2Int pos) PlayBuild()
+        public override (Building buil, Vector2Int pos) PlayBuild()
         {
             int rand = Random.Range(0,1000);
             Vector2Int[] temples = board.GetTempleSlots(this);
