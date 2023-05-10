@@ -48,7 +48,7 @@ namespace Taluva.Controller
             this.AIRandom = true;
             this.NbPlayers = 2;
         }
-        private class Coup
+        public class Coup
         {
             //New Chunk or cells
             public Vector2Int[] positions;
@@ -124,7 +124,7 @@ namespace Taluva.Controller
             historic.Add(new(positions, null, actualPlayer, cells));
         }
 
-        public void Undo()
+        public Coup Undo()
         {
             if (!historic.CanUndo)
                 return;
@@ -161,9 +161,10 @@ namespace Taluva.Controller
                     }
                 }
             }
+            return c;
         }
 
-        public void Redo()
+        public Coup Redo()
         {
             if (!historic.CanRedo)
                 return;
@@ -196,6 +197,8 @@ namespace Taluva.Controller
                     nbActualPlayer = i;
             }
             actualPlayer = players[(nbActualPlayer + 1) % NbPlayers];
+
+            return c;
         }
 
         public Player? GetWinner()
