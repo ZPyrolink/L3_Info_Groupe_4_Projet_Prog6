@@ -173,28 +173,29 @@ namespace Taluva.Model
                 return false;
 
             Cell leftCell = WorldMap[left];
+            Cell rightCell = WorldMap[right];
 
-            if (leftCell.ParentCunk.Level != level || leftCell.ParentCunk.Level != level)
+            if (leftCell.ParentCunk.Level != level || rightCell.ParentCunk.Level != level)
                 return false;
 
             if (WorldMap[pt].ParentCunk.rotation == r)
                 return false;
 
-            Cell rightCell = WorldMap[right];
+            
 
             if (!leftCell.ContainsBuilding() && !rightCell.ContainsBuilding())
                 return true;
 
             if (leftCell.ContainsBuilding() && !rightCell.ContainsBuilding() &&
-                GetVillage(GetCellCoord(leftCell)).Count > 1)
+                GetVillage(left).Count > 1)
                 return leftCell.ActualBuildings == Building.Barrack;
 
             if (!leftCell.ContainsBuilding() && rightCell.ContainsBuilding() &&
-                GetVillage(GetCellCoord(rightCell)).Count > 1)
+                GetVillage(right).Count > 1)
                 return rightCell.ActualBuildings == Building.Barrack;
 
             if (leftCell.ContainsBuilding() && rightCell.ContainsBuilding() &&
-                GetVillage(GetCellCoord(leftCell)).Count > 2)
+                GetVillage(left).Count > 2)
                 return leftCell.ActualBuildings == Building.Barrack && rightCell.ActualBuildings == Building.Barrack;
 
             return false;
