@@ -23,10 +23,8 @@ public class Player
     {
         playerIA = true;
     }
-
-
     
-    //Player play function
+    //Player placeChunk
     public void PlaceChunk(Board gameBoard, Vector2Int p, Chunk chunk)
     {
         gameBoard.AddChunk(chunk, this, new PointRotation(p), chunk.rotation);
