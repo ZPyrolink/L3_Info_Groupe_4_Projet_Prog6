@@ -305,12 +305,12 @@ namespace Taluva.Model
         /// <param name="player">Actual player</param>
         /// <param name="p">Position chosen in the GetChunkSlots</param>
         /// <param name="r">Rotation chosen</param>
-        public void AddChunk(Chunk c, Player player, PointRotation p, Rotation r)
+        public bool AddChunk(Chunk c, Player player, PointRotation p, Rotation r)
         {
             if (!GetChunkSlots()
                     .Where(pr => pr.point.Equals(p.point))
                     .Any(pr => pr.rotations.Where((t, i) => t == p.rotations[i]).Any())) {
-                return;
+                return false;
             }
 
             player.lastChunk = c;
@@ -331,6 +331,7 @@ namespace Taluva.Model
                 AddCell(c, p, neighbors[5], neighbors[4]);
 
             c.rotation = r;
+            return true;
         }
 
         /// <summary>
@@ -339,10 +340,10 @@ namespace Taluva.Model
         /// <param name="c">Cell where the building will be places</param>
         /// <param name="b">Building to placed</param>
         /// <param name="player">Actual player</param>
-        public void PlaceBuilding(Cell c, Building b, Player player)
+        public bool PlaceBuilding(Cell c, Building b, Player player)
         {
             if (c == null || player == null)
-                return;
+                return false;
 
             Vector2Int coord = GetCellCoord(c);
 
@@ -373,8 +374,10 @@ namespace Taluva.Model
                     player.nbTowers--;
                     break;
                 default:
-                    return;
+                    return false;
             }
+
+            return true;
         }
 
         public List<Vector2Int> FindBiomesAroundVillage(Vector2Int cell, Player player)

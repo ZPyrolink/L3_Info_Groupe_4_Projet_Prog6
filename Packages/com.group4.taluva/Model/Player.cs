@@ -25,13 +25,25 @@ public class Player
     }
     
     //Player placeChunk
-    public void PlaceChunk(Board gameBoard, Vector2Int p, Chunk chunk)
+    public void PlaceChunk(Board gameBoard, PointRotation p, Chunk chunk , Rotation r )
     {
-        gameBoard.AddChunk(chunk, this, new PointRotation(p), chunk.rotation);
+        gameBoard.AddChunk(chunk, this, p, r);
         
     }
     public void PlaceBuilding(Board gameBoard, Cell c, Building b)
     {
         gameBoard.PlaceBuilding(c, b, this);
+    }
+
+    public void Play(TurnPhase phase)
+    {
+        if (phase == TurnPhase.SelectCells)
+        {
+            
+        }
+        else
+        {
+            
+        }
     }
 }
