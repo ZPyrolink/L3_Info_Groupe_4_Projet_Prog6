@@ -63,7 +63,7 @@ namespace TestsTaluva
             Assert.AreEqual(48, _gm.pile._stack.Count);
             _gm.actualChunk = _gm.pile.Draw();
             _gm.ValidateTile(new(new(0, 0), new[] { true, false, false, false, false, false }), Rotation.N);
-            _gm.PlaceBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
+            _gm.ValidateBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
 
             _gm.Undo();
             Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.None);
@@ -94,7 +94,7 @@ namespace TestsTaluva
             Assert.IsFalse(_gm.IsVoid(new(-1, -1)));
             Assert.AreEqual(47, _gm.pile._stack.Count);
 
-            _gm.PlaceBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
+            _gm.ValidateBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
 
             _gm.Undo();
             _gm.Redo();
