@@ -296,7 +296,9 @@ namespace Taluva.Model
                     if (rotations[i])
                         pr.AddRotation((Rotation) i);
 
-                chunkSlots.Add(pr);
+                if(pr.HaveRotation())
+                    chunkSlots.Add(pr);
+
                 pointRemove.Add(pt);
             }
 
@@ -338,6 +340,9 @@ namespace Taluva.Model
         /// <param name="right">Right position of the cell</param>
         private void AddCell(Chunk c, PointRotation p, Vector2Int left, Vector2Int right)
         {
+            if (!WorldMap.IsVoid(p.point))
+                c.Level = WorldMap[p.point].ParentCunk.Level + 1;
+
             WorldMap.Add(c.Coords[0], p.point);
             WorldMap.Add(c.Coords[1], left);
             WorldMap.Add(c.Coords[2], right);
@@ -398,7 +403,7 @@ namespace Taluva.Model
                 c.Build(b);
             }
 
-            Vector2Int[] tmp = GetBarrackSlots();
+            Vector2Int[] tmp = GetBarrackSlots(player);
             List<Vector2Int> tmp2 = FindBiomesAroundVillage(GetCellCoord(c), player);
 
             switch (b)
@@ -451,9 +456,10 @@ namespace Taluva.Model
         /// Find all the slots for the barrack
         /// </summary>
         /// <returns>Return the possible possition for the barrack</returns>
-        public Vector2Int[] GetBarrackSlots() => WorldMap
+        public Vector2Int[] GetBarrackSlots(Player player) => WorldMap
             .Select(GetCellCoord)
-            .Where(p => !WorldMap.IsVoid(p) && WorldMap[p].ActualBuildings == Building.None &&
+            .Where(p => !WorldMap.IsVoid(p) && (WorldMap[p].ParentCunk.Level == 1 || GetAllVillage(p).Any(v => WorldMap[v[0]].Owner == player.ID)) 
+                        && WorldMap[p].ActualBuildings == Building.None &&
                         WorldMap[p].ActualBiome != Biomes.Volcano)
             .ToArray();
 
