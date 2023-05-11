@@ -26,9 +26,9 @@ namespace Taluva.Model
             this.Coords = new Cell[3];
             this.Coords[0] = c.Coords[0];
             this.Coords[1] = c.Coords[1];
-            c.Coords[1].ParentCunk = this;
+            c.Coords[1].ParentCunk = c;
             this.Coords[2] = c.Coords[2];
-            c.Coords[2].ParentCunk = this;
+            c.Coords[2].ParentCunk = c;
             this.Level = c.Level;
         }
         

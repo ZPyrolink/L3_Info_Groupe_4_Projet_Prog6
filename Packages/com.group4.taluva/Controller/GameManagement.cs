@@ -7,15 +7,7 @@ using Taluva.Model.AI;
 using UnityEngine;
 
 using System.Collections.Generic;
-
-using UnityEditor;
-using UnityEditor.Networking.PlayerConnection;
-
-using Codice.Client.Common.FsNodeReaders;
-
-using UnityEngine.UIElements;
 using System.IO;
-using System.Text;
 using System.Globalization;
 
 namespace Taluva.Controller
@@ -26,10 +18,7 @@ namespace Taluva.Controller
         public Player actualPlayer => players[ActualPlayerIndex];
         private AI ActualAi => (AI) actualPlayer;
         private readonly string savePath = Directory.GetCurrentDirectory() + "/Save/";
-
-        private Player[] players;
-        public Player actualPlayer;
-        private AI ActualAi => (AI)actualPlayer;
+        
         public int NbPlayers { get; set; }
         public int ActualPlayerIndex { get; private set; }
         public int maxTurn;
@@ -128,8 +117,8 @@ namespace Taluva.Controller
                 for(int i = 0; i < NbPlayers; i++) {
                     writer.Write((uint)players[i].ID);
                     writer.Write(players[i] is AI);
-                    if (players[i].playerIA)
-                        writer.Write((int)players[i].difficulty);
+                    // if (players[i].playerIA)
+                        // writer.Write((int)players[i].difficulty);
                 }
 
                 writer.Write(historic.Count);

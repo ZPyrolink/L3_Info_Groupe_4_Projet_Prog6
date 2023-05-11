@@ -126,10 +126,10 @@ public class TilesMgr : MonoBehaviour
             mat.SetRenderMode(MaterialExtensions.BlendMode.Opaque);
             mat.color = mat.color.With(a: 1);
         }
-        
+
         (Vector2Int pos, Rotation rot, _) = GetPr();
         GameMgr.Instance.Phase1(new(pos, rot), rot);
-        
+
         ClearFeedForward();
     }
 
@@ -143,7 +143,7 @@ public class TilesMgr : MonoBehaviour
                 Building.Tower => tower,
                 Building.Temple => temple
             }, boardParent);
-            
+
             _current.transform.localScale = _buildsScale[_currentBuild];
             Material[] mats = _current.GetComponent<MeshRenderer>().materials;
             foreach (Material mat in mats)
@@ -155,7 +155,7 @@ public class TilesMgr : MonoBehaviour
 
         if (_current.transform.position == pos)
             return;
-        
+
         _current.transform.position = pos;
     }
 
@@ -167,7 +167,7 @@ public class TilesMgr : MonoBehaviour
             mat.SetRenderMode(MaterialExtensions.BlendMode.Opaque);
             mat.color = mat.color.With(a: 1);
         }
-        
+
         Vector2Int pos = new() { x = (int) (_current.transform.position.x / xOffset) };
         if (pos.x % 2 != 0)
             pos.y = (int) ((_current.transform.position.z - zOffset / 2) / zOffset);
@@ -175,7 +175,7 @@ public class TilesMgr : MonoBehaviour
             pos.y = (int) (_current.transform.position.z / zOffset);
 
         GameMgr.Instance.Phase2(new(pos), _currentBuild);
-        
+
         ClearFeedForward();
     }
 
@@ -219,6 +219,9 @@ public class TilesMgr : MonoBehaviour
 
     public void SetFeedForwards2(Building build)
     {
+        if (_current is not null)
+            Destroy(_current);
+        
         ClearFeedForward();
         _currentBuild = build;
         Vector2Int[] poss = build switch

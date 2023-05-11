@@ -158,9 +158,9 @@ namespace UI
                 _guis[i].transform.GetChild(2).GetComponentInChildren<Text>().text =
                     GameMgr.Instance.players[i].nbBarrack.ToString();
                 _guis[i].transform.GetChild(3).GetComponentInChildren<Text>().text =
-                    GameMgr.Instance.players[i].nbTemple.ToString();
-                _guis[i].transform.GetChild(4).GetComponentInChildren<Text>().text =
                     GameMgr.Instance.players[i].nbTowers.ToString();
+                _guis[i].transform.GetChild(4).GetComponentInChildren<Text>().text =
+                    GameMgr.Instance.players[i].nbTemple.ToString();
 
                 RectTransform rt = _guis[i].GetComponent<RectTransform>();
 
@@ -171,8 +171,8 @@ namespace UI
             }
 
             currentPlayerBuild[0].text = GameMgr.Instance.actualPlayer.nbBarrack.ToString();
-            currentPlayerBuild[1].text = GameMgr.Instance.actualPlayer.nbTemple.ToString();
-            currentPlayerBuild[2].text = GameMgr.Instance.actualPlayer.nbTowers.ToString();
+            currentPlayerBuild[1].text = GameMgr.Instance.actualPlayer.nbTowers.ToString();
+            currentPlayerBuild[2].text = GameMgr.Instance.actualPlayer.nbTemple.ToString();
         }
 
         #endregion
