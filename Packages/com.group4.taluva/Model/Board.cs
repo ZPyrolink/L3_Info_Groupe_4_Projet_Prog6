@@ -462,7 +462,7 @@ namespace Taluva.Model
         /// <returns>Return the possible possition for the barrack</returns>
         public Vector2Int[] GetBarrackSlots(Player player) => WorldMap
             .Select(GetCellCoord)
-            .Where(p => !WorldMap.IsVoid(p) && (WorldMap[p].ParentCunk.Level == 1 || GetAllVillage(p).Any(v => WorldMap[v[0]].Owner == player.ID)) 
+            .Where(p => !WorldMap.IsVoid(p) && (WorldMap[p].ParentCunk.Level == 1 || IsAdjacentToCity(p, player)) 
                         && WorldMap[p].ActualBuildings == Building.None &&
                         WorldMap[p].ActualBiome != Biomes.Volcano)
             .ToArray();
