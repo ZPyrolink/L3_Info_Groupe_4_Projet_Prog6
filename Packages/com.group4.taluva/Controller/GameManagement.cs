@@ -429,7 +429,6 @@ namespace Taluva.Controller
             if (actualPlayer is AI ai) {
                 AIMove(ai);
             } else {
-                //TODO : use nextPhase
                 OnChangePhase(TurnPhase.SelectCells);
                 // Phase1();
             }
