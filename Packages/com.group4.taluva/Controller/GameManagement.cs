@@ -372,7 +372,7 @@ namespace Taluva.Controller
         //Place building
         public void Phase2(PointRotation pr, Building b)
         {
-            Cell c = gameBoard.WorldMap.GetValue(pr.point);
+            Cell c = gameBoard.WorldMap[pr.point];
             if (ValidateBuilding(c, b))
             {
                 //TODO : notify view building placed
@@ -404,7 +404,7 @@ namespace Taluva.Controller
             actualPhase = TurnPhase.PlaceBuilding;
             (Building b, Vector2Int pos) = ((AI)actualPlayer).PlayBuild();
             PointRotation p = new PointRotation(pos);
-            Cell c = gameBoard.WorldMap.GetValue(p.point);
+            Cell c = gameBoard.WorldMap[p.point];
             ValidateBuilding(c,b);
             actualPhase = TurnPhase.SelectCells;
             InitPlay(); //TODO : AI move done, notify view, move to next player
@@ -429,7 +429,7 @@ namespace Taluva.Controller
                 }
             }
             AddHistoric(sameBiomes.Count > 0 ? sameBiomes.ToArray() : new[] { gameBoard.GetCellCoord(c) }, cells.Count > 0 ? cells.ToArray() : new[] { c }, b);
-            gameBoard.PlaceBuilding(c, b, actualPlayer);
+            return gameBoard.PlaceBuilding(c, b, actualPlayer);
 
         }
 

@@ -388,7 +388,7 @@ namespace Taluva.Model
         {
             if (c == null || player == null) {
                 Debug.Log("Oh no!");
-                return;
+                return false;
             }
                 
 
