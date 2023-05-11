@@ -295,7 +295,9 @@ namespace Taluva.Model
                     if (rotations[i])
                         pr.AddRotation((Rotation)i);
 
-                chunkSlots.Add(pr);
+                if(pr.HaveRotation())
+                    chunkSlots.Add(pr);
+
                 pointRemove.Add(pt);
             }
 
