@@ -9,11 +9,16 @@ using UnityEditor;
 using UnityEditor.Networking.PlayerConnection;
 using Codice.Client.Common.FsNodeReaders;
 using UnityEngine.UIElements;
+using System.IO;
+using System.Text;
+using System.Globalization;
 
 namespace Taluva.Controller
 {
     public class GameManagment
     {
+        private readonly string savePath = Directory.GetCurrentDirectory() + "/Save/";
+
         private Player[] players;
         public Player actualPlayer;
         private AI ActualAi => (AI)actualPlayer;
@@ -99,6 +104,70 @@ namespace Taluva.Controller
         /// </summary>
         public bool CanRedo => historic.CanRedo;
 
+        public void Save()
+        {
+            using (FileStream file = File.Open(savePath + DateTime.Now.ToString(new CultureInfo("de-DE")), FileMode.Create, FileAccess.Write))
+            using (BinaryWriter writer = new(file)) {
+                writer.Write(NbPlayers);
+                for(int i = 0; i < NbPlayers; i++) {
+                    writer.Write((uint)players[i].ID);
+                    writer.Write(players[i] is AI);
+                    if (players[i].playerIA)
+                        writer.Write((int)players[i].difficulty);
+                }
+
+                writer.Write(historic.Count);
+                for (int i = 0; i < historic.Count; i++) {
+                    writer.Write(i == historic.Index);
+                    writer.Write(historic[i].positions.Length);
+                    for (int j = 0; j < historic[i].positions.Length; j++) {
+                        writer.Write(historic[i].positions[i].x);
+                        writer.Write(historic[i].positions[i].y);
+                    }
+                    writer.Write((int)historic[i].rotation);
+                    writer.Write((uint)historic[i].player.ID);
+                    for(int j = 1; j < historic[i].chunk.Coords.Length; j++) {
+                        writer.Write((int)historic[i].chunk.Coords[j].ActualBiome);
+                        writer.Write((int)historic[i].chunk.Coords[j].ActualBuildings);
+                        if(historic[i].chunk.Coords[j].ActualBuildings != Building.None)
+                            writer.Write((int)historic[i].chunk.Coords[j].Owner);
+                    }
+                    writer.Write((int)historic[i].chunk.rotation);
+                    writer.Write((int)historic[i].chunk.Level);
+                    writer.Write(historic[i].cells.Length > 0);
+                    if(historic[i].cells.Length > 0) {
+                        for(int j = 0; j < historic[i].cells.Length; j++) {
+                            writer.Write((int)historic[i].cells[j].ActualBiome);
+                            writer.Write((int)historic[i].cells[j].ActualBuildings);
+                            if (historic[i].chunk.Coords[j].ActualBuildings != Building.None)
+                                writer.Write((int)historic[i].chunk.Coords[j].Owner);
+                            writer.Write((int)historic[i].building[j]);
+                        }
+                    }
+                    i++;
+                    if (i >= historic.Count)
+                        break;
+
+                    writer.Write(i == historic.Index);
+                    for (int j = 0; j < historic[i].positions.Length; j++) {
+                        writer.Write(historic[i].positions[j].x);
+                        writer.Write(historic[i].positions[j].y);
+                    }
+                    writer.Write((int)historic[i].player.ID);
+                    for(int j = 0; j < historic[i].cells.Length; j++) {
+                        writer.Write((int)historic[i].cells[j].ActualBiome);
+                        writer.Write((int)historic[i].cells[j].ActualBuildings);
+                        if (historic[i].chunk.Coords[j].ActualBuildings != Building.None)
+                            writer.Write((int)historic[i].chunk.Coords[j].Owner);
+                        writer.Write((int)historic[i].building[j]);
+                    }
+
+                    //T'ES GRAND AUJOURD'HUI! T'ES TRES GRAND!
+
+                }
+            }
+
+        }
 
         /// <summary>
         /// Use this when you're in phase 1 during the placement of the chunk.
@@ -117,7 +186,7 @@ namespace Taluva.Controller
                     newCells[i] = new(gameBoard.WorldMap[positions[i]].ParentCunk.Coords[i]);
                     buildings[i] = gameBoard.WorldMap[positions[i]].ActualBuildings;
                 }
-                historic.Add(new(gameBoard.GetChunksCoords(position, rotation), rotation, actualPlayer, chunk, newCells, buildings));
+                historic.Add(new(gameBoard.GetChunksCoords(position, rotation), rotation, actualPlayer, new(chunk), newCells, buildings));
             } else {
                 historic.Add(new(new[] { position }, rotation, actualPlayer, new(chunk)));
             }
