@@ -100,6 +100,43 @@ namespace Taluva.Model
             return villages;
         }
 
+        public Vector2Int[] GetChunksCoords(Vector2Int c, Rotation r)
+        {
+            Vector2Int[] cells = new Vector2Int[3];
+            cells[0] = c;
+
+            Vector2Int[] neighbors = GetNeighbors(c);
+
+            switch(r){
+                case Rotation.N:
+                    cells[1] = neighbors[0];
+                    cells[2] = neighbors[5];
+                    break;
+                case Rotation.NE:
+                    cells[1] = neighbors[1];
+                    cells[2] = neighbors[0];
+                    break;
+                case Rotation.SE:
+                    cells[1] = neighbors[2];
+                    cells[2] = neighbors[1];
+                    break;
+                case Rotation.S:
+                    cells[1] = neighbors[3];
+                    cells[2] = neighbors[2];
+                    break;
+                case Rotation.SW:
+                    cells[1] = neighbors[4];
+                    cells[2] = neighbors[3];
+                    break;
+                case Rotation.NW:
+                    cells[1] = neighbors[5];
+                    cells[2] = neighbors[4];
+                    break;
+            }
+
+            return cells;
+        }
+
         /// <summary>
         /// Find all the neighbors.
         /// The neighbors will always return clockwise.
@@ -317,8 +354,7 @@ namespace Taluva.Model
         {
             if (!GetChunkSlots()
                     .Where(pr => pr.point.Equals(p.point))
-                    .Any(pr => pr.rotations.Where((t, i) => t == p.rotations[i]).Any()))
-            {
+                    .Any(pr => pr.rotations.Where((t, i) => t == p.rotations[i]).Any())) {
                 return false;
             }
 
@@ -373,7 +409,6 @@ namespace Taluva.Model
                         SetC();
                         player.nbBarrack -= c.ParentCunk.Level;
                     }
-
                     break;
                 case Building.Temple when GetTempleSlots(player).Contains(coord):
                     SetC();
