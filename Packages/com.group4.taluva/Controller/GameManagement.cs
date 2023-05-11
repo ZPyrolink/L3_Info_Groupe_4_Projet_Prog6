@@ -287,7 +287,7 @@ namespace Taluva.Controller
                     if (gameBoard.GetTempleSlots(p).Length == p.nbTemple)
                         completedBuildingTypes++;
 
-                    if (gameBoard.GetBarrackSlots().Length == p.nbBarrack)
+                    if (gameBoard.GetBarrackSlots(p).Length == p.nbBarrack)
                         completedBuildingTypes++;
 
                     if (gameBoard.GetTowerSlots(p).Length == p.nbTowers)
@@ -477,7 +477,7 @@ namespace Taluva.Controller
 
         public Vector2Int[] BarracksSlots()
         {
-            return gameBoard.GetBarrackSlots();
+            return gameBoard.GetBarrackSlots(actualPlayer);
         }
 
         public Vector2Int[] TowerSlots(Player actualPlayer)

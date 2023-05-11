@@ -59,7 +59,7 @@ namespace Taluva.Model.AI
                 rand = Random.Range(0, towers.Length);
                 return (Building.Tower,towers[rand]);
             }
-            Vector2Int[] barracks = board.GetBarrackSlots();
+            Vector2Int[] barracks = board.GetBarrackSlots(this);
             rand = Random.Range(0, barracks.Length);
             return (Building.Barrack,barracks[rand]);
         }

@@ -402,7 +402,7 @@ namespace Taluva.Model
                 c.Build(b);
             }
 
-            Vector2Int[] tmp = GetBarrackSlots();
+            Vector2Int[] tmp = GetBarrackSlots(player);
             List<Vector2Int> tmp2 = FindBiomesAroundVillage(GetCellCoord(c), player);
 
             switch (b)
@@ -457,9 +457,10 @@ namespace Taluva.Model
         /// Find all the slots for the barrack
         /// </summary>
         /// <returns>Return the possible possition for the barrack</returns>
-        public Vector2Int[] GetBarrackSlots() => WorldMap
+        public Vector2Int[] GetBarrackSlots(Player player) => WorldMap
             .Select(GetCellCoord)
-            .Where(p => !WorldMap.IsVoid(p) && WorldMap[p].ActualBuildings == Building.None &&
+            .Where(p => !WorldMap.IsVoid(p) && (WorldMap[p].ParentCunk.Level == 1 || GetAllVillage(p).Any(v => WorldMap[v[0]].Owner == player.ID)) 
+                        && WorldMap[p].ActualBuildings == Building.None &&
                         WorldMap[p].ActualBiome != Biomes.Volcano)
             .ToArray();
 
