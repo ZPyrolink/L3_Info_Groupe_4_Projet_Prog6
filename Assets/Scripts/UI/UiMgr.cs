@@ -7,6 +7,8 @@ using UnityEngine.UI;
 
 using Utils;
 
+using Wrapper;
+
 using GameObject = UnityEngine.GameObject;
 using Outline = Imports.QuickOutline.Scripts.Outline;
 using Random = UnityEngine.Random;
@@ -74,11 +76,11 @@ namespace UI
                 switch (value)
                 {
                     case > 2:
-                        NextPlayer();
+                        // NextPlayer();
                         _phase = 1;
                         break;
                     case <= 0:
-                        PreviousPlayer();
+                        // PreviousPlayer();
                         _phase = 2;
                         break;
                     default:
@@ -99,7 +101,7 @@ namespace UI
 
         private void Start()
         {
-            NbTiles = nbTilesPerPlayers * PlayerMgr.Instance.Length;
+            NbTiles = nbTilesPerPlayers * GameMgr.Instance.NbPlayers;
             Phase = 1;
             _defaultBuildsY = builds.transform.GetChild(0).GetComponent<RectTransform>().anchoredPosition.y;
             Instance = this;
@@ -107,8 +109,8 @@ namespace UI
 
         private void Update()
         {
-            if (Input.GetKeyDown(nextPlayer))
-                NextPlayer();
+            // if (Input.GetKeyDown(nextPlayer))
+            //     NextPlayer();
 
             if (Input.GetKeyDown(nextPhase))
                 Next();
@@ -126,20 +128,20 @@ namespace UI
         // Start is called before the first frame update
         private void OnGUI()
         {
-            for (int i = 0; i < PlayerMgr.Instance.Length; i++)
+            for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
             {
                 if (_guis[i] is null)
                 {
                     _guis[i] = Instantiate(playerPrefab, transform);
                     foreach (MeshRenderer mr in _guis[i].GetComponentsInChildren<MeshRenderer>())
-                        mr.material.color = PlayerMgr.Instance[i].Color;
+                        mr.material.color = GameMgr.Instance.players[i].ID.GetColor();
                 }
 
                 _guis[i].GetComponent<Image>().color =
-                    i == PlayerMgr.Instance.CurrentIndex ? Color.white : new(.75f, .75f, .75f);
+                    i == GameMgr.Instance.ActualPlayerIndex ? Color.white : new(.75f, .75f, .75f);
 
                 foreach (Animator anim in _guis[i].GetComponentsInChildren<Animator>())
-                    if (PlayerMgr.Instance.CurrentIndex == i)
+                    if (GameMgr.Instance.ActualPlayerIndex == i)
                     {
                         anim.enabled = true;
                     }
@@ -150,15 +152,15 @@ namespace UI
                     }
 
 
-                _guis[i].transform.GetChild(0).GetComponent<Text>().text = PlayerMgr.Instance[i].Name;
-                _guis[i].transform.GetChild(1).GetComponent<Image>().color = PlayerMgr.Instance[i].Color;
+                _guis[i].transform.GetChild(0).GetComponent<Text>().text = $"Player {i}";
+                _guis[i].transform.GetChild(1).GetComponent<Image>().color = GameMgr.Instance.players[i].ID.GetColor();
 
                 _guis[i].transform.GetChild(2).GetComponentInChildren<Text>().text =
-                    PlayerMgr.Instance[i].Builds[0].ToString();
+                    GameMgr.Instance.players[i].nbBarrack.ToString();
                 _guis[i].transform.GetChild(3).GetComponentInChildren<Text>().text =
-                    PlayerMgr.Instance[i].Builds[1].ToString();
+                    GameMgr.Instance.players[i].nbTemple.ToString();
                 _guis[i].transform.GetChild(4).GetComponentInChildren<Text>().text =
-                    PlayerMgr.Instance[i].Builds[2].ToString();
+                    GameMgr.Instance.players[i].nbTowers.ToString();
 
                 RectTransform rt = _guis[i].GetComponent<RectTransform>();
 
@@ -168,9 +170,9 @@ namespace UI
                 rt.anchoredPosition = new(-10, -10 - 110 * i);
             }
 
-            currentPlayerBuild[0].text = PlayerMgr.Instance.Current.Builds[0].ToString();
-            currentPlayerBuild[1].text = PlayerMgr.Instance.Current.Builds[1].ToString();
-            currentPlayerBuild[2].text = PlayerMgr.Instance.Current.Builds[2].ToString();
+            currentPlayerBuild[0].text = GameMgr.Instance.actualPlayer.nbBarrack.ToString();
+            currentPlayerBuild[1].text = GameMgr.Instance.actualPlayer.nbTemple.ToString();
+            currentPlayerBuild[2].text = GameMgr.Instance.actualPlayer.nbTowers.ToString();
         }
 
         #endregion
@@ -188,18 +190,17 @@ namespace UI
 
         private void Phase1()
         {
-            if (NbTiles == nbTilesPerPlayers * PlayerMgr.Instance.Length)
+            if (NbTiles == nbTilesPerPlayers * GameMgr.Instance.NbPlayers)
                 TilesMgr.Instance.SetFeedForward(Vector3.zero);
             else
                 TilesMgr.Instance.SetFeedForwards1();
             
-            BiomeColor[] values = (BiomeColor[]) Enum.GetValues(typeof(BiomeColor));
             CurrentTile.SetActive(true);
+            
             MeshRenderer mr = tile.transform.GetComponentInChildren<MeshRenderer>();
-
-            mr.materials[3].color = values[Random.Range(1, values.Length - 1)].GetColor();
-            mr.materials[2].color = BiomeColor.Volcano.GetColor();
-            mr.materials[0].color = values[Random.Range(1, values.Length - 1)].GetColor();
+            mr.materials[0].color = GameMgr.Instance.actualChunk.Coords[1].ActualBiome.GetColor();
+            mr.materials[2].color = Biomes.Volcano.GetColor();
+            mr.materials[3].color = GameMgr.Instance.actualChunk.Coords[2].ActualBiome.GetColor();
             
             tile.SetActive(true);
             builds.SetActive(false);
@@ -216,8 +217,8 @@ namespace UI
         public void Undo() => Phase--;
         public void Redo() => Phase++;
 
-        private void NextPlayer() => PlayerMgr.Instance.CurrentIndex++;
-        private void PreviousPlayer() => PlayerMgr.Instance.CurrentIndex--;
+        // private void NextPlayer() => GameMgr.Instance.InitPlay();
+        // private void PreviousPlayer() => PlayerMgr.Instance.CurrentIndex--;
 
         public void ToggleMenu()
         {
@@ -240,7 +241,7 @@ namespace UI
             child.anchoredPosition = child.anchoredPosition.With(y: 20);
             Outline outline = child.GetComponentInChildren<Outline>();
             outline.enabled = true;
-            outline.OutlineColor = PlayerMgr.Instance.Current.Color;
+            outline.OutlineColor = GameMgr.Instance.actualPlayer.ID.GetColor();
         }
     }
 }

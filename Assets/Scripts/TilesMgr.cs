@@ -12,12 +12,12 @@ using UnityEngine;
 
 using Utils;
 
+using Wrapper;
+
 public class TilesMgr : MonoBehaviour
 {
     private const float xOffset = 1.5f, yOffset = .41f, zOffset = 1.73205f;
     public static TilesMgr Instance { get; private set; }
-
-    private Board _board;
 
     [SerializeField]
     private Transform boardParent;
@@ -44,11 +44,7 @@ public class TilesMgr : MonoBehaviour
 
     private Dictionary<GameObject, PointRotation> _gos;
 
-    private void Start()
-    {
-        Instance = this;
-        _board = new();
-    }
+    private void Start() => Instance = this;
 
     private void Update()
     {
@@ -90,7 +86,7 @@ public class TilesMgr : MonoBehaviour
 
         Outline outline = go.GetComponent<Outline>();
         outline.enabled = true;
-        outline.OutlineColor = PlayerMgr.Instance.Current.Color;
+        outline.OutlineColor = GameMgr.Instance.actualPlayer.ID.GetColor();
         outline.OutlineMode = Outline.Mode.OutlineAll;
     }
 
@@ -130,12 +126,9 @@ public class TilesMgr : MonoBehaviour
             mat.SetRenderMode(MaterialExtensions.BlendMode.Opaque);
             mat.color = mat.color.With(a: 1);
         }
-
-        Cell left = new(BiomeColorExt.Of(mats[0].color)), right = new(BiomeColorExt.Of(mats[3].color));
-
-        (Vector2Int pos, Rotation rot, int level) = GetPr();
-        Chunk c = new(level, left, right);
-        _board.AddChunk(c, new(PlayerColor.Blue), new(pos, rot), rot);
+        
+        (Vector2Int pos, Rotation rot, _) = GetPr();
+        GameMgr.Instance.Phase1(new(pos, rot), rot);
         
         ClearFeedForward();
     }
@@ -156,7 +149,7 @@ public class TilesMgr : MonoBehaviour
             foreach (Material mat in mats)
             {
                 mat.SetRenderMode(MaterialExtensions.BlendMode.Transparent);
-                mat.color = PlayerMgr.Instance.Current.Color.With(a: .75f);
+                mat.color = GameMgr.Instance.actualPlayer.ID.GetColor().With(a: .75f);
             }
         }
 
@@ -180,10 +173,8 @@ public class TilesMgr : MonoBehaviour
             pos.y = (int) ((_current.transform.position.z - zOffset / 2) / zOffset);
         else
             pos.y = (int) (_current.transform.position.z / zOffset);
-        
-        Debug.Log((pos, (int) (_current.transform.position.y / yOffset)));
-        
-        _board.PlaceBuilding(_board.WorldMap[pos], _currentBuild, new(PlayerColor.Blue));
+
+        GameMgr.Instance.Phase2(new(pos), _currentBuild);
         
         ClearFeedForward();
     }
@@ -214,11 +205,11 @@ public class TilesMgr : MonoBehaviour
     public void SetFeedForwards1()
     {
         ClearFeedForward();
-        foreach (PointRotation pr in _board.GetChunkSlots())
+        foreach (PointRotation pr in GameMgr.Instance.ChunkSlots())
         {
             Vector3 pos = new(pr.point.x, 0, pr.point.y);
-            if (!_board.WorldMap.IsVoid(pr.point))
-                pos.y = _board.WorldMap[pr.point].ParentCunk.Level * yOffset;
+            if (!GameMgr.Instance.IsVoid(pr.point))
+                pos.y = GameMgr.Instance.LevelAt(pr.point) * yOffset;
             pos.Scale(new(xOffset, 1, zOffset));
             if (pr.point.x % 2 != 0)
                 pos.z += zOffset / 2;
@@ -232,16 +223,16 @@ public class TilesMgr : MonoBehaviour
         _currentBuild = build;
         Vector2Int[] poss = build switch
         {
-            Building.Barrack => _board.GetBarrackSlots(),
-            Building.Tower => _board.GetTowerSlots(new(PlayerColor.Blue)),
-            Building.Temple => _board.GetTempleSlots(new(PlayerColor.Blue))
+            Building.Barrack => GameMgr.Instance.BarracksSlots(),
+            Building.Tower => GameMgr.Instance.TowerSlots(GameMgr.Instance.actualPlayer),
+            Building.Temple => GameMgr.Instance.TempleSlots(GameMgr.Instance.actualPlayer)
         };
 
         foreach (Vector2Int p in poss)
         {
             Vector3 pos = new(p.x, 0, p.y);
-            if (!_board.WorldMap.IsVoid(p))
-                pos.y = _board.WorldMap[p].ParentCunk.Level * yOffset;
+            if (!GameMgr.Instance.IsVoid(p))
+                pos.y = GameMgr.Instance.LevelAt(p) * yOffset;
             pos.Scale(new(xOffset, 1, zOffset));
             if (p.x % 2 != 0)
                 pos.z += zOffset / 2;
@@ -252,7 +243,7 @@ public class TilesMgr : MonoBehaviour
     public GameObject SetFeedForward(Vector3 pos)
     {
         GameObject go = Instantiate(feedForward, pos, Quaternion.Euler(-90, -90, 0), feedForwardParent);
-        go.GetComponent<MeshRenderer>().materials[1].color = PlayerMgr.Instance.Current.Color;
+        go.GetComponent<MeshRenderer>().materials[1].color = GameMgr.Instance.actualPlayer.ID.GetColor();
         return go;
     }
 

@@ -1125,8 +1125,8 @@ GameObject:
   m_Component:
   - component: {fileID: 338899226}
   - component: {fileID: 338899225}
-  - component: {fileID: 338899227}
   - component: {fileID: 338899228}
+  - component: {fileID: 338899229}
   m_Layer: 0
   m_Name: Mgr
   m_TagString: Untagged
@@ -1167,47 +1167,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &338899227
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 338899224}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14eb1095bf2a4a85bb8d4c83410bc2a9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  players:
-  - name: P1
-    color: {r: 0.8235294, g: 0.05882353, b: 0.15686275, a: 1}
-    builds: 000000000100000002000000
-  - name: P2
-    color: {r: 0.42352942, g: 0.5764706, b: 0.36862746, a: 1}
-    builds: 010000000100000002000000
-  - name: P3
-    color: {r: 0.28235295, g: 0.33333334, b: 0.7176471, a: 1}
-    builds: 020000000100000002000000
-  - name: P4
-    color: {r: 1, g: 0.84313726, b: 0, a: 1}
-    builds: 030000000100000002000000
-  currentIndex: 0
-  playerChanged:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 338899225}
-        m_TargetAssemblyTypeName: TilesMgr, Assembly-CSharp
-        m_MethodName: ClearOutline
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!114 &338899228
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1223,6 +1182,19 @@ MonoBehaviour:
   hexTile: {fileID: 8683040418472302429, guid: f365e0346c3bdca4e89b670ac6b95b54, type: 3}
   fps: {fileID: 1889032831}
   gui: {fileID: 1209922086}
+--- !u!114 &338899229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 338899224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c35b9f2cdfb844fca00fe491b032dbca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nbPlayers: 3
 --- !u!1 &342422411
 GameObject:
   m_ObjectHideFlags: 0

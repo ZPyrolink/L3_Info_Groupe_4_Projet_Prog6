@@ -37,21 +37,22 @@ namespace Taluva.Controller
         {
             historic = new();
             this.players = new Player[nbPlayers];
-            this.ActualPlayerIndex = 1;
+            this.ActualPlayerIndex = -1;
             this.gameBoard = new();
             this.NbPlayers = nbPlayers;
             this.maxTurn = 12 * nbPlayers;
+
+            PlayerColor[] pc = (PlayerColor[]) Enum.GetValues(typeof(PlayerColor));
+            
             for (int i = 0; i < this.NbPlayers; i++)
             {
-                players[i] = new((PlayerColor) i);
+                players[i] = new(pc[i]);
                 if (this.AIRandom && i == 1)
                 {
                     players[i].playerIA = true;
                     break;
                 }
             }
-
-            ActualPlayerIndex = 0;
         }
 
         public void setAI()
@@ -265,7 +266,7 @@ namespace Taluva.Controller
                         return p;
                 }
 
-                throw new NotImplementedException();
+                return null;
             }
         }
         private Player NormalEnd
@@ -511,5 +512,7 @@ namespace Taluva.Controller
         {
             set { throw new NotImplementedException(); }
         }
+
+        public int LevelAt(Vector2Int point) => gameBoard.WorldMap[point].ParentCunk.Level;
     }
 }
