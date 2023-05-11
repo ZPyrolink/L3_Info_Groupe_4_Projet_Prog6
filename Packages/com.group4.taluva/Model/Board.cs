@@ -399,10 +399,10 @@ namespace Taluva.Model
 
             Vector2Int coord = GetCellCoord(c);
 
-            void SetC()
+            void SetC(Cell cell)
             {
-                c.Owner = player.ID;
-                c.Build(b);
+                cell.Owner = player.ID;
+                cell.Build(b);
             }
 
             Vector2Int[] tmp = GetBarrackSlots(player);
@@ -413,16 +413,16 @@ namespace Taluva.Model
                 case Building.Barrack when tmp2.All(t => tmp.Contains(t)):
                     foreach (Vector2Int v in tmp2)
                     {
-                        SetC();
+                        SetC(WorldMap[v]);
                         player.nbBarrack -= c.ParentCunk.Level;
                     }
                     break;
                 case Building.Temple when GetTempleSlots(player).Contains(coord):
-                    SetC();
+                    SetC(c);
                     player.nbTemple--;
                     break;
                 case Building.Tower when GetTowerSlots(player).Contains(coord):
-                    SetC();
+                    SetC(c);
                     player.nbTowers--;
                     break;
                 default:
