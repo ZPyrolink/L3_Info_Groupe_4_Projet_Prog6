@@ -71,8 +71,8 @@ namespace TestsTaluva
 
             _gm.actualChunk = _gm.pile.Draw();
             _gm.ValidateTile(new(new(0, 1), new[] { false, false, false, true, false, false }), Rotation.S);
-            _gm.PlaceBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
-            _gm.PlaceBuilding(_gm.gameBoard.WorldMap[new(-1, -1)], Building.Barrack);
+            _gm.ValidateBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
+            _gm.ValidateBuilding(_gm.gameBoard.WorldMap[new(-1, -1)], Building.Barrack);
             _gm.actualChunk = _gm.pile.Draw();
             _gm.ValidateTile(new(new(0, 1), new[] { false, false, false, false, false, true }), Rotation.NW);
 
@@ -104,7 +104,7 @@ namespace TestsTaluva
 
             _gm.actualChunk = _gm.pile.Draw();
             _gm.ValidateTile(new(new(0, 1), new[] { false, false, false, true, false, false }), Rotation.S);
-            _gm.PlaceBuilding(_gm.gameBoard.WorldMap[new(-1, -1)], Building.Barrack);
+            _gm.ValidateBuilding(_gm.gameBoard.WorldMap[new(-1, -1)], Building.Barrack);
             _gm.actualChunk = _gm.pile.Draw();
             _gm.ValidateTile(new(new(0, 1), new[] { false, false, false, false, false, true }), Rotation.NW);
 
