@@ -339,6 +339,9 @@ namespace Taluva.Model
         /// <param name="right">Right position of the cell</param>
         private void AddCell(Chunk c, PointRotation p, Vector2Int left, Vector2Int right)
         {
+            if (!WorldMap.IsVoid(p.point))
+                c.Level = WorldMap[p.point].ParentCunk.Level + 1;
+
             WorldMap.Add(c.Coords[0], p.point);
             WorldMap.Add(c.Coords[1], left);
             WorldMap.Add(c.Coords[2], right);
