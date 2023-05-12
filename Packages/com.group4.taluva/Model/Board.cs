@@ -18,6 +18,11 @@ namespace Taluva.Model
             WorldMap = new();
         }
 
+        public Board(Board b)
+        {
+            WorldMap = new DynamicMatrix<Cell>(b.WorldMap);
+        }
+
         /// <summary>
         /// Remove the cell from the map
         /// </summary>
@@ -232,9 +237,11 @@ namespace Taluva.Model
                 GetVillage(right).Count > 1)
                 return rightCell.ActualBuildings == Building.Barrack;
 
-            if (leftCell.ContainsBuilding() && rightCell.ContainsBuilding() &&
-                GetVillage(left).Count > 2)
-                return leftCell.ActualBuildings == Building.Barrack && rightCell.ActualBuildings == Building.Barrack;
+            if (leftCell.ContainsBuilding() && rightCell.ContainsBuilding())
+                if((leftCell.Owner == rightCell.Owner && GetVillage(left).Count > 2) ||
+                    leftCell.Owner != rightCell.Owner && GetVillage(left).Count >= 2 && GetVillage(right).Count >= 2)
+                    return leftCell.ActualBuildings == Building.Barrack && rightCell.ActualBuildings == Building.Barrack;
+
 
             return false;
         }

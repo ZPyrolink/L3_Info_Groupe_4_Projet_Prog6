@@ -4,9 +4,18 @@ namespace Taluva.Model.AI
 {
     public class AIRandom : AI
     {
-        public AIRandom(PlayerColor id,Board board) : base(id)
+        public AIRandom(PlayerColor id,Board board) : base(id,board,null)
         {
             
+        }
+        public AIRandom(AIRandom original) : base(original)
+        {
+            
+        }
+
+        public override Player Clone()
+        {
+            return new AIRandom(this);
         }
 
         public override PointRotation PlayChunk()

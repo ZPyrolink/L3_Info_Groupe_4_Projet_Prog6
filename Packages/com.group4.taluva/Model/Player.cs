@@ -7,7 +7,7 @@ using UnityEngine;
 public class Player
 {
     public Chunk lastChunk { get; set; }
-    bool b_played;
+    public bool b_played;
     public PlayerColor ID { get; private set; }
     public int nbTowers = 2;
     public int nbTemple = 3;
@@ -24,7 +24,24 @@ public class Player
     {
         playerIA = true;
     }
-    
+
+    public Player Clone()
+    {
+        return new Player(this);
+    }
+
+    public Player(Player original) : this(original.ID)
+    {
+        Player clone = new Player(this.ID);
+        clone.lastChunk = this.lastChunk;
+        clone.b_played = this.b_played;
+        clone.nbTowers = this.nbTowers;
+        clone.nbTemple = this.nbTemple;
+        clone.nbBarrack = this.nbBarrack;
+        clone.playerIA = this.playerIA;
+    }
+
+
     //Player placeChunk
     public void PlaceChunk(Board gameBoard, PointRotation p, Chunk chunk , Rotation r )
     {
