@@ -352,7 +352,7 @@ namespace Taluva.Controller
             return null;
         }
 
-        private Player? EarlyEnd
+        private Player EarlyEnd
         {
             get
             {
@@ -478,7 +478,7 @@ namespace Taluva.Controller
                 OnPlayerElimination(actualPlayer);
             }
         }
-
+        
         public void Phase1(PointRotation pr, Rotation r)
         {
             if (ValidateTile(pr, r)) {
