@@ -12,6 +12,8 @@ using UnityEngine.UIElements;
 using System.IO;
 using System.Text;
 using System.Globalization;
+using System.Linq;
+using Codice.Client.GameUI.Explorer;
 
 namespace Taluva.Controller
 {
@@ -20,6 +22,7 @@ namespace Taluva.Controller
         private readonly string savePath = Directory.GetCurrentDirectory() + "/Save/";
 
         private Player[] players;
+        private Player[] eliminatedPlayers;
         public Player actualPlayer;
         private AI ActualAi => (AI)actualPlayer;
         public int NbPlayers { get; set; }
@@ -32,21 +35,26 @@ namespace Taluva.Controller
         public Chunk actualChunk;
         private bool AIRandom = false;
         private Player Winner { get; set; }
+        private GameEnd victoryType { get; set; }
         //Actions
         //Notify phase change
         public Action<TurnPhase> ChangePhase { get; set; }
         private void OnChangePhase(TurnPhase phase) => ChangePhase?.Invoke(phase);
         
         //Notify end of game
-        public Action<bool> NotifyEndGame { get; set; }
-        private void OnEndGame(bool endgame) => NotifyEndGame?.Invoke(endgame);
+        public Action<Player, GameEnd> NotifyEndGame { get; set; }
+        private void OnEndGame(Player winner, GameEnd victory) => NotifyEndGame?.Invoke(winner, victory);
         
         //Notify where the AI places the chunk
         public Action<PointRotation> NotifyAIChunkPlacement { get; set; }
         private void OnAIChunkPlacement(PointRotation pr) => NotifyAIChunkPlacement?.Invoke(pr);
         //Notify where the AI places the building
-        public Action<(Building, Vector2Int)> NotifyAIBuildingPlacement { get; set; }
-        private void OnAIBuildingPlacement(Building b, Vector2Int pos) => NotifyAIBuildingPlacement?.Invoke((b, pos));
+        public Action<Building, Vector2Int> NotifyAIBuildingPlacement { get; set; }
+        private void OnAIBuildingPlacement(Building b, Vector2Int pos) => NotifyAIBuildingPlacement?.Invoke(b, pos);
+        
+        //Notify player eliminated
+        public Action<Player> NotifyPlayerEliminated { get; set; }
+        private void OnPlayerElimination(Player p) => NotifyPlayerEliminated?.Invoke(p);
 
         public GameManagment(int nbPlayers)
         {
@@ -298,18 +306,26 @@ namespace Taluva.Controller
             return c;
         }
 
-        public Player? GetWinner()
+        public Player CheckWinner()
         {
+            Player p;
             if (maxTurn == 0)
             {
-                OnEndGame(true);
-                return NormalEnd; 
+                p = NormalEnd;
+                this.victoryType = GameEnd.NormalEnd;
+                OnEndGame(p, GameEnd.NormalEnd);
             }
 
-            if (EarlyEnd != null)
+            Player tmp = EarlyEnd;
+            if (tmp != null)
             {
-                OnEndGame(true);
-                return EarlyEnd;
+                p = tmp;
+                this.victoryType = GameEnd.EarlyEnd;
+                OnEndGame(p, GameEnd.EarlyEnd);
+            }
+            if ((eliminatedPlayers.Length == (players.Length - 1)) && !eliminatedPlayers.Contains(actualPlayer))
+            {
+                OnEndGame(actualPlayer, GameEnd.LastPlayerStanding);
             }
             return null;
         }
@@ -405,11 +421,10 @@ namespace Taluva.Controller
 
         public void InitPlay()
         {
-            if (GetWinner() != null) {
-                EndGame();
-                OnEndGame(true);
+            if (CheckWinner() != null) {
                 return;
             }
+            PlayerEliminated();
             actualTurn++;
             this.actualChunk = pile.Draw();
             if (actualTurn + 1 > NbPlayers) {
@@ -433,12 +448,13 @@ namespace Taluva.Controller
                 // Phase1();
             }
         }
-
-        public void EndGame()
+        public void PlayerEliminated()
         {
-            this.Winner = GetWinner();
-            //notify view to end game
-            OnEndGame(true);
+            if (actualPlayer.nbBarrack == 0 && actualPlayer != this.Winner)
+            {
+                eliminatedPlayers[eliminatedPlayers.Length] = actualPlayer;
+                OnPlayerElimination(actualPlayer);
+            }
         }
 
         public void Phase1(PointRotation pr, Rotation r)
