@@ -18,6 +18,11 @@ namespace Taluva.Model
             WorldMap = new();
         }
 
+        public Board(Board b)
+        {
+            WorldMap = new DynamicMatrix<Cell>(b.WorldMap);
+        }
+
         /// <summary>
         /// Remove the cell from the map
         /// </summary>

@@ -14,6 +14,14 @@ namespace Taluva.Utils
         // Dans la théorie, cette liste devra ajouter 0.5 à ces coordonées en Y quand X % 2 == 1
 
         public DynamicMatrix() => _matrix = new();
+        public DynamicMatrix(DynamicMatrix<T> dynMatrix)
+        {
+            _matrix = new Dictionary<int, Dictionary<int, T>>();
+            foreach ((int index,Dictionary<int,T> row) in dynMatrix._matrix)
+            {
+                _matrix.Add(index,new Dictionary<int, T>(row));
+            }
+        }
 
         /// <summary>
         /// Line maximum in the matrix
