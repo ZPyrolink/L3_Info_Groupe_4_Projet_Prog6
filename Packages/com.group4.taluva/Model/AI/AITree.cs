@@ -8,13 +8,13 @@ namespace Taluva.Model.AI
 {
     public abstract class AITree : AI
     {
-        public AITree(PlayerColor id,Board board,Pile<Chunk> pile) : base(id, board,pile){}
+        public AITree(PlayerColor id,GameManagment gm,Pile<Chunk> pile) : base(id, gm,pile){}
         public AITree(AITree orignal) : base(orignal){}
         
         private int TreeExplore(GameManagment gm)
         {
             Chunk[] possibleDraw = pile.GetRemaining();
-            PointRotation[] possibleChunk = board.GetChunkSlots();
+            PointRotation[] possibleChunk = gm.gameBoard.GetChunkSlots();
             foreach (PointRotation p in possibleChunk)
             {
                 for (int i = 0; i < p.rotations.Length; i++)
