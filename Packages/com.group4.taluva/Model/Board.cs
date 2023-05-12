@@ -518,7 +518,7 @@ namespace Taluva.Model
             cell.ActualBuildings == Building.None && cell.IsBuildable &&
             IsAdjacentToCity(GetCellCoord(cell), actualPlayer) &&
             GetAllVillage(GetCellCoord(cell))
-                .All(village =>
+                .Any(village =>
                     WorldMap[village[0]].Owner == actualPlayer.ID && !CityHasTemple(village) &&
                     village.Count >= 3);
 
