@@ -9,16 +9,12 @@ using Utils;
 
 using Wrapper;
 
-using GameObject = UnityEngine.GameObject;
-using Outline = Imports.QuickOutline.Scripts.Outline;
-using Random = UnityEngine.Random;
-
 namespace UI
 {
     public class UiMgr : MonoBehaviour
     {
         public static UiMgr Instance { get; private set; }
-        
+
         [SerializeField]
         private Text uiNbTiles;
 
@@ -184,7 +180,7 @@ namespace UI
                 1 => (Action) TilesMgr.Instance.ValidateTile,
                 2 => TilesMgr.Instance.ValidateBuild
             }).Invoke();
-            
+
             Phase++;
         }
 
@@ -194,14 +190,14 @@ namespace UI
                 TilesMgr.Instance.SetFeedForward(Vector3.zero);
             else
                 TilesMgr.Instance.SetFeedForwards1();
-            
+
             CurrentTile.SetActive(true);
-            
+
             MeshRenderer mr = tile.transform.GetComponentInChildren<MeshRenderer>();
             mr.materials[0].color = GameMgr.Instance.actualChunk.Coords[1].ActualBiome.GetColor();
             mr.materials[2].color = Biomes.Volcano.GetColor();
             mr.materials[3].color = GameMgr.Instance.actualChunk.Coords[2].ActualBiome.GetColor();
-            
+
             tile.SetActive(true);
             builds.SetActive(false);
         }
@@ -210,15 +206,16 @@ namespace UI
         {
             tile.SetActive(false);
             builds.SetActive(true);
+
+            foreach (MeshRenderer mr in builds.GetComponentsInChildren<MeshRenderer>())
+                mr.material.color = GameMgr.Instance.actualPlayer.ID.GetColor();
+
             NbTiles--;
             UpBuild(0);
         }
 
         public void Undo() => Phase--;
         public void Redo() => Phase++;
-
-        // private void NextPlayer() => GameMgr.Instance.InitPlay();
-        // private void PreviousPlayer() => PlayerMgr.Instance.CurrentIndex--;
 
         public void ToggleMenu()
         {
@@ -228,20 +225,24 @@ namespace UI
         public void UpBuild(int i)
         {
             RectTransform child;
+            Animator anim;
+            
             foreach (Transform t in builds.transform)
             {
                 child = t.GetComponent<RectTransform>();
                 child.anchoredPosition = child.anchoredPosition.With(y: _defaultBuildsY);
-                t.GetComponentInChildren<Outline>().enabled = false;
+
+                anim = t.GetComponentInChildren<Animator>();
+                anim.enabled = false;
+                anim.transform.localRotation = Quaternion.Euler(-90, -90, 0);
             }
-            
+
             TilesMgr.Instance.SetFeedForwards2((Building) i + 1);
 
             child = builds.transform.GetChild(i).GetComponent<RectTransform>();
             child.anchoredPosition = child.anchoredPosition.With(y: 20);
-            Outline outline = child.GetComponentInChildren<Outline>();
-            outline.enabled = true;
-            outline.OutlineColor = GameMgr.Instance.actualPlayer.ID.GetColor();
+            anim = child.GetComponentInChildren<Animator>();
+            anim.enabled = true;
         }
     }
 }

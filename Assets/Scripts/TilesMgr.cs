@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Imports.QuickOutline.Scripts;
-
 using Taluva.Model;
 
 using UI;
@@ -62,9 +60,6 @@ public class TilesMgr : MonoBehaviour
 
         switch (hit.transform.tag)
         {
-            // case "Tile":
-            //     OutlineGo(hit.transform.gameObject);
-            //     break;
             case "Feed Forward":
                 _currentFf = hit.transform.gameObject;
                 (UiMgr.Instance.Phase switch
@@ -78,16 +73,6 @@ public class TilesMgr : MonoBehaviour
                 Debug.Log("Another object is hited", hit.transform);
                 break;
         }
-    }
-
-    private void OutlineGo(GameObject go)
-    {
-        ClearOutline();
-
-        Outline outline = go.GetComponent<Outline>();
-        outline.enabled = true;
-        outline.OutlineColor = GameMgr.Instance.actualPlayer.ID.GetColor();
-        outline.OutlineMode = Outline.Mode.OutlineAll;
     }
 
     private void PutTile(Vector3 pos)
@@ -256,11 +241,5 @@ public class TilesMgr : MonoBehaviour
         _current = null;
         foreach (Transform t in feedForwardParent)
             Destroy(t.gameObject);
-    }
-
-    public void ClearOutline()
-    {
-        foreach (Outline o in GameObject.FindGameObjectsWithTag("Tile").Select(go => go.GetComponent<Outline>()))
-            o.enabled = false;
     }
 }
