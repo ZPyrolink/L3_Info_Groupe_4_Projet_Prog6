@@ -9,6 +9,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
+using System.Linq;
 
 namespace Taluva.Controller
 {
@@ -29,6 +30,26 @@ namespace Taluva.Controller
         public Chunk actualChunk;
         private bool AIRandom = false;
         private Player Winner { get; set; }
+        private GameEnd victoryType { get; set; }
+        //Actions
+        //Notify phase change
+        public Action<TurnPhase> ChangePhase { get; set; }
+        private void OnChangePhase(TurnPhase phase) => ChangePhase?.Invoke(phase);
+        
+        //Notify end of game
+        public Action<Player, GameEnd> NotifyEndGame { get; set; }
+        private void OnEndGame(Player winner, GameEnd victory) => NotifyEndGame?.Invoke(winner, victory);
+        
+        //Notify where the AI places the chunk
+        public Action<PointRotation> NotifyAIChunkPlacement { get; set; }
+        private void OnAIChunkPlacement(PointRotation pr) => NotifyAIChunkPlacement?.Invoke(pr);
+        //Notify where the AI places the building
+        public Action<Building, Vector2Int> NotifyAIBuildingPlacement { get; set; }
+        private void OnAIBuildingPlacement(Building b, Vector2Int pos) => NotifyAIBuildingPlacement?.Invoke(b, pos);
+        
+        //Notify player eliminated
+        public Action<Player> NotifyPlayerEliminated { get; set; }
+        private void OnPlayerElimination(Player p) => NotifyPlayerEliminated?.Invoke(p);
 
         public GameManagment(int nbPlayers)
         {
@@ -118,9 +139,9 @@ namespace Taluva.Controller
                     writer.Write((uint)players[i].ID);
                     writer.Write(players[i] is AI);
                     // if (players[i].playerIA)
-                        // writer.Write((int)players[i].difficulty);
+                    //     writer.Write((int)players[i].difficulty);
                 }
-
+                
                 writer.Write(historic.Count);
                 for (int i = 0; i < historic.Count; i++) {
                     writer.Write(i == historic.Index);
@@ -218,6 +239,39 @@ namespace Taluva.Controller
             historic.Add(new(positions, null, actualPlayer, newCells, buildings));
         }
 
+        public void PrecedentPhase()
+        {
+            if (actualPhase != TurnPhase.IAPlays)
+            {
+                int precedantPhaseValue = ((int)actualPhase - 1) % Enum.GetNames(typeof(TurnPhase)).Length - 1;
+                actualPhase = (TurnPhase)precedantPhaseValue; 
+                OnChangePhase(actualPhase);
+            }
+            else
+            {
+                actualPhase = TurnPhase.NextPlayer; //Change Player ?
+                OnChangePhase(actualPhase);
+            }
+           
+        }
+
+        public void NextPhase()
+        {
+
+            if (actualPhase != TurnPhase.IAPlays)
+            {
+                int nextPhaseValue = ((int)actualPhase + 1) % Enum.GetNames(typeof(TurnPhase)).Length - 1;
+                actualPhase = (TurnPhase)nextPhaseValue;
+                OnChangePhase(actualPhase);
+            }
+            else
+            {
+                actualPhase = TurnPhase.NextPlayer;
+                OnChangePhase(actualPhase);
+            }
+            
+        }
+        
         public Coup Undo()
         {
             if (!historic.CanUndo)
@@ -249,7 +303,6 @@ namespace Taluva.Controller
                             break;
                         case Building.Temple:
                             actualPlayer.nbTemple++;
-                            ;
                             break;
                         case Building.Tower:
                             actualPlayer.nbTowers++;
@@ -262,7 +315,7 @@ namespace Taluva.Controller
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
                 }
             }
-
+            PrecedentPhase();
             return c;
         }
 
@@ -290,19 +343,38 @@ namespace Taluva.Controller
             for (int i = 0; i < NbPlayers; i++)
                 if (actualPlayer == players[i])
                     ActualPlayerIndex = NbPlayers;
+            
+            NextPhase();
             return c;
         }
 
-        public Player? GetWinner()
+        public Player CheckWinner()
         {
+            Player p;
             if (maxTurn == 0)
-                return NormalEnd;
-            if (EarlyEnd != null)
-                return EarlyEnd;
+            {
+                p = NormalEnd;
+                this.victoryType = GameEnd.NormalEnd;
+                OnEndGame(p, GameEnd.NormalEnd);
+            }
+
+            Player tmp = EarlyEnd;
+            if (tmp != null)
+            {
+                p = tmp;
+                this.victoryType = GameEnd.EarlyEnd;
+                OnEndGame(p, GameEnd.EarlyEnd);
+            }
+            var tmp2 = players.Where(p => !p.Eliminated);
+
+            if (tmp2.Count() == 1)
+            {
+                OnEndGame(tmp2.First(), GameEnd.LastPlayerStanding);
+            }
             return null;
         }
 
-        private Player? EarlyEnd
+        private Player EarlyEnd
         {
             get
             {
@@ -408,54 +480,49 @@ namespace Taluva.Controller
 
         public void InitPlay()
         {
-            if (GetWinner() != null)
+            if (CheckWinner() != null)
             {
-                EndGame();
                 return;
             }
-
+            PlayerEliminated();
             ActualPlayerIndex++;
-            //TODO : notify vieuw turn change
             this.actualChunk = pile.Draw();
             if (ActualPlayerIndex + 1 > NbPlayers)
             {
                 ActualPlayerIndex = 0;
             }
 
-            ActualPlayerIndex = ActualPlayerIndex;
-
-            if (actualPlayer.nbBarrack == 0 && actualPlayer != Winner)
-            {
+            if (actualPlayer.Eliminated) {
                 ActualPlayerIndex++;
-                if (ActualPlayerIndex + 1 > NbPlayers)
-                {
+                if (ActualPlayerIndex + 1 > NbPlayers) {
                     ActualPlayerIndex = 0;
                 }
             }
-
+            
             if (actualPlayer is AI ai)
             {
+                actualPhase = TurnPhase.IAPlays;
                 AIMove(ai);
             }
             else
             {
-                //TODO : notify view phase change
-                // Phase1();
+                NextPhase();
             }
         }
-
-        public void EndGame()
+        public void PlayerEliminated()
         {
-            this.Winner = GetWinner();
-            //TODO : notify view to end game
+            if (BarracksSlots().Length == 0 && actualPlayer != this.Winner && TempleSlots(actualPlayer).Length == 0 && TowerSlots(actualPlayer).Length == 0)
+            {
+                actualPlayer.Eliminate();
+                OnPlayerElimination(actualPlayer);
+            }
         }
-
+        
         public void Phase1(PointRotation pr, Rotation r)
         {
             if (ValidateTile(pr, r))
             {
-                //TODO : notify view chunk placed at the postion x, y
-                actualPhase = TurnPhase.PlaceBuilding;
+                NextPhase();
                 this.maxTurn--;
             }
         }
@@ -464,43 +531,33 @@ namespace Taluva.Controller
         public void Phase2(PointRotation pr, Building b)
         {
             Cell c = gameBoard.WorldMap[pr.point];
-            if (ValidateBuilding(c, b))
-            {
-                //TODO : notify view building placed
-                actualPhase = TurnPhase.SelectCells;
+            if (ValidateBuilding(c, b)) {
+                NextPhase();
                 InitPlay();
             }
         }
 
-        public TurnPhase NotifyTurnPhaseChange
-        {
-            set { throw new NotImplementedException(); }
-        }
-
-        // public event NotifyEndGame()
-        // {
-        //     
-        // }
-
         //Placement chunk et buildings
         public void AIMove(AI ai)
         {
-            PointRotation pr = ((AI) actualPlayer).PlayChunk();
+            OnChangePhase(TurnPhase.IAPlays);
+            actualPhase = TurnPhase.IAPlays;
+            PointRotation pr = ((AI)actualPlayer).PlayChunk();
             Rotation r = Rotation.N;
             for (int i = 0; i < 6; i++)
             {
                 if (pr.rotations[i])
                     r = (Rotation) i;
             }
-
+            OnAIChunkPlacement(pr);
             ValidateTile(pr, r);
-            actualPhase = TurnPhase.PlaceBuilding;
-            (Building b, Vector2Int pos) = ((AI) actualPlayer).PlayBuild();
+            (Building b, Vector2Int pos) = ((AI)actualPlayer).PlayBuild();
             PointRotation p = new PointRotation(pos);
             Cell c = gameBoard.WorldMap[p.point];
+            OnAIBuildingPlacement(b, pos);  
             ValidateBuilding(c, b);
-            actualPhase = TurnPhase.SelectCells;
-            InitPlay(); //TODO : AI move done, notify view, move to next player
+            NextPhase();
+            InitPlay(); 
         }
 
         public List<Vector2Int> FindBiomesAroundVillage(Vector2Int cell) =>
@@ -515,6 +572,8 @@ namespace Taluva.Controller
 
         public bool ValidateBuilding(Cell c, Building b)
         {
+            bool building = false;
+
             List<Cell> cells = new();
             List<Vector2Int> sameBiomes = FindBiomesAroundVillage(gameBoard.GetCellCoord(c));
             if (sameBiomes.Count > 0)
@@ -524,10 +583,12 @@ namespace Taluva.Controller
                     cells.Add(new(gameBoard.WorldMap[cell]));
                 }
             }
+            building = gameBoard.PlaceBuilding(c, b, actualPlayer);
 
-            AddHistoric(sameBiomes.Count > 0 ? sameBiomes.ToArray() : new[] { gameBoard.GetCellCoord(c) },
-                cells.Count > 0 ? cells.ToArray() : new[] { c }, b);
-            return gameBoard.PlaceBuilding(c, b, actualPlayer);
+            if (building)
+                AddHistoric(sameBiomes.Count > 0 ? sameBiomes.ToArray() : new[] { gameBoard.GetCellCoord(c) }, cells.Count > 0 ? cells.ToArray() : new[] { c }, b);
+
+            return building;
         }
 
         public Vector2Int[] BarracksSlots()
