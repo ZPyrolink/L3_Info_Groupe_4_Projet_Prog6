@@ -55,6 +55,7 @@ namespace UI
         private void Awake()
         {
             Instance = this;
+            SetUpGui();
         }
 
         private void Start()
@@ -72,20 +73,35 @@ namespace UI
                 ToggleMenu();
         }
 
-        private void OnGUI()
+        #endregion
+
+        private void SetUpGui()
         {
             for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
             {
-                if (_guis[i] is null)
-                {
-                    _guis[i] = Instantiate(playerPrefab, transform);
-                    foreach (MeshRenderer mr in _guis[i].GetComponentsInChildren<MeshRenderer>())
-                        mr.material.color = GameMgr.Instance.players[i].ID.GetColor();
-                }
+                _guis[i] = Instantiate(playerPrefab, transform);
+                RectTransform rt = _guis[i].GetComponent<RectTransform>();
+                
+                rt.pivot = Vector2.one;
+                rt.anchorMin = Vector2.one;
+                rt.anchorMax = Vector2.one;
+                rt.anchoredPosition = new(-10, -10 - 110 * i);
+                
+                foreach (MeshRenderer mr in _guis[i].GetComponentsInChildren<MeshRenderer>())
+                    mr.material.color = GameMgr.Instance.players[i].ID.GetColor();
+                
+                _guis[i].transform.GetChild(0).GetComponent<Text>().text = $"Player {i}";
+                _guis[i].transform.GetChild(1).GetComponent<Image>().color = GameMgr.Instance.players[i].ID.GetColor();
+            }
+        }
 
+        public void UpdateCurrentPlayer()
+        {
+            for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
+            {
                 _guis[i].GetComponent<Image>().color =
                     i == GameMgr.Instance.ActualPlayerIndex ? Color.white : new(.75f, .75f, .75f);
-
+                
                 foreach (Animator anim in _guis[i].GetComponentsInChildren<Animator>())
                     if (GameMgr.Instance.ActualPlayerIndex == i)
                     {
@@ -96,32 +112,28 @@ namespace UI
                         anim.enabled = false;
                         anim.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                     }
+            }
+        }
 
-
-                _guis[i].transform.GetChild(0).GetComponent<Text>().text = $"Player {i}";
-                _guis[i].transform.GetChild(1).GetComponent<Image>().color = GameMgr.Instance.players[i].ID.GetColor();
-
+        public void UpdatePlayersBuild()
+        {
+            for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
+            {
                 _guis[i].transform.GetChild(2).GetComponentInChildren<Text>().text =
                     GameMgr.Instance.players[i].nbBarrack.ToString();
                 _guis[i].transform.GetChild(3).GetComponentInChildren<Text>().text =
                     GameMgr.Instance.players[i].nbTowers.ToString();
                 _guis[i].transform.GetChild(4).GetComponentInChildren<Text>().text =
                     GameMgr.Instance.players[i].nbTemple.ToString();
-
-                RectTransform rt = _guis[i].GetComponent<RectTransform>();
-
-                rt.pivot = Vector2.one;
-                rt.anchorMin = Vector2.one;
-                rt.anchorMax = Vector2.one;
-                rt.anchoredPosition = new(-10, -10 - 110 * i);
             }
+        }
 
+        public void UpdateCurrentPlayerBuild()
+        {
             currentPlayerBuildCount[0].text = GameMgr.Instance.actualPlayer.nbBarrack.ToString();
             currentPlayerBuildCount[1].text = GameMgr.Instance.actualPlayer.nbTowers.ToString();
             currentPlayerBuildCount[2].text = GameMgr.Instance.actualPlayer.nbTemple.ToString();
         }
-
-        #endregion
 
         public void Next()
         {
@@ -134,6 +146,9 @@ namespace UI
 
         public void Phase1()
         {
+            UpdateCurrentPlayer();
+            UpdatePlayersBuild();
+            
             if (NbTiles == ListeChunk.Count)
                 TilesMgr.Instance.SetFeedForward(Vector3.zero);
             else
@@ -152,6 +167,7 @@ namespace UI
 
         public void Phase2()
         {
+            UpdateCurrentPlayerBuild();
             currentTile.SetActive(false);
             builds.SetActive(true);
 
