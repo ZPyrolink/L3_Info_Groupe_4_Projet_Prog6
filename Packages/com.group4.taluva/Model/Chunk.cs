@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace Taluva.Model
 {
@@ -20,6 +21,16 @@ namespace Taluva.Model
 
         }
         
+        public Chunk(Chunk c)
+        {
+            this.Coords = new Cell[3];
+            this.Coords[0] = c.Coords[0];
+            this.Coords[1] = c.Coords[1];
+            c.Coords[1].ParentCunk = this;
+            this.Coords[2] = c.Coords[2];
+            c.Coords[2].ParentCunk = this;
+            this.Level = c.Level;
+        }
         
 
         void RotateChunk()

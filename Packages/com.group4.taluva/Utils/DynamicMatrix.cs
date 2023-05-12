@@ -111,7 +111,7 @@ namespace Taluva.Utils
         /// </summary>
         /// <param name="coordonnes">Coordonnes of the object</param>
         /// <returns>Return the object at the position</returns>
-        [Obsolete("Use the getter of the indexer instead!")]
+        [Obsolete("Use the getter of the indexer instead!", true)]
         public T GetValue(Vector2Int coordonnes) => this[coordonnes];
 
         /// <summary>

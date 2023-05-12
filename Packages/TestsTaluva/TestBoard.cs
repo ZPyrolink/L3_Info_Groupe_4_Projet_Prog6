@@ -129,7 +129,7 @@ namespace TestsTaluva
         public void TestGetBuildingSlotsAfterInit()
         {
             _board = new();
-            Assert.AreEqual(0, _board.GetBarrackSlots().Length);
+            Assert.AreEqual(0, _board.GetBarrackSlots(_player1).Length);
             Assert.AreEqual(0, _board.GetTempleSlots(new(PlayerColor.Blue)).Length);
             Assert.AreEqual(0, _board.GetTowerSlots(new(PlayerColor.Blue)).Length);
         }
@@ -137,7 +137,7 @@ namespace TestsTaluva
         [Test]
         public void TestGetBarrackSlots()
         {
-            Vector2Int[] possibles = _board.GetBarrackSlots();
+            Vector2Int[] possibles = _board.GetBarrackSlots(_player1);
             Vector2Int[] barrackSlots = new Vector2Int[2];
 
             barrackSlots[0] = new(-1, -1);

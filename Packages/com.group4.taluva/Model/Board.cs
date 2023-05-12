@@ -104,6 +104,43 @@ namespace Taluva.Model
             return villages;
         }
 
+        public Vector2Int[] GetChunksCoords(Vector2Int c, Rotation r)
+        {
+            Vector2Int[] cells = new Vector2Int[3];
+            cells[0] = c;
+
+            Vector2Int[] neighbors = GetNeighbors(c);
+
+            switch(r){
+                case Rotation.N:
+                    cells[1] = neighbors[0];
+                    cells[2] = neighbors[5];
+                    break;
+                case Rotation.NE:
+                    cells[1] = neighbors[1];
+                    cells[2] = neighbors[0];
+                    break;
+                case Rotation.SE:
+                    cells[1] = neighbors[2];
+                    cells[2] = neighbors[1];
+                    break;
+                case Rotation.S:
+                    cells[1] = neighbors[3];
+                    cells[2] = neighbors[2];
+                    break;
+                case Rotation.SW:
+                    cells[1] = neighbors[4];
+                    cells[2] = neighbors[3];
+                    break;
+                case Rotation.NW:
+                    cells[1] = neighbors[5];
+                    cells[2] = neighbors[4];
+                    break;
+            }
+
+            return cells;
+        }
+
         /// <summary>
         /// Find all the neighbors.
         /// The neighbors will always return clockwise.
@@ -190,18 +227,21 @@ namespace Taluva.Model
 
             if (!leftCell.ContainsBuilding() && !rightCell.ContainsBuilding())
                 return true;
-
             if (leftCell.ContainsBuilding() && !rightCell.ContainsBuilding() &&
-                GetVillage(left).Count > 1)
+                GetVillage(left).Count > 1) {
                 return leftCell.ActualBuildings == Building.Barrack;
+            }
+                
 
             if (!leftCell.ContainsBuilding() && rightCell.ContainsBuilding() &&
                 GetVillage(right).Count > 1)
                 return rightCell.ActualBuildings == Building.Barrack;
 
-            if (leftCell.ContainsBuilding() && rightCell.ContainsBuilding() &&
-                GetVillage(left).Count > 2)
-                return leftCell.ActualBuildings == Building.Barrack && rightCell.ActualBuildings == Building.Barrack;
+            if (leftCell.ContainsBuilding() && rightCell.ContainsBuilding())
+                if((leftCell.Owner == rightCell.Owner && GetVillage(left).Count > 2) ||
+                    leftCell.Owner != rightCell.Owner && GetVillage(left).Count >= 2 && GetVillage(right).Count >= 2)
+                    return leftCell.ActualBuildings == Building.Barrack && rightCell.ActualBuildings == Building.Barrack;
+
 
             return false;
         }
@@ -224,8 +264,10 @@ namespace Taluva.Model
 
             foreach (Cell c in WorldMap) {
                 Vector2Int p = GetCellCoord(c);
-                if (c.ActualBiome == Biomes.Volcano)
+                if (c.ActualBiome == Biomes.Volcano) {
                     slots.Add(p);
+                }
+                    
 
                 Vector2Int[] neighbors = GetNeighbors(p);
 
@@ -246,6 +288,8 @@ namespace Taluva.Model
                     if (WorldMap[pt].ActualBiome == Biomes.Volcano)
                         continue;
 
+                    
+
                     pointRemove.Add(pt);
                     continue;
                 }
@@ -258,12 +302,16 @@ namespace Taluva.Model
                     if (rotations[i])
                         pr.AddRotation((Rotation)i);
 
-                chunkSlots.Add(pr);
+                if(pr.HaveRotation())
+                    chunkSlots.Add(pr);
+
                 pointRemove.Add(pt);
             }
 
-            foreach (Vector2Int pr in pointRemove)
+            foreach (Vector2Int pr in pointRemove) {
                 slots.Remove(pr);
+            }
+                
 
             //Recherche des points qui sont des volcans et qui permettent une position pour ecraser la map
             foreach (Vector2Int pt in slots) {
@@ -310,13 +358,17 @@ namespace Taluva.Model
         /// <param name="player">Actual player</param>
         /// <param name="p">Position chosen in the GetChunkSlots</param>
         /// <param name="r">Rotation chosen</param>
-        public void AddChunk(Chunk c, Player player, PointRotation p, Rotation r)
+        /// <returns>Return if the Chunk has been placed</returns>
+        public bool AddChunk(Chunk c, Player player, PointRotation p, Rotation r)
         {
             if (!GetChunkSlots()
                     .Where(pr => pr.point.Equals(p.point))
                     .Any(pr => pr.rotations.Where((t, i) => t == p.rotations[i]).Any())) {
-                return;
+                return false;
             }
+
+            if (!WorldMap.IsVoid(p.point))
+                c.Level = WorldMap[p.point].ParentCunk.Level + 1;
 
             player.lastChunk = c;
 
@@ -336,6 +388,7 @@ namespace Taluva.Model
                 AddCell(c, p, neighbors[5], neighbors[4]);
 
             c.rotation = r;
+            return true;
         }
 
         /// <summary>
@@ -344,42 +397,57 @@ namespace Taluva.Model
         /// <param name="c">Cell where the building will be places</param>
         /// <param name="b">Building to placed</param>
         /// <param name="player">Actual player</param>
-        public void PlaceBuilding(Cell c, Building b, Player player)
+        /// <returns>Return if the building has been placed</returns>
+        public bool PlaceBuilding(Cell c, Building b, Player player)
         {
-            if (c == null || player == null)
-                return;
+            if (c == null || player == null) {
+                Debug.Log("Oh no!");
+                return false;
+            }
+                
 
             Vector2Int coord = GetCellCoord(c);
 
-            void SetC()
+            void SetC(Cell cell)
             {
-                c.Owner = player.ID;
-                c.Build(b);
+                cell.Owner = player.ID;
+                cell.Build(b);
             }
 
-            Vector2Int[] tmp = GetBarrackSlots();
+            Vector2Int[] tmp = GetBarrackSlots(player);
             List<Vector2Int> tmp2 = FindBiomesAroundVillage(GetCellCoord(c), player);
+
+            if(b == Building.Barrack) {
+                int nbBarrack = 0;
+                foreach(Vector2Int v in tmp2) {
+                    nbBarrack += WorldMap[v].ParentCunk.Level;
+                }
+                if (nbBarrack > player.nbBarrack)
+                    return false;
+            }
 
             switch (b)
             {
                 case Building.Barrack when tmp2.All(t => tmp.Contains(t)):
                     foreach (Vector2Int v in tmp2)
                     {
-                        SetC();
-                        player.nbBarrack -= c.ParentCunk.Level;
+                        SetC(WorldMap[v]);
+                        player.nbBarrack -= WorldMap[v].ParentCunk.Level;
                     }
                     break;
                 case Building.Temple when GetTempleSlots(player).Contains(coord):
-                    SetC();
+                    SetC(c);
                     player.nbTemple--;
                     break;
                 case Building.Tower when GetTowerSlots(player).Contains(coord):
-                    SetC();
+                    SetC(c);
                     player.nbTowers--;
                     break;
                 default:
-                    return;
+                    return false;
             }
+
+            return true;
         }
 
         public List<Vector2Int> FindBiomesAroundVillage(Vector2Int cell, Player player)
@@ -394,6 +462,7 @@ namespace Taluva.Model
                 foreach (Vector2Int c in villages) {
                     Vector2Int[] neighbors = GetNeighbors(c);
                     foreach (Vector2Int neighbor in neighbors) {
+                        if (WorldMap.IsVoid(neighbor)) continue;
                         if (WorldMap[neighbor].ActualBuildings != Building.None) continue;
 
                         if (WorldMap[neighbor].ActualBiome == biomes)
@@ -409,10 +478,11 @@ namespace Taluva.Model
         /// Find all the slots for the barrack
         /// </summary>
         /// <returns>Return the possible possition for the barrack</returns>
-        public Vector2Int[] GetBarrackSlots() => WorldMap
+        public Vector2Int[] GetBarrackSlots(Player player) => WorldMap
             .Select(GetCellCoord)
-            .Where(p => !WorldMap.IsVoid(p) && WorldMap[p].ActualBuildings == Building.None &&
-                        WorldMap[p].ActualBiome != Biomes.Volcano)
+            .Where(p => !WorldMap.IsVoid(p) && (WorldMap[p].ParentCunk.Level == 1 || IsAdjacentToCity(p, player)) 
+                        && WorldMap[p].ActualBuildings == Building.None &&
+                        WorldMap[p].ActualBiome != Biomes.Volcano && WorldMap[p].ParentCunk.Level <= player.nbBarrack)
             .ToArray();
 
         /// <summary>

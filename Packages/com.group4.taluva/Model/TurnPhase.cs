@@ -2,8 +2,9 @@
 {
     public enum TurnPhase
     {
-        SelectCells,
-        RotateCell,
-        PlaceBuilding
+        SelectCells = 0,
+        PlaceBuilding = 1,
+        NextPlayer = 2,
+        IAPlays = 3
     }
 }
