@@ -351,6 +351,7 @@ namespace Taluva.Model
         /// <param name="player">Actual player</param>
         /// <param name="p">Position chosen in the GetChunkSlots</param>
         /// <param name="r">Rotation chosen</param>
+        /// <returns>Return if the Chunk has been placed</returns>
         public bool AddChunk(Chunk c, Player player, PointRotation p, Rotation r)
         {
             if (!GetChunkSlots()
@@ -389,6 +390,7 @@ namespace Taluva.Model
         /// <param name="c">Cell where the building will be places</param>
         /// <param name="b">Building to placed</param>
         /// <param name="player">Actual player</param>
+        /// <returns>Return if the building has been placed</returns>
         public bool PlaceBuilding(Cell c, Building b, Player player)
         {
             if (c == null || player == null) {
@@ -408,13 +410,22 @@ namespace Taluva.Model
             Vector2Int[] tmp = GetBarrackSlots(player);
             List<Vector2Int> tmp2 = FindBiomesAroundVillage(GetCellCoord(c), player);
 
+            if(b == Building.Barrack) {
+                int nbBarrack = 0;
+                foreach(Vector2Int v in tmp2) {
+                    nbBarrack += WorldMap[v].ParentCunk.Level;
+                }
+                if (nbBarrack > player.nbBarrack)
+                    return false;
+            }
+
             switch (b)
             {
                 case Building.Barrack when tmp2.All(t => tmp.Contains(t)):
                     foreach (Vector2Int v in tmp2)
                     {
                         SetC(WorldMap[v]);
-                        player.nbBarrack -= c.ParentCunk.Level;
+                        player.nbBarrack -= WorldMap[v].ParentCunk.Level;
                     }
                     break;
                 case Building.Temple when GetTempleSlots(player).Contains(coord):
@@ -464,7 +475,7 @@ namespace Taluva.Model
             .Select(GetCellCoord)
             .Where(p => !WorldMap.IsVoid(p) && (WorldMap[p].ParentCunk.Level == 1 || IsAdjacentToCity(p, player)) 
                         && WorldMap[p].ActualBuildings == Building.None &&
-                        WorldMap[p].ActualBiome != Biomes.Volcano)
+                        WorldMap[p].ActualBiome != Biomes.Volcano && WorldMap[p].ParentCunk.Level <= player.nbBarrack)
             .ToArray();
 
         /// <summary>

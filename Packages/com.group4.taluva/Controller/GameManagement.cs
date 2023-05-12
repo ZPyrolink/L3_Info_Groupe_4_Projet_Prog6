@@ -463,6 +463,8 @@ namespace Taluva.Controller
 
         public bool ValidateBuilding(Cell c, Building b)
         {
+            bool building = false;
+
             List<Cell> cells = new();
             List<Vector2Int> sameBiomes = FindBiomesAroundVillage(gameBoard.GetCellCoord(c));
             if (sameBiomes.Count > 0) {
@@ -470,9 +472,12 @@ namespace Taluva.Controller
                     cells.Add(new(gameBoard.WorldMap[cell]));
                 }
             }
-            AddHistoric(sameBiomes.Count > 0 ? sameBiomes.ToArray() : new[] { gameBoard.GetCellCoord(c) }, cells.Count > 0 ? cells.ToArray() : new[] { c }, b);
-            return gameBoard.PlaceBuilding(c, b, actualPlayer);
+            building = gameBoard.PlaceBuilding(c, b, actualPlayer);
 
+            if (building)
+                AddHistoric(sameBiomes.Count > 0 ? sameBiomes.ToArray() : new[] { gameBoard.GetCellCoord(c) }, cells.Count > 0 ? cells.ToArray() : new[] { c }, b);
+
+            return building;
         }
 
         public Vector2Int[] BarracksSlots()
