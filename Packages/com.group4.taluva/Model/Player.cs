@@ -13,6 +13,7 @@ public class Player
     public int nbTemple = 3;
     public int nbBarrack = 20;
     public bool playerIA = false;
+    public bool Eliminated { get; private set; } = false;
 
     public Player(PlayerColor id)
     {
@@ -35,15 +36,5 @@ public class Player
         gameBoard.PlaceBuilding(c, b, this);
     }
 
-    public void Play(TurnPhase phase)
-    {
-        if (phase == TurnPhase.SelectCells)
-        {
-            
-        }
-        else
-        {
-            
-        }
-    }
+    public void Eliminate() => Eliminated = true;
 }

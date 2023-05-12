@@ -22,7 +22,6 @@ namespace Taluva.Controller
         private readonly string savePath = Directory.GetCurrentDirectory() + "/Save/";
 
         private Player[] players;
-        private Player[] eliminatedPlayers;
         public Player actualPlayer;
         private AI ActualAi => (AI)actualPlayer;
         public int NbPlayers { get; set; }
@@ -235,14 +234,35 @@ namespace Taluva.Controller
 
         public void PrecedentPhase()
         {
-            int precedantPhaseValue = ((int)actualPhase + 1) % Enum.GetNames(typeof(TurnPhase)).Length - 1;
-            actualPhase = (TurnPhase)precedantPhaseValue;
+            if (actualPhase != TurnPhase.IAPlays)
+            {
+                int precedantPhaseValue = ((int)actualPhase - 1) % Enum.GetNames(typeof(TurnPhase)).Length - 1;
+                actualPhase = (TurnPhase)precedantPhaseValue; 
+                OnChangePhase(actualPhase);
+            }
+            else
+            {
+                actualPhase = TurnPhase.NextPlayer; //Change Player ?
+                OnChangePhase(actualPhase);
+            }
+           
         }
 
         public void NextPhase()
         {
-            int nextPhaseValue = ((int)actualPhase + 1) % Enum.GetNames(typeof(TurnPhase)).Length - 1;
-            actualPhase = (TurnPhase)nextPhaseValue;
+
+            if (actualPhase != TurnPhase.IAPlays)
+            {
+                int nextPhaseValue = ((int)actualPhase + 1) % Enum.GetNames(typeof(TurnPhase)).Length - 1;
+                actualPhase = (TurnPhase)nextPhaseValue;
+                OnChangePhase(actualPhase);
+            }
+            else
+            {
+                actualPhase = TurnPhase.NextPlayer;
+                OnChangePhase(actualPhase);
+            }
+            
         }
         
         public Coup Undo()
@@ -323,9 +343,11 @@ namespace Taluva.Controller
                 this.victoryType = GameEnd.EarlyEnd;
                 OnEndGame(p, GameEnd.EarlyEnd);
             }
-            if ((eliminatedPlayers.Length == (players.Length - 1)) && !eliminatedPlayers.Contains(actualPlayer))
+            var tmp2 = players.Where(p => !p.Eliminated);
+
+            if (tmp2.Count() == 1)
             {
-                OnEndGame(actualPlayer, GameEnd.LastPlayerStanding);
+                OnEndGame(tmp2.First(), GameEnd.LastPlayerStanding);
             }
             return null;
         }
@@ -430,29 +452,29 @@ namespace Taluva.Controller
             if (actualTurn + 1 > NbPlayers) {
                 actualTurn = 0;
             }
-
             actualPlayer = players[actualTurn];
 
-            if (actualPlayer.nbBarrack == 0 && actualPlayer != Winner) {
+            if (actualPlayer.Eliminated) {
                 actualTurn++;
                 if (actualTurn + 1 > NbPlayers) {
                     actualTurn = 0;
                 }
                 actualPlayer = players[actualTurn];
             }
-
-            if (actualPlayer is AI ai) {
+            
+            if (actualPlayer is AI ai)
+            {
+                actualPhase = TurnPhase.IAPlays;
                 AIMove(ai);
             } else {
-                OnChangePhase(TurnPhase.SelectCells);
-                // Phase1();
+                NextPhase();
             }
         }
         public void PlayerEliminated()
         {
-            if (actualPlayer.nbBarrack == 0 && actualPlayer != this.Winner)
+            if (actualPlayer.nbBarrack == 0 && actualPlayer != this.Winner && TempleSlots(actualPlayer).Length == 0 && TowerSlots(actualPlayer).Length == 0)
             {
-                eliminatedPlayers[eliminatedPlayers.Length] = actualPlayer;
+                actualPlayer.Eliminate();
                 OnPlayerElimination(actualPlayer);
             }
         }
@@ -460,8 +482,7 @@ namespace Taluva.Controller
         public void Phase1(PointRotation pr, Rotation r)
         {
             if (ValidateTile(pr, r)) {
-                actualPhase = TurnPhase.PlaceBuilding;
-                OnChangePhase(TurnPhase.PlaceBuilding);
+                NextPhase();
                 this.maxTurn--;
             }
         }
@@ -471,8 +492,7 @@ namespace Taluva.Controller
         {
             Cell c = gameBoard.WorldMap[pr.point];
             if (ValidateBuilding(c, b)) {
-                actualPhase = TurnPhase.NextPlayer;
-                OnChangePhase(TurnPhase.NextPlayer);
+                NextPhase();
                 InitPlay();
             }
         }
@@ -495,8 +515,7 @@ namespace Taluva.Controller
             Cell c = gameBoard.WorldMap[p.point];
             OnAIBuildingPlacement(b, pos);  
             ValidateBuilding(c, b);
-            actualPhase = TurnPhase.NextPlayer;
-            OnChangePhase(TurnPhase.NextPlayer);
+            NextPhase();
             InitPlay(); 
         }
 

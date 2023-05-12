@@ -490,7 +490,8 @@ namespace Taluva.Model
             .Where(p => IsAdjacentToCity(p, actualPlayer))
             .Where(p => !GetAllVillage(p)
                 .Where(village => WorldMap[village[0]].Owner == actualPlayer.ID)
-                .Any(CityHasTower)).ToArray();
+                .Any(CityHasTower))
+            .ToArray();
 
         /// <summary>
         /// Check if a position is adjacent to a city
