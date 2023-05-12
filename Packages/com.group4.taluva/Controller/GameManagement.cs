@@ -484,8 +484,8 @@ namespace Taluva.Controller
             {
                 return;
             }
-            PlayerEliminated();
             ActualPlayerIndex++;
+            PlayerEliminated();
             this.actualChunk = pile.Draw();
             if (ActualPlayerIndex + 1 > NbPlayers)
             {
