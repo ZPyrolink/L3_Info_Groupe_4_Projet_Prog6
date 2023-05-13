@@ -1430,18 +1430,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiNbTiles: {fileID: 431239586}
-  nbTilesPerPlayers: 12
   playerPrefab: {fileID: 8498145737385341156, guid: 0838f978437d3bc4a8d8e906ac9af2c8, type: 3}
-  currentPlayerBuild:
+  currentPlayerBuildCount:
   - {fileID: 1499728012}
   - {fileID: 1709047421}
   - {fileID: 1854947264}
-  tile: {fileID: 567591721}
+  currentTile: {fileID: 567591721}
   builds: {fileID: 514725167}
   menuCanva: {fileID: 1694325169}
-  phase1: 257
-  phase2: 258
-  nextPlayer: 271
   nextPhase: 13
   menu: 27
 --- !u!1 &414219290

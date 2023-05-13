@@ -20,7 +20,7 @@ public class TilesMgr : MonoBehaviour
     [SerializeField]
     private Transform boardParent;
 
-    private GameObject _current, _currentFf;
+    private GameObject _currentPreview, _currentFf;
 
     [SerializeField]
     private GameObject feedForward;
@@ -42,7 +42,7 @@ public class TilesMgr : MonoBehaviour
 
     private Dictionary<GameObject, PointRotation> _gos;
 
-    private void Start() => Instance = this;
+    private void Awake() => Instance = this;
 
     private void Update()
     {
@@ -62,10 +62,10 @@ public class TilesMgr : MonoBehaviour
         {
             case "Feed Forward":
                 _currentFf = hit.transform.gameObject;
-                (UiMgr.Instance.Phase switch
+                (GameMgr.Instance.actualPhase switch
                 {
-                    1 => (Action<Vector3>) PutTile,
-                    2 => PutBuild
+                    TurnPhase.SelectCells => (Action<Vector3>) PutTile,
+                    TurnPhase.PlaceBuilding => PutBuild
                 }).Invoke(hit.transform.position);
                 break;
 
@@ -77,14 +77,14 @@ public class TilesMgr : MonoBehaviour
 
     private void PutTile(Vector3 pos)
     {
-        if (_current is null)
+        if (_currentPreview is null)
         {
             GameObject tmp = UiMgr.Instance.CurrentTile;
-            _current = Instantiate(tmp, boardParent);
+            _currentPreview = Instantiate(tmp, boardParent);
             tmp.SetActive(false);
-            _current.transform.localScale = new(100, 100, 100);
-            _current.layer = LayerMask.NameToLayer("Default");
-            Material[] mats = _current.GetComponent<MeshRenderer>().materials;
+            _currentPreview.transform.localScale = new(100, 100, 100);
+            _currentPreview.layer = LayerMask.NameToLayer("Default");
+            Material[] mats = _currentPreview.GetComponent<MeshRenderer>().materials;
             foreach (Material mat in mats.Where((_, i) => i != 1))
             {
                 mat.SetRenderMode(MaterialExtensions.BlendMode.Transparent);
@@ -92,12 +92,12 @@ public class TilesMgr : MonoBehaviour
             }
         }
 
-        if (_current.transform.position == pos)
+        if (_currentPreview.transform.position == pos)
             RotateTile();
         else
         {
-            _current.transform.position = pos;
-            _current.transform.rotation = Quaternion.Euler(270,
+            _currentPreview.transform.position = pos;
+            _currentPreview.transform.rotation = Quaternion.Euler(270,
                 _gos == null ? 270 : ((Rotation) Array.IndexOf(_gos[_currentFf].rotations, true)).YDegree(),
                 0);
         }
@@ -105,7 +105,7 @@ public class TilesMgr : MonoBehaviour
 
     public void ValidateTile()
     {
-        Material[] mats = _current.GetComponent<MeshRenderer>().materials;
+        Material[] mats = _currentPreview.GetComponent<MeshRenderer>().materials;
         foreach (Material mat in mats.Where((_, i) => i != 1))
         {
             mat.SetRenderMode(MaterialExtensions.BlendMode.Opaque);
@@ -113,24 +113,23 @@ public class TilesMgr : MonoBehaviour
         }
 
         (Vector2Int pos, Rotation rot, _) = GetPr();
+        _currentPreview = null;
         GameMgr.Instance.Phase1(new(pos, rot), rot);
-
-        ClearFeedForward();
     }
 
     private void PutBuild(Vector3 pos)
     {
-        if (_current is null)
+        if (_currentPreview is null)
         {
-            _current = Instantiate(_currentBuild switch
+            _currentPreview = Instantiate(_currentBuild switch
             {
                 Building.Barrack => barrack,
                 Building.Tower => tower,
                 Building.Temple => temple
             }, boardParent);
 
-            _current.transform.localScale = _buildsScale[_currentBuild];
-            Material[] mats = _current.GetComponent<MeshRenderer>().materials;
+            _currentPreview.transform.localScale = _buildsScale[_currentBuild];
+            Material[] mats = _currentPreview.GetComponent<MeshRenderer>().materials;
             foreach (Material mat in mats)
             {
                 mat.SetRenderMode(MaterialExtensions.BlendMode.Transparent);
@@ -138,42 +137,42 @@ public class TilesMgr : MonoBehaviour
             }
         }
 
-        if (_current.transform.position == pos)
+        if (_currentPreview.transform.position == pos)
             return;
 
-        _current.transform.position = pos;
+        _currentPreview.transform.position = pos;
     }
 
     public void ValidateBuild()
     {
-        Material[] mats = _current.GetComponent<MeshRenderer>().materials;
+        Material[] mats = _currentPreview.GetComponent<MeshRenderer>().materials;
         foreach (Material mat in mats.Where((_, i) => i != 1))
         {
             mat.SetRenderMode(MaterialExtensions.BlendMode.Opaque);
             mat.color = mat.color.With(a: 1);
         }
 
-        Vector2Int pos = new() { x = (int) (_current.transform.position.x / xOffset) };
+        Vector2Int pos = new() { x = (int) (_currentPreview.transform.position.x / xOffset) };
         if (pos.x % 2 != 0)
-            pos.y = (int) ((_current.transform.position.z - zOffset / 2) / zOffset);
+            pos.y = (int) ((_currentPreview.transform.position.z - zOffset / 2) / zOffset);
         else
-            pos.y = (int) (_current.transform.position.z / zOffset);
+            pos.y = (int) (_currentPreview.transform.position.z / zOffset);
+
+        _currentPreview = null;
 
         GameMgr.Instance.Phase2(new(pos), _currentBuild);
-
-        ClearFeedForward();
     }
 
     private (Vector2Int pos, Rotation rot, int level) GetPr()
     {
-        Rotation rot = RotationExt.Of(Mathf.Round(_current.transform.rotation.eulerAngles.y));
-        Vector2Int pos = new() { x = (int) (_current.transform.position.x / xOffset) };
+        Rotation rot = RotationExt.Of(Mathf.Round(_currentPreview.transform.rotation.eulerAngles.y));
+        Vector2Int pos = new() { x = (int) (_currentPreview.transform.position.x / xOffset) };
         if (pos.x % 2 != 0)
-            pos.y = (int) ((_current.transform.position.z - zOffset / 2) / zOffset);
+            pos.y = (int) ((_currentPreview.transform.position.z - zOffset / 2) / zOffset);
         else
-            pos.y = (int) (_current.transform.position.z / zOffset);
+            pos.y = (int) (_currentPreview.transform.position.z / zOffset);
 
-        return (pos, rot, (int) (_current.transform.position.y / yOffset) + 1);
+        return (pos, rot, (int) (_currentPreview.transform.position.y / yOffset) + 1);
     }
 
     private void RotateTile()
@@ -182,8 +181,8 @@ public class TilesMgr : MonoBehaviour
 
         do
         {
-            _current.transform.Rotate(new(0, 360f / 6, 0), Space.World);
-            rot = RotationExt.Of(Mathf.Round(_current.transform.rotation.eulerAngles.y));
+            _currentPreview.transform.Rotate(new(0, 360f / 6, 0), Space.World);
+            rot = RotationExt.Of(Mathf.Round(_currentPreview.transform.rotation.eulerAngles.y));
         } while (_gos?[_currentFf]?.rotations?[(int) rot] == false);
     }
 
@@ -204,8 +203,11 @@ public class TilesMgr : MonoBehaviour
 
     public void SetFeedForwards2(Building build)
     {
-        if (_current is not null)
-            Destroy(_current);
+        if (_currentPreview is not null)
+        {
+            Destroy(_currentPreview);
+            _currentPreview = null;
+        }
         
         ClearFeedForward();
         _currentBuild = build;
@@ -238,7 +240,6 @@ public class TilesMgr : MonoBehaviour
     public void ClearFeedForward()
     {
         _gos = new();
-        _current = null;
         foreach (Transform t in feedForwardParent)
             Destroy(t.gameObject);
     }

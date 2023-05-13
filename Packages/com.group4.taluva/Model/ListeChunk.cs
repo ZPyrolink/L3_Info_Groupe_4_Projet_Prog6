@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using UnityEngine.UIElements;
+
 namespace Taluva.Model
 {
     public static class ListeChunk
@@ -17,6 +19,8 @@ namespace Taluva.Model
         }; //indexes : Forest = 0, Lake = 1, desert = 2, Plain = 3, Mountain = 4
 
         public static Pile<Chunk> Pile => new(Chunks.ToArray());
+
+        public static int Count => Chunks.Count;
 
         //Create all chunks and store them in a list
         static ListeChunk()

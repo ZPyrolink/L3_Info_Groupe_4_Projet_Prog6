@@ -26,7 +26,7 @@ namespace Taluva.Controller
         public int ActualPlayerIndex { get; private set; }
         public int maxTurn;
         public Board gameBoard;
-        private TurnPhase actualPhase = TurnPhase.NextPlayer;
+        public TurnPhase actualPhase { get; private set; } = TurnPhase.NextPlayer;
         private Historic<Coup> historic;
         public Pile<Chunk> pile = ListeChunk.Pile;
         public Chunk actualChunk;
