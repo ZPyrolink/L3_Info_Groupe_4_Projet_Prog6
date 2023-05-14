@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Linq;
+
+using UnityEngine;
 
 namespace Taluva.Model
 {
@@ -19,26 +22,27 @@ namespace Taluva.Model
         {
             rotations = rot;
         }
-        
-        public PointRotation(Vector2Int point,Rotation rot) : this(point)
-        {
-            this.rotations[(int)rot] = true;
 
+        public PointRotation(Vector2Int point, Rotation rot) : this(point)
+        {
+            this.rotations[(int) rot] = true;
         }
 
         public bool RotationEquals(PointRotation rotations)
         {
-            for(int i = 0;i < this.rotations.Length; i++) {
-                if (this.rotations[i] != rotations.rotations[i]) 
+            for (int i = 0; i < this.rotations.Length; i++)
+            {
+                if (this.rotations[i] != rotations.rotations[i])
                     return false;
             }
+
             return true;
         }
 
         public bool HaveRotation()
         {
-            foreach(bool b in rotations)
-                if(b)
+            foreach (bool b in rotations)
+                if (b)
                     return true;
             return false;
         }
@@ -51,15 +55,17 @@ namespace Taluva.Model
 
         public void AddRotation(Rotation r)
         {
-            rotations[(int)r] = true;
+            rotations[(int) r] = true;
         }
 
         public string RotationString()
         {
             string s = "";
-            for(int i = 0; i < rotations.Length; i++)
-                if (rotations[i]) {
-                    switch ((Rotation)i) {
+            for (int i = 0; i < rotations.Length; i++)
+                if (rotations[i])
+                {
+                    switch ((Rotation) i)
+                    {
                         case Rotation.N:
                             s += "N";
                             break;
@@ -79,9 +85,11 @@ namespace Taluva.Model
                             s += "SW";
                             break;
                     }
+
                     s += " ";
                 }
-            return s;    
+
+            return s;
         }
     }
 }

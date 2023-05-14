@@ -110,10 +110,11 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             mat.SetRenderMode(MaterialExtensions.BlendMode.Opaque);
             mat.color = mat.color.With(a: 1);
         }
+        
+        Rotation rot = RotationExt.Of(Mathf.Round(_currentPreview.transform.rotation.eulerAngles.y));
 
-        (Vector2Int pos, Rotation rot, _) = GetPr();
         _currentPreview = null;
-        GameMgr.Instance.Phase1(new(pos, rot), rot);
+        GameMgr.Instance.Phase1(new(_gos[_currentFf].point, rot), rot);
     }
 
     private void PutBuild(Vector3 pos)
@@ -153,27 +154,9 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             mat.color = mat.color.With(a: 1);
         }
 
-        Vector2Int pos = new() { x = (int) (_currentPreview.transform.position.x / xOffset) };
-        if (pos.x % 2 != 0)
-            pos.y = (int) ((_currentPreview.transform.position.z - zOffset / 2) / zOffset);
-        else
-            pos.y = (int) (_currentPreview.transform.position.z / zOffset);
-
         _currentPreview = null;
 
-        GameMgr.Instance.Phase2(new(pos), _currentBuild);
-    }
-
-    private (Vector2Int pos, Rotation rot, int level) GetPr()
-    {
-        Rotation rot = RotationExt.Of(Mathf.Round(_currentPreview.transform.rotation.eulerAngles.y));
-        Vector2Int pos = new() { x = (int) (_currentPreview.transform.position.x / xOffset) };
-        if (pos.x % 2 != 0)
-            pos.y = (int) ((_currentPreview.transform.position.z - zOffset / 2) / zOffset);
-        else
-            pos.y = (int) (_currentPreview.transform.position.z / zOffset);
-
-        return (pos, rot, (int) (_currentPreview.transform.position.y / yOffset) + 1);
+        GameMgr.Instance.Phase2(new(_gos[_currentFf].point), _currentBuild);
     }
 
     private void RotateTile()
