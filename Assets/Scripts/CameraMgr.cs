@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 using UnityEngine;
 
@@ -24,11 +25,21 @@ public class CameraMgr : MonoBehaviour
 
     private Plane _horizontalAxisPlane = new(Vector3.up, Vector3.zero);
 
+    private Vector3 _defaultPosition;
+    private Quaternion _defaultRotation;
+
+    private int _currentRotation;
+    
     // Start is called before the first frame update
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Confined;
         _cam = Camera.main;
+
+        _defaultPosition = _cam.transform.position;
+        _defaultRotation = _cam.transform.rotation;
+
+        _currentRotation = 0;
     }
 
     private void Update()
@@ -110,12 +121,24 @@ public class CameraMgr : MonoBehaviour
     // }
 
     private void Move(Vector3 direction) => _cam.transform.Translate(direction * moveFactor);
-
+    
     public void Rotate(float angle)
     {
         Transform camTr = _cam.transform;
         _cam.transform.RotateAround(ScreenToHorizontalPlane(camTr.position, camTr.forward),
             Vector3.up, angle);
+
+        _currentRotation++;
+        _currentRotation %= rotationNb;
+    }
+
+    public void ResetPosition()
+    {
+        _cam.transform.position = _defaultPosition;
+        _cam.transform.rotation = _defaultRotation;
+        
+        for (int i = 0; i < _currentRotation; i++)
+            Rotate(360f / rotationNb);
     }
 
     public void Zoom(int factor)
