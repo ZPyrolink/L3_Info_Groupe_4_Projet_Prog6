@@ -101,6 +101,8 @@ public class TilesMgr : MonoBehaviour
                 _gos == null ? 270 : ((Rotation) Array.IndexOf(_gos[_currentFf].rotations, true)).YDegree(),
                 0);
         }
+
+        UiMgr.Instance.EnableValidateBtn = true;
     }
 
     public void ValidateTile()
@@ -141,6 +143,8 @@ public class TilesMgr : MonoBehaviour
             return;
 
         _currentPreview.transform.position = pos;
+        
+        UiMgr.Instance.EnableValidateBtn = true;
     }
 
     public void ValidateBuild()
@@ -239,6 +243,7 @@ public class TilesMgr : MonoBehaviour
 
     public void ClearFeedForward()
     {
+        UiMgr.Instance.EnableValidateBtn = false;
         _gos = new();
         foreach (Transform t in feedForwardParent)
             Destroy(t.gameObject);

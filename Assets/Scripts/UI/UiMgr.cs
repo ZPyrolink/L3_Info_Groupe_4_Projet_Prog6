@@ -50,6 +50,14 @@ namespace UI
         [SerializeField]
         private KeyCode nextPhase = KeyCode.Return, menu = KeyCode.Escape;
 
+        [SerializeField]
+        private Button validateButton;
+
+        public bool EnableValidateBtn
+        {
+            set => validateButton.interactable = value;
+        }
+
         #region Unity events
 
         private void Awake()
@@ -81,15 +89,15 @@ namespace UI
             {
                 _guis[i] = Instantiate(playerPrefab, transform);
                 RectTransform rt = _guis[i].GetComponent<RectTransform>();
-                
+
                 rt.pivot = Vector2.one;
                 rt.anchorMin = Vector2.one;
                 rt.anchorMax = Vector2.one;
                 rt.anchoredPosition = new(-10, -10 - 110 * i);
-                
+
                 foreach (MeshRenderer mr in _guis[i].GetComponentsInChildren<MeshRenderer>())
                     mr.material.color = GameMgr.Instance.players[i].ID.GetColor();
-                
+
                 _guis[i].transform.GetChild(0).GetComponent<Text>().text = $"Player {i}";
                 _guis[i].transform.GetChild(1).GetComponent<Image>().color = GameMgr.Instance.players[i].ID.GetColor();
             }
@@ -101,7 +109,7 @@ namespace UI
             {
                 _guis[i].GetComponent<Image>().color =
                     i == GameMgr.Instance.ActualPlayerIndex ? Color.white : new(.75f, .75f, .75f);
-                
+
                 foreach (Animator anim in _guis[i].GetComponentsInChildren<Animator>())
                     if (GameMgr.Instance.ActualPlayerIndex == i)
                     {
@@ -148,7 +156,7 @@ namespace UI
         {
             UpdateCurrentPlayer();
             UpdatePlayersBuild();
-            
+
             if (NbTiles == ListeChunk.Count)
                 TilesMgr.Instance.SetFeedForward(Vector3.zero);
             else
