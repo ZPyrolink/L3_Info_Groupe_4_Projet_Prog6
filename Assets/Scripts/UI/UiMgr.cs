@@ -12,10 +12,8 @@ using Wrapper;
 
 namespace UI
 {
-    public class UiMgr : MonoBehaviour
+    public class UiMgr : MonoBehaviourMgr<UiMgr>
     {
-        public static UiMgr Instance { get; private set; }
-
         [SerializeField]
         private Text uiNbTiles;
 
@@ -60,9 +58,9 @@ namespace UI
 
         #region Unity events
 
-        private void Awake()
+        protected override void Awake()
         {
-            Instance = this;
+            base.Awake();
             SetUpGui();
         }
 

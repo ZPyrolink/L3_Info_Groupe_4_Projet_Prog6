@@ -7,19 +7,16 @@ using UI;
 
 using UnityEngine;
 
+using Utils;
+
 namespace Wrapper
 {
-    public class GameMgr : MonoBehaviour
+    public class GameMgr : MonoBehaviourMgr<GameManagment>
     {
         [SerializeField]
         private int nbPlayers;
 
-        public static GameManagment Instance;
-
-        private void Awake()
-        {
-            Instance = new(nbPlayers);
-        }
+        protected override GameManagment InitInstance => new(nbPlayers);
 
         private void Start()
         {

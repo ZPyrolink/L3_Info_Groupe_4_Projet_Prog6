@@ -12,10 +12,9 @@ using Utils;
 
 using Wrapper;
 
-public class TilesMgr : MonoBehaviour
+public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 {
     private const float xOffset = 1.5f, yOffset = .41f, zOffset = 1.73205f;
-    public static TilesMgr Instance { get; private set; }
 
     [SerializeField]
     private Transform boardParent;
@@ -41,8 +40,6 @@ public class TilesMgr : MonoBehaviour
     };
 
     private Dictionary<GameObject, PointRotation> _gos;
-
-    private void Awake() => Instance = this;
 
     private void Update()
     {
