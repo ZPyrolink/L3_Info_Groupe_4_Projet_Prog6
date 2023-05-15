@@ -19,7 +19,8 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     [SerializeField]
     private Transform boardParent;
 
-    private GameObject _currentPreview, _currentFf;
+    private GameObject _currentFf;
+    private GameObject[] _currentPreviews;
 
     [SerializeField]
     private GameObject feedForward;
@@ -74,14 +75,17 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     private void PutTile(Vector3 pos)
     {
-        if (_currentPreview is null)
+        if (_currentPreviews is null)
         {
             GameObject tmp = UiMgr.Instance.CurrentTile;
-            _currentPreview = Instantiate(tmp, boardParent);
+            _currentPreviews = new[]
+            {
+                Instantiate(tmp, boardParent)
+            };
             tmp.SetActive(false);
-            _currentPreview.transform.localScale = new(100, 100, 100);
-            _currentPreview.layer = LayerMask.NameToLayer("Default");
-            Material[] mats = _currentPreview.GetComponent<MeshRenderer>().materials;
+            _currentPreviews[0].transform.localScale = new(100, 100, 100);
+            _currentPreviews[0].layer = LayerMask.NameToLayer("Default");
+            Material[] mats = _currentPreviews[0].GetComponent<MeshRenderer>().materials;
             foreach (Material mat in mats.Where((_, i) => i != 1))
             {
                 mat.SetRenderMode(MaterialExtensions.BlendMode.Transparent);
@@ -89,12 +93,12 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             }
         }
 
-        if (_currentPreview.transform.position == pos)
+        if (_currentPreviews[0].transform.position == pos)
             RotateTile();
         else
         {
-            _currentPreview.transform.position = pos;
-            _currentPreview.transform.rotation = Quaternion.Euler(270,
+            _currentPreviews[0].transform.position = pos;
+            _currentPreviews[0].transform.rotation = Quaternion.Euler(270,
                 _gos == null ? 270 : ((Rotation) Array.IndexOf(_gos[_currentFf].rotations, true)).YDegree(),
                 0);
         }
@@ -104,58 +108,70 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     public void ValidateTile()
     {
-        Material[] mats = _currentPreview.GetComponent<MeshRenderer>().materials;
+        Material[] mats = _currentPreviews[0].GetComponent<MeshRenderer>().materials;
         foreach (Material mat in mats.Where((_, i) => i != 1))
         {
             mat.SetRenderMode(MaterialExtensions.BlendMode.Opaque);
             mat.color = mat.color.With(a: 1);
         }
-        
-        Rotation rot = RotationExt.Of(Mathf.Round(_currentPreview.transform.rotation.eulerAngles.y));
 
-        _currentPreview = null;
+        Rotation rot = RotationExt.Of(Mathf.Round(_currentPreviews[0].transform.rotation.eulerAngles.y));
+
+        _currentPreviews[0] = null;
         GameMgr.Instance.Phase1(new(_gos[_currentFf].point, rot), rot);
     }
 
     private void PutBuild(Vector3 pos)
     {
-        if (_currentPreview is null)
-        {
-            _currentPreview = Instantiate(_currentBuild switch
-            {
-                Building.Barrack => barrack,
-                Building.Tower => tower,
-                Building.Temple => temple
-            }, boardParent);
+        Vector2Int currentPos = _gos[_currentFf].point;
+        List<Vector2Int> tmp = GameMgr.Instance.FindBiomesAroundVillage(currentPos);
+        if (_currentPreviews.Length < tmp.Count)
+            _currentPreviews = new GameObject[tmp.Count];
 
-            _currentPreview.transform.localScale = _buildsScale[_currentBuild];
-            Material[] mats = _currentPreview.GetComponent<MeshRenderer>().materials;
-            foreach (Material mat in mats)
+        for (int i = 0; i < tmp.Count; i++)
+        {
+            if (_currentPreviews[i] == null)
             {
-                mat.SetRenderMode(MaterialExtensions.BlendMode.Transparent);
-                mat.color = GameMgr.Instance.actualPlayer.ID.GetColor().With(a: .75f);
+                _currentPreviews[i] = Instantiate(_currentBuild switch
+                {
+                    Building.Barrack => barrack,
+                    Building.Tower => tower,
+                    Building.Temple => temple
+                }, boardParent);
+
+                _currentPreviews[i].transform.localScale = _buildsScale[_currentBuild];
+                Material[] mats = _currentPreviews[i].GetComponent<MeshRenderer>().materials;
+                foreach (Material mat in mats)
+                {
+                    mat.SetRenderMode(MaterialExtensions.BlendMode.Transparent);
+                    mat.color = GameMgr.Instance.actualPlayer.ID.GetColor().With(a: .75f);
+                }
             }
+            
+            _currentPreviews[i].transform.position = _gos
+                .First(go => go.Value.point == tmp[i])
+                .Key.transform.position;
         }
 
-        if (_currentPreview.transform.position == pos)
-            return;
+        for (int i = tmp.Count; i < _currentPreviews.Length; i++)
+            Destroy(_currentPreviews[i]);
 
-        _currentPreview.transform.position = pos;
-        
         UiMgr.Instance.EnableValidateBtn = true;
     }
 
     public void ValidateBuild()
     {
-        Material[] mats = _currentPreview.GetComponent<MeshRenderer>().materials;
-        foreach (Material mat in mats.Where((_, i) => i != 1))
+        foreach (GameObject currentPreview in _currentPreviews)
         {
-            mat.SetRenderMode(MaterialExtensions.BlendMode.Opaque);
-            mat.color = mat.color.With(a: 1);
+            Material[] mats = currentPreview.GetComponent<MeshRenderer>().materials;
+            foreach (Material mat in mats.Where((_, i) => i != 1))
+            {
+                mat.SetRenderMode(MaterialExtensions.BlendMode.Opaque);
+                mat.color = mat.color.With(a: 1);
+            }
         }
 
-        _currentPreview = null;
-
+        _currentPreviews = null;
         GameMgr.Instance.Phase2(new(_gos[_currentFf].point), _currentBuild);
     }
 
@@ -165,8 +181,8 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
         do
         {
-            _currentPreview.transform.Rotate(new(0, 360f / 6, 0), Space.World);
-            rot = RotationExt.Of(Mathf.Round(_currentPreview.transform.rotation.eulerAngles.y));
+            _currentPreviews[0].transform.Rotate(new(0, 360f / 6, 0), Space.World);
+            rot = RotationExt.Of(Mathf.Round(_currentPreviews[0].transform.rotation.eulerAngles.y));
         } while (_gos?[_currentFf]?.rotations?[(int) rot] == false);
     }
 
@@ -187,12 +203,12 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     public void SetFeedForwards2(Building build)
     {
-        if (_currentPreview is not null)
+        if (_currentPreviews[0] is not null)
         {
-            Destroy(_currentPreview);
-            _currentPreview = null;
+            Destroy(_currentPreviews[0]);
+            _currentPreviews[0] = null;
         }
-        
+
         ClearFeedForward();
         _currentBuild = build;
         Vector2Int[] poss = build switch
