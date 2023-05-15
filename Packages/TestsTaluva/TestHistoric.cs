@@ -1,4 +1,6 @@
 ﻿using NUnit.Framework;
+using System.Globalization;
+using System;
 using Taluva.Controller;
 using Taluva.Model;
 using UnityEngine;
@@ -114,5 +116,46 @@ namespace TestsTaluva
             Assert.AreEqual(45, _gm.pile._stack.Count);
             Assert.AreEqual(18, _gm.actualPlayer.nbBarrack);
         }
+
+        [Test]
+        public void TestSave1Tile()
+        {
+            _gm.ValidateTile(new(new(0, 0), new[] { true, false, false, false, false, false }), Rotation.N);
+            string path = "save1";
+
+            _gm.Save(path);
+
+            GameManagment gm = new(path);
+            Assert.IsFalse(gm.IsVoid(new(0, 0)));
+            Assert.IsFalse(gm.IsVoid(new(-1, 0)));
+            Assert.IsFalse(gm.IsVoid(new(-1, -1)));
+            Assert.AreEqual(_gm.pile._stack.Count, gm.pile._stack.Count);
+
+            Assert.AreEqual(_gm.actualChunk.Coords[1].ActualBiome, gm.actualChunk.Coords[1].ActualBiome);
+            Assert.AreEqual(_gm.actualChunk.Coords[2].ActualBiome, gm.actualChunk.Coords[2].ActualBiome);
+            Assert.AreEqual(_gm.gameBoard.WorldMap[new(0, 0)].ActualBiome, gm.gameBoard.WorldMap[new(0, 0)].ActualBiome);
+            Assert.AreEqual(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBiome, gm.gameBoard.WorldMap[new(-1, 0)].ActualBiome);
+            Assert.AreEqual(_gm.gameBoard.WorldMap[new(-1, -1)].ActualBiome, gm.gameBoard.WorldMap[new(-1, -1)].ActualBiome);
+
+            Assert.AreEqual(_gm.gameBoard.WorldMap[new(0, 0)].ActualBuildings, gm.gameBoard.WorldMap[new(0, 0)].ActualBuildings);
+            Assert.AreEqual(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings, gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings);
+            Assert.AreEqual(_gm.gameBoard.WorldMap[new(-1, -1)].ActualBuildings, gm.gameBoard.WorldMap[new(-1, -1)].ActualBuildings);
+
+        }
+
+        [Test]
+        public void TestSave1Building()
+        {
+            _gm.ValidateTile(new(new(0, 0), new[] { true, false, false, false, false, false }), Rotation.N);
+            _gm.ValidateBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
+
+            string path = "save1";
+            _gm.Save(path);
+            GameManagment gm = new(path);
+
+            Assert.AreEqual(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings, gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings);
+        }
+
+
     }
 }

@@ -9,6 +9,7 @@ namespace Taluva.Model.AI
     {
         protected readonly GameManagment gm;
         protected readonly Pile<Chunk> pile;
+        public Difficulty difficulty;
 
         public AI(PlayerColor id, GameManagment gm, Pile<Chunk> pile) : base(id)
         {

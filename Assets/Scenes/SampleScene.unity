@@ -1442,6 +1442,8 @@ MonoBehaviour:
   nextPhase: 13
   menu: 27
   validateButton: {fileID: 1931092067}
+  undoButton: {fileID: 0}
+  redoButton: {fileID: 0}
 --- !u!1 &414219290
 GameObject:
   m_ObjectHideFlags: 0

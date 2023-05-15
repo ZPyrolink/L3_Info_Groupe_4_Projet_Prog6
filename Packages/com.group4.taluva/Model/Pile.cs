@@ -7,7 +7,7 @@ namespace Taluva.Model
     public class Pile<T>
     {
         public Stack<T> _stack { get; }
-        private readonly List<T> _played;
+        public readonly List<T> _played;
         
         public T[] GetRemaining() => _stack.ToArray();
 
@@ -18,6 +18,17 @@ namespace Taluva.Model
             _played = new();
 
             _stack = new(list.OrderBy(_ => random.Next()));
+        }
+
+        public Pile(List<T> list)
+        {
+            _stack = new(list.Count);
+            _played = new();
+
+            foreach(T item in list)
+            {
+                _stack.Push(item);
+            }
         }
 
         public T Draw()
