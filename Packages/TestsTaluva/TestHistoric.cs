@@ -1,4 +1,6 @@
 ﻿using NUnit.Framework;
+using System.Globalization;
+using System;
 using Taluva.Controller;
 using Taluva.Model;
 using UnityEngine;
@@ -113,6 +115,23 @@ namespace TestsTaluva
             Assert.IsFalse(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.Barrack);
             Assert.AreEqual(45, _gm.pile._stack.Count);
             Assert.AreEqual(18, _gm.actualPlayer.nbBarrack);
+        }
+
+        [Test]
+        public void TestSave()
+        {
+            _gm.ValidateTile(new(new(0, 0), new[] { true, false, false, false, false, false }), Rotation.N);
+            string path = DateTime.Now.ToString(new CultureInfo("de-DE"));
+
+            _gm.Save(path);
+
+            GameManagment gm = new(path);
+            Assert.IsFalse(gm.IsVoid(new(0, 0)));
+            Assert.IsFalse(gm.IsVoid(new(-1, 0)));
+            Assert.IsFalse(gm.IsVoid(new(-1, -1)));
+            Assert.AreEqual(47, gm.pile._stack.Count);
+            Assert.AreEqual(_gm.actualChunk.Coords[1].ActualBiome, gm.actualChunk.Coords[1].ActualBiome);
+            Assert.AreEqual(_gm.actualChunk.Coords[2].ActualBiome, gm.actualChunk.Coords[3].ActualBiome);
         }
     }
 }

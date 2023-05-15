@@ -39,18 +39,18 @@ namespace Taluva.Controller
         //Notify phase change
         public Action<TurnPhase> ChangePhase { get; set; }
         private void OnChangePhase(TurnPhase phase) => ChangePhase?.Invoke(phase);
-        
+
         //Notify end of game
         public Action<Player, GameEnd> NotifyEndGame { get; set; }
         private void OnEndGame(Player winner, GameEnd victory) => NotifyEndGame?.Invoke(winner, victory);
-        
+
         //Notify where the AI places the chunk
         public Action<PointRotation> NotifyAIChunkPlacement { get; set; }
         private void OnAIChunkPlacement(PointRotation pr) => NotifyAIChunkPlacement?.Invoke(pr);
         //Notify where the AI places the building
         public Action<Building, Vector2Int> NotifyAIBuildingPlacement { get; set; }
         private void OnAIBuildingPlacement(Building b, Vector2Int pos) => NotifyAIBuildingPlacement?.Invoke(b, pos);
-        
+
         //Notify player eliminated
         public Action<Player> NotifyPlayerEliminated { get; set; }
         private void OnPlayerElimination(Player p) => NotifyPlayerEliminated?.Invoke(p);
@@ -63,9 +63,11 @@ namespace Taluva.Controller
             this.gameBoard = new();
             this.NbPlayers = nbPlayers;
             this.maxTurn = 12 * nbPlayers;
-            for (int i = 0; i < this.NbPlayers; i++) {
+            for (int i = 0; i < this.NbPlayers; i++)
+            {
                 players[i] = new((PlayerColor)i);
-                if (this.AIRandom && i == 1) {
+                if (this.AIRandom && i == 1)
+                {
                     players[i].playerIA = true;
                     break;
                 }
@@ -126,69 +128,184 @@ namespace Taluva.Controller
         /// </summary>
         public bool CanRedo => historic.CanRedo;
 
-        public void Save()
+        public void Save(string path)
         {
-            using (FileStream file = File.Open(savePath + DateTime.Now.ToString(new CultureInfo("de-DE")), FileMode.Create, FileAccess.Write))
-            using (BinaryWriter writer = new(file)) {
+            using (FileStream file = File.Open(savePath + path, FileMode.OpenOrCreate, FileAccess.Write))
+            using (BinaryWriter writer = new(file))
+            {
                 writer.Write(NbPlayers);
-                for(int i = 0; i < NbPlayers; i++) {
+                for (int i = 0; i < NbPlayers; i++)
+                {
                     writer.Write((uint)players[i].ID);
                     writer.Write(players[i] is AI);
-                    // if (players[i].playerIA)
-                    //     writer.Write((int)players[i].difficulty);
+                    if (players[i] is AI)
+                        writer.Write((int)((AI)players[i]).difficulty);
                 }
-                
+
+                Chunk[] stackArray = pile._stack.ToArray();
+                writer.Write(stackArray.Length + pile._played.Count - 2);
+
+                for (int i = stackArray.Length - 1; i >= 0; i--)
+                {
+                    writer.Write((int)stackArray[i].Coords[1].ActualBiome);
+                    writer.Write((int)stackArray[i].Coords[2].ActualBiome);
+                }
+
+                for (int i = pile._played.Count - 1; i >= 0; i--)
+                {
+                    writer.Write((int)pile._played[i].Coords[1].ActualBiome);
+                    writer.Write((int)pile._played[i].Coords[2].ActualBiome);
+                }
+
                 writer.Write(historic.Count);
-                for (int i = 0; i < historic.Count; i++) {
+                for (int i = 0; i < historic.Count; i++)
+                {
                     writer.Write(i == historic.Index);
-                    writer.Write(historic[i].positions.Length);
-                    for (int j = 0; j < historic[i].positions.Length; j++) {
-                        writer.Write(historic[i].positions[i].x);
-                        writer.Write(historic[i].positions[i].y);
-                    }
-                    writer.Write((int)historic[i].rotation);
-                    writer.Write((uint)historic[i].player.ID);
-                    for(int j = 1; j < historic[i].chunk.Coords.Length; j++) {
-                        writer.Write((int)historic[i].chunk.Coords[j].ActualBiome);
-                        writer.Write((int)historic[i].chunk.Coords[j].ActualBuildings);
-                        if(historic[i].chunk.Coords[j].ActualBuildings != Building.None)
-                            writer.Write((int)historic[i].chunk.Coords[j].Owner);
-                    }
-                    writer.Write((int)historic[i].chunk.rotation);
-                    writer.Write((int)historic[i].chunk.Level);
-                    writer.Write(historic[i].cells.Length > 0);
-                    if(historic[i].cells.Length > 0) {
-                        for(int j = 0; j < historic[i].cells.Length; j++) {
+                    if (i % 2 == 0)
+                    {
+                        writer.Write(historic[i].positions.Length);
+                        for (int j = 0; j < historic[i].positions.Length; j++)
+                        {
+                            writer.Write(historic[i].positions[i].x);
+                            writer.Write(historic[i].positions[i].y);
+                        }
+                        writer.Write((int)historic[i].rotation);
+                        writer.Write((uint)historic[i].player.ID);
+                        for (int j = 1; j < historic[i].chunk.Coords.Length; j++)
+                        {
+                            writer.Write((int)historic[i].chunk.Coords[j].ActualBiome);
+                            writer.Write((int)historic[i].chunk.Coords[j].ActualBuildings);
+                            if (historic[i].chunk.Coords[j].ActualBuildings != Building.None)
+                                writer.Write((int)historic[i].chunk.Coords[j].Owner);
+                        }
+                        writer.Write((int)historic[i].chunk.rotation);
+                        writer.Write((int)historic[i].chunk.Level);
+                        writer.Write(historic[i].cells.Length > 0);
+                        if (historic[i].cells.Length > 0)
+                        {
+                            for (int j = 0; j < historic[i].cells.Length; j++)
+                            {
+                                writer.Write((int)historic[i].cells[j].ActualBiome);
+                                writer.Write((int)historic[i].cells[j].ActualBuildings);
+                                if (historic[i].chunk.Coords[j].ActualBuildings != Building.None)
+                                    writer.Write((int)historic[i].chunk.Coords[j].Owner);
+                                writer.Write((int)historic[i].building[j]);
+                            }
+                        }
+                    } else
+                    {
+                        writer.Write(historic[i].positions.Length);
+                        for (int j = 0; j < historic[i].positions.Length; j++)
+                        {
+                            writer.Write(historic[i].positions[j].x);
+                            writer.Write(historic[i].positions[j].y);
+                        }
+                        writer.Write((int)historic[i].player.ID);
+                        for (int j = 0; j < historic[i].cells.Length; j++)
+                        {
                             writer.Write((int)historic[i].cells[j].ActualBiome);
                             writer.Write((int)historic[i].cells[j].ActualBuildings);
+                            writer.Write(historic[i].chunk.Coords[j].ActualBuildings != Building.None);
                             if (historic[i].chunk.Coords[j].ActualBuildings != Building.None)
                                 writer.Write((int)historic[i].chunk.Coords[j].Owner);
                             writer.Write((int)historic[i].building[j]);
                         }
                     }
-                    i++;
-                    if (i >= historic.Count)
-                        break;
-
-                    writer.Write(i == historic.Index);
-                    for (int j = 0; j < historic[i].positions.Length; j++) {
-                        writer.Write(historic[i].positions[j].x);
-                        writer.Write(historic[i].positions[j].y);
-                    }
-                    writer.Write((int)historic[i].player.ID);
-                    for(int j = 0; j < historic[i].cells.Length; j++) {
-                        writer.Write((int)historic[i].cells[j].ActualBiome);
-                        writer.Write((int)historic[i].cells[j].ActualBuildings);
-                        if (historic[i].chunk.Coords[j].ActualBuildings != Building.None)
-                            writer.Write((int)historic[i].chunk.Coords[j].Owner);
-                        writer.Write((int)historic[i].building[j]);
-                    }
-
-                    //T'ES GRAND AUJOURD'HUI! T'ES TRES GRAND!
-
                 }
             }
+        }
 
+        public GameManagment(string path)
+        {
+            using (FileStream file = File.Open(savePath + path, FileMode.Open, FileAccess.Read))
+            using (BinaryReader reader = new(file))
+            {
+                this.NbPlayers = reader.ReadInt16();
+                this.maxTurn = 12 * NbPlayers;
+                this.actualTurn = 1;
+                this.gameBoard = new();
+                actualPlayer = players[0];
+                this.players = new Player[this.NbPlayers];
+                for (int i = 0; i < NbPlayers; i++)
+                {
+                    PlayerColor id = (PlayerColor)reader.ReadInt16();
+                    bool ia = reader.ReadBoolean();
+                    if (ia)
+                    {
+                        Difficulty d = (Difficulty)reader.ReadInt16();
+                        switch (d)
+                        {
+                            //a completer en declarant les nouvelles classes d'ia
+                            case Difficulty.BadPlayer:
+                                players[i] = new AIRandom(id, this);
+                                break;
+                            case Difficulty.Normal:
+                                throw new NotImplementedException();
+                                break;
+                            case Difficulty.SkillIssue:
+                                throw new NotImplementedException();
+                                break;
+                        }
+
+                    } else
+                    {
+                        players[i] = new(id);
+                    }
+                }
+
+                List<Chunk> chunks = new();
+
+                for (int i = 0; i < reader.ReadInt16(); i++)
+                {
+                    Cell left = new((Biomes)reader.ReadInt16());
+                    Cell right = new((Biomes)reader.ReadInt16());
+                    Chunk c = new(1, left, right);
+                    chunks.Add(c);
+                }
+
+                pile = new(chunks.ToArray());
+
+                int historicCount = reader.ReadInt16();
+                for (int i = 0; i < historicCount; i++)
+                {
+                    bool index = reader.ReadBoolean();
+                    if (!index)
+                    {
+                        if(i % 2 == 0)
+                        {
+                            this.actualChunk = pile.Draw();
+                            int nbTiles = reader.ReadInt16();
+                            Vector2Int[] positions = new Vector2Int[nbTiles];
+                            for(int j = 0; i < nbTiles; j++)
+                            {
+                                positions[i] = new(reader.ReadInt16(), reader.ReadInt16());
+                            }
+                            Rotation r = (Rotation)reader.ReadInt16();
+                            ValidateTile(new(positions[0], r), r);
+                        } else
+                        {
+                            int nbTiles = reader.ReadInt16();
+                            Vector2Int[] positions = new Vector2Int[nbTiles];
+                            for(int j = 0; i < nbTiles; j++)
+                            {
+                                positions[i] = new(reader.ReadInt16(), reader.ReadInt16());
+                            }
+                            int playerID = reader.ReadInt16();
+                            Building[] b = new Building[nbTiles];
+                            for(int j = 0;  j < nbTiles; j++)
+                            {
+                                reader.ReadInt16();
+                                reader.ReadInt16();
+                                bool bl = reader.ReadBoolean();
+                                if(bl)
+                                    reader.ReadInt16();
+                                b[i] = (Building)reader.ReadInt16();
+                            }
+                            ValidateBuilding(gameBoard.WorldMap[positions[0]], b[0]);
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -200,16 +317,19 @@ namespace Taluva.Controller
         /// <param name="chunk">The chunk played at the round</param>
         public void AddHistoric(Vector2Int position, Rotation rotation, Chunk chunk)
         {
-            if (!gameBoard.WorldMap.IsVoid(position)) {
+            if (!gameBoard.WorldMap.IsVoid(position))
+            {
                 Vector2Int[] positions = gameBoard.GetChunksCoords(position, rotation);
                 Cell[] newCells = new Cell[gameBoard.WorldMap[position].ParentCunk.Coords.Length];
                 Building[] buildings = new Building[gameBoard.WorldMap[position].ParentCunk.Coords.Length];
-                for (int i = 0; i < gameBoard.WorldMap[position].ParentCunk.Coords.Length; i++) {
+                for (int i = 0; i < gameBoard.WorldMap[position].ParentCunk.Coords.Length; i++)
+                {
                     newCells[i] = new(gameBoard.WorldMap[positions[i]].ParentCunk.Coords[i]);
                     buildings[i] = gameBoard.WorldMap[positions[i]].ActualBuildings;
                 }
                 historic.Add(new(gameBoard.GetChunksCoords(position, rotation), rotation, actualPlayer, new(chunk), newCells, buildings));
-            } else {
+            } else
+            {
                 historic.Add(new(new[] { position }, rotation, actualPlayer, new(chunk)));
             }
 
@@ -225,7 +345,8 @@ namespace Taluva.Controller
         {
             Cell[] newCells = new Cell[cells.Length];
             Building[] buildings = new Building[cells.Length];
-            for (int i = 0; i < cells.Length; i++) {
+            for (int i = 0; i < cells.Length; i++)
+            {
                 newCells[i] = new(cells[i]);
                 buildings[i] = b;
             }
@@ -237,15 +358,14 @@ namespace Taluva.Controller
             if (actualPhase != TurnPhase.IAPlays)
             {
                 int precedantPhaseValue = ((int)actualPhase - 1) % Enum.GetNames(typeof(TurnPhase)).Length - 1;
-                actualPhase = (TurnPhase)precedantPhaseValue; 
+                actualPhase = (TurnPhase)precedantPhaseValue;
                 OnChangePhase(actualPhase);
-            }
-            else
+            } else
             {
                 actualPhase = TurnPhase.NextPlayer; //Change Player ?
                 OnChangePhase(actualPhase);
             }
-           
+
         }
 
         public void NextPhase()
@@ -256,34 +376,39 @@ namespace Taluva.Controller
                 int nextPhaseValue = ((int)actualPhase + 1) % Enum.GetNames(typeof(TurnPhase)).Length - 1;
                 actualPhase = (TurnPhase)nextPhaseValue;
                 OnChangePhase(actualPhase);
-            }
-            else
+            } else
             {
                 actualPhase = TurnPhase.NextPlayer;
                 OnChangePhase(actualPhase);
             }
-            
+
         }
-        
+
         public Coup Undo()
         {
             if (!historic.CanUndo)
                 return null;
 
             Coup c = historic.Undo();
-            if (c.chunk != null) {
+            if (c.chunk != null)
+            {
                 gameBoard.RemoveChunk(c.chunk);
-                if (c.cells[0] != null) {
-                    for (int i = 0; i < c.cells.Length; i++) {
+                if (c.cells[0] != null)
+                {
+                    for (int i = 0; i < c.cells.Length; i++)
+                    {
                         gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
                         gameBoard.PlaceBuilding(c.cells[i], c.building[i], actualPlayer);
                     }
                 }
                 pile.Stack(c.chunk);
-            } else {
+            } else
+            {
                 actualPlayer = c.player;
-                for (int i = 0; i < c.cells.Length; i++) {
-                    switch (c.building[i]) {
+                for (int i = 0; i < c.cells.Length; i++)
+                {
+                    switch (c.building[i])
+                    {
                         case Building.None:
                             break;
                         case Building.Temple:
@@ -309,19 +434,22 @@ namespace Taluva.Controller
                 return null;
 
             Coup c = historic.Redo();
-            if (c.chunk == null) {
-                for (int i = 0; i < c.cells.Length; i++) {
+            if (c.chunk == null)
+            {
+                for (int i = 0; i < c.cells.Length; i++)
+                {
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
                     gameBoard.PlaceBuilding(c.cells[i], c.building[i], actualPlayer);
                 }
-            } else {
+            } else
+            {
                 gameBoard.AddChunk(c.chunk, c.player, new(c.positions[0], (Rotation)c.rotation), (Rotation)c.rotation);
                 pile.Draw();
             }
             for (int i = 0; i < NbPlayers; i++)
                 if (actualPlayer == players[i])
                     actualPlayer = players[i % NbPlayers];
-            
+
             NextPhase();
             return c;
         }
@@ -356,7 +484,8 @@ namespace Taluva.Controller
         {
             get
             {
-                foreach (Player p in players) {
+                foreach (Player p in players)
+                {
                     int completedBuildingTypes = 0;
 
                     if (gameBoard.GetTempleSlots(p).Length == p.nbTemple)
@@ -381,61 +510,73 @@ namespace Taluva.Controller
             {
                 int maxTemple = 0;
                 Player winner1 = null;
-                foreach (Player p in players) {
+                foreach (Player p in players)
+                {
                     if (p.nbBarrack == 0)
                         continue;
 
-                    if (p.nbTemple > maxTemple) {
+                    if (p.nbTemple > maxTemple)
+                    {
                         maxTemple = p.nbTemple;
                         winner1 = p;
                     }
                 }
 
                 int egalityTemple = 0;
-                foreach (Player p in players) {
+                foreach (Player p in players)
+                {
                     if (p.nbBarrack == 0)
                         continue;
                     if (p.nbTemple == maxTemple)
                         egalityTemple++;
                 }
 
-                if (egalityTemple >= 2) {
+                if (egalityTemple >= 2)
+                {
                     int maxTower = 0;
                     Player winner2 = null;
-                    foreach (Player p in players) {
+                    foreach (Player p in players)
+                    {
                         if (p.nbBarrack == 0)
                             continue;
-                        if (p.nbTemple > maxTower) {
+                        if (p.nbTemple > maxTower)
+                        {
                             maxTower = p.nbTemple;
                             winner2 = p;
                         }
                     }
 
                     int egalityTower = 0;
-                    foreach (Player p in players) {
+                    foreach (Player p in players)
+                    {
                         if (p.nbBarrack == 0)
                             continue;
                         if (p.nbTemple == maxTemple)
                             egalityTower++;
                     }
 
-                    if (egalityTower >= 2) {
+                    if (egalityTower >= 2)
+                    {
                         int maxBarrack = 0;
                         Player winner3 = null;
-                        foreach (Player p in players) {
+                        foreach (Player p in players)
+                        {
                             if (p.nbBarrack == 0)
                                 continue;
-                            if (p.nbTemple > maxBarrack) {
+                            if (p.nbTemple > maxBarrack)
+                            {
                                 maxBarrack = p.nbTemple;
                                 winner3 = p;
                             }
                         }
 
                         return winner3;
-                    } else {
+                    } else
+                    {
                         return winner2;
                     }
-                } else {
+                } else
+                {
                     return winner1;
                 }
             }
@@ -443,30 +584,35 @@ namespace Taluva.Controller
 
         public void InitPlay()
         {
-            if (CheckWinner() != null) {
+            if (CheckWinner() != null)
+            {
                 return;
             }
             PlayerEliminated();
             actualTurn++;
             this.actualChunk = pile.Draw();
-            if (actualTurn + 1 > NbPlayers) {
+            if (actualTurn + 1 > NbPlayers)
+            {
                 actualTurn = 0;
             }
             actualPlayer = players[actualTurn];
 
-            if (actualPlayer.Eliminated) {
+            if (actualPlayer.Eliminated)
+            {
                 actualTurn++;
-                if (actualTurn + 1 > NbPlayers) {
+                if (actualTurn + 1 > NbPlayers)
+                {
                     actualTurn = 0;
                 }
                 actualPlayer = players[actualTurn];
             }
-            
+
             if (actualPlayer is AI ai)
             {
                 actualPhase = TurnPhase.IAPlays;
                 AIMove(ai);
-            } else {
+            } else
+            {
                 NextPhase();
             }
         }
@@ -478,10 +624,11 @@ namespace Taluva.Controller
                 OnPlayerElimination(actualPlayer);
             }
         }
-        
+
         public void Phase1(PointRotation pr, Rotation r)
         {
-            if (ValidateTile(pr, r)) {
+            if (ValidateTile(pr, r))
+            {
                 NextPhase();
                 this.maxTurn--;
             }
@@ -491,12 +638,13 @@ namespace Taluva.Controller
         public void Phase2(PointRotation pr, Building b)
         {
             Cell c = gameBoard.WorldMap[pr.point];
-            if (ValidateBuilding(c, b)) {
+            if (ValidateBuilding(c, b))
+            {
                 NextPhase();
                 InitPlay();
             }
         }
-        
+
         //Placement chunk et buildings
         public void AIMove(AI ai)
         {
@@ -504,7 +652,8 @@ namespace Taluva.Controller
             actualPhase = TurnPhase.IAPlays;
             PointRotation pr = ((AI)actualPlayer).PlayChunk();
             Rotation r = Rotation.N;
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < 6; i++)
+            {
                 if (pr.rotations[i])
                     r = (Rotation)i;
             }
@@ -513,10 +662,10 @@ namespace Taluva.Controller
             (Building b, Vector2Int pos) = ((AI)actualPlayer).PlayBuild();
             PointRotation p = new PointRotation(pos);
             Cell c = gameBoard.WorldMap[p.point];
-            OnAIBuildingPlacement(b, pos);  
+            OnAIBuildingPlacement(b, pos);
             ValidateBuilding(c, b);
             NextPhase();
-            InitPlay(); 
+            InitPlay();
         }
 
         public List<Vector2Int> FindBiomesAroundVillage(Vector2Int cell) => gameBoard.FindBiomesAroundVillage(cell, actualPlayer);
@@ -534,8 +683,10 @@ namespace Taluva.Controller
 
             List<Cell> cells = new();
             List<Vector2Int> sameBiomes = FindBiomesAroundVillage(gameBoard.GetCellCoord(c));
-            if (sameBiomes.Count > 0) {
-                foreach (Vector2Int cell in sameBiomes) {
+            if (sameBiomes.Count > 0)
+            {
+                foreach (Vector2Int cell in sameBiomes)
+                {
                     cells.Add(new(gameBoard.WorldMap[cell]));
                 }
             }

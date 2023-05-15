@@ -7,7 +7,7 @@ namespace Taluva.Model
     public class Pile<T>
     {
         public Stack<T> _stack { get; }
-        private readonly List<T> _played;
+        public readonly List<T> _played;
         
         public T[] GetRemaining() => _stack.ToArray();
 
