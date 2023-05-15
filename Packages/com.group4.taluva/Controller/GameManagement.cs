@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
 using System.Linq;
+using PlasticGui.WebApi.Responses;
 
 using UnityEngine.UIElements;
 
@@ -66,7 +67,7 @@ namespace Taluva.Controller
             this.gameBoard = new();
             this.NbPlayers = nbPlayers;
             this.maxTurn = 12 * nbPlayers;
-
+            
             PlayerColor[] pc = (PlayerColor[]) Enum.GetValues(typeof(PlayerColor));
 
             for (int i = 0; i < this.NbPlayers; i++)
@@ -701,26 +702,29 @@ namespace Taluva.Controller
             }
         }
 
+        private void NextPlayer()
+        {
+            ActualPlayerIndex = (ActualPlayerIndex + 1) % NbPlayers;
+        }
+
+        private void PrecedentPlayer()
+        {
+            ActualPlayerIndex = (ActualPlayerIndex - 1) % NbPlayers;
+        }
+        
         public void InitPlay()
         {
+            MeshRender();
             if (CheckWinner() != null)
             {
                 return;
             }
 
-            ActualPlayerIndex++;
-            if (ActualPlayerIndex + 1 > NbPlayers)
-            {
-                ActualPlayerIndex = 0;
-            }
+            NextPlayer();
 
             while (actualPlayer.Eliminated)
             {
-                ActualPlayerIndex++;
-                if (ActualPlayerIndex + 1 > NbPlayers)
-                {
-                    ActualPlayerIndex = 0;
-                }
+                NextPlayer();
             }
 
             this.actualChunk = pile.Draw();
@@ -788,6 +792,44 @@ namespace Taluva.Controller
             ValidateBuilding(c, b);
             NextPhase();
             InitPlay();
+        }
+
+        public Texture2D ExportTexture(CustomRenderTexture crt)
+        {
+            var oldRT = RenderTexture.active;
+            // Vector2Int center = CalculateCenter(gameBoard.GetChunksCoords(coord, r));
+            
+            Material mat = new Material(Shader.Find("MatTest"));
+            var tex = new Texture2D(1024, 1024);
+            tex.ReadPixels(new Rect(0,0,1024,1024), 0, 0);
+            RenderTexture.active = crt;
+            mat.SetVector(Shader.PropertyToID("_Location"), new Vector2(-2, 0));
+            mat.SetTexture(Shader.PropertyToID("_BeachMask"),tex);
+            crt.Update();
+            tex.Apply();
+            RenderTexture.active = oldRT;
+            return tex;
+        }
+
+        public void MeshRender()
+        {
+            CustomRenderTexture crt = new CustomRenderTexture(1024, 1024);
+            Texture2D tex = ExportTexture(crt);
+            GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            plane.SetActive(true);
+            Material mat = new Material(Shader.Find("MeshTest"));
+            MeshRenderer mr = plane.transform.GetComponentInChildren<MeshRenderer>();
+            mr.material = mat;
+            mr.material.SetTexture(Shader.PropertyToID("_test"), tex);
+
+        }
+
+        Vector2Int CalculateCenter(Vector2Int[] TriangleCoords)
+        {
+            Vector2Int center = new Vector2Int();
+            center.x = TriangleCoords[0].x + TriangleCoords[1].x + TriangleCoords[2].x;
+            center.y = TriangleCoords[0].y + TriangleCoords[1].y + TriangleCoords[2].y;
+            return center;
         }
 
         public List<Vector2Int> FindBiomesAroundVillage(Vector2Int cell) =>
