@@ -205,7 +205,7 @@ namespace UI
 
         private void UndoPhase1(GameManagment.Coup c) => TilesMgr.Instance.RemoveTile(c.positions[0]);
 
-        private void UndoPhase2(GameManagment.Coup c) { }
+        private void UndoPhase2(GameManagment.Coup c) => TilesMgr.Instance.RemoveBuild(c.positions);
 
         public void Redo() => GameMgr.Instance.Redo();
 

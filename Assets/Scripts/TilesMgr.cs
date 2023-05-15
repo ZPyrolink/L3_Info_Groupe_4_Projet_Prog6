@@ -249,7 +249,25 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         if (!GameMgr.Instance.IsVoid(pos))
             p.y = GameMgr.Instance.LevelAt(pos) * yOffset;
         p.Scale(new(xOffset, 1, zOffset));
+        if (pos.x % 2 != 0)
+            p.z += zOffset / 2;
 
         Destroy(boardParent.transform.Cast<Transform>().First(t => t.position == p).gameObject);
+    }
+
+    public void RemoveBuild(Vector2Int[] poss)
+    {
+        foreach (Vector2Int pos in poss)
+        {
+            Vector3 p = new(pos.x, 0, pos.y);
+            if (!GameMgr.Instance.IsVoid(pos))
+                p.y = GameMgr.Instance.LevelAt(pos) * yOffset;
+            p.Scale(new(xOffset, 1, zOffset));
+
+            if (pos.x % 2 != 0)
+                p.z += zOffset / 2;
+
+            Destroy(boardParent.transform.Cast<Transform>().First(t => t.position == p).gameObject);
+        }
     }
 }
