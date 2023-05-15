@@ -56,6 +56,12 @@ namespace UI
             set => validateButton.interactable = value;
         }
 
+        [SerializeField]
+        private Button undoButton;
+        [SerializeField]
+        private Button redoButton;
+
+
         #region Unity events
 
         protected override void Awake()
@@ -152,6 +158,8 @@ namespace UI
 
         public void Phase1()
         {
+            undoButton.interactable = GameMgr.Instance.CanUndo;
+            redoButton.interactable = GameMgr.Instance.CanRedo;
             UpdateCurrentPlayer();
             UpdatePlayersBuild();
 
@@ -173,6 +181,8 @@ namespace UI
 
         public void Phase2()
         {
+            undoButton.interactable = GameMgr.Instance.CanUndo;
+            redoButton.interactable = GameMgr.Instance.CanRedo;
             UpdateCurrentPlayerBuild();
             currentTile.SetActive(false);
             builds.SetActive(true);

@@ -427,7 +427,7 @@ namespace Taluva.Controller
         {
             if (actualPhase != TurnPhase.IAPlays)
             {
-                int precedantPhaseValue = ((int)actualPhase - 1) % Enum.GetNames(typeof(TurnPhase)).Length - 1;
+                int precedantPhaseValue = ((int)actualPhase - 1) % (Enum.GetNames(typeof(TurnPhase)).Length - 1);
                 actualPhase = (TurnPhase)precedantPhaseValue;
                 OnChangePhase(actualPhase);
             } else
@@ -477,7 +477,6 @@ namespace Taluva.Controller
                         gameBoard.PlaceBuilding(c.cells[i], c.building[i], actualPlayer);
                     }
                 }
-
                 pile.Stack(c.chunk);
             } else
             {
@@ -498,7 +497,6 @@ namespace Taluva.Controller
                             actualPlayer.nbBarrack += gameBoard.WorldMap[c.positions[i]].ParentCunk.Level;
                             break;
                     }
-
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
                 }
             }
