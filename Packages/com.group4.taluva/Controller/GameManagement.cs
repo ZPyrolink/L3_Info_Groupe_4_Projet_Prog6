@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
 using System.Linq;
+using UnityEngine.UIElements;
 
 namespace Taluva.Controller
 {
@@ -19,7 +20,7 @@ namespace Taluva.Controller
     {
         public Player[] players;
         public Player actualPlayer => players[ActualPlayerIndex];
-        private AI ActualAi => (AI) actualPlayer;
+        private AI ActualAi => (AI)actualPlayer;
         private readonly string savePath = Directory.GetCurrentDirectory() + "/Save/";
 
         public int NbPlayers { get; set; }
@@ -66,7 +67,7 @@ namespace Taluva.Controller
             this.NbPlayers = nbPlayers;
             this.maxTurn = 12 * nbPlayers;
 
-            PlayerColor[] pc = (PlayerColor[]) Enum.GetValues(typeof(PlayerColor));
+            PlayerColor[] pc = (PlayerColor[])Enum.GetValues(typeof(PlayerColor));
 
             for (int i = 0; i < this.NbPlayers; i++)
             {
@@ -138,6 +139,7 @@ namespace Taluva.Controller
 
         public void Save(string path)
         {
+            Directory.CreateDirectory(savePath);
             using (FileStream file = File.Open(savePath + path, FileMode.OpenOrCreate, FileAccess.Write))
             using (BinaryWriter writer = new(file))
             {
@@ -151,7 +153,7 @@ namespace Taluva.Controller
                 }
 
                 Chunk[] stackArray = pile._stack.ToArray();
-                writer.Write(stackArray.Length + pile._played.Count - 2);
+                writer.Write(stackArray.Length + pile._played.Count);
 
                 for (int i = stackArray.Length - 1; i >= 0; i--)
                 {
@@ -168,7 +170,7 @@ namespace Taluva.Controller
                 writer.Write(historic.Count);
                 for (int i = 0; i < historic.Count; i++)
                 {
-                    writer.Write(i == historic.Index);
+                    writer.Write(i <= historic.Index);
                     if (i % 2 == 0)
                     {
                         writer.Write(historic[i].positions.Length);
@@ -188,8 +190,8 @@ namespace Taluva.Controller
                         }
                         writer.Write((int)historic[i].chunk.rotation);
                         writer.Write((int)historic[i].chunk.Level);
-                        writer.Write(historic[i].cells.Length > 0);
-                        if (historic[i].cells.Length > 0)
+                        writer.Write(historic[i].cells[0] != null);
+                        if (historic[i].cells[0] != null)
                         {
                             for (int j = 0; j < historic[i].cells.Length; j++)
                             {
@@ -213,9 +215,8 @@ namespace Taluva.Controller
                         {
                             writer.Write((int)historic[i].cells[j].ActualBiome);
                             writer.Write((int)historic[i].cells[j].ActualBuildings);
-                            writer.Write(historic[i].chunk.Coords[j].ActualBuildings != Building.None);
-                            if (historic[i].chunk.Coords[j].ActualBuildings != Building.None)
-                                writer.Write((int)historic[i].chunk.Coords[j].Owner);
+                            if (historic[i].cells[j].ActualBuildings != Building.None)
+                                writer.Write((int)historic[i].cells[j].Owner);
                             writer.Write((int)historic[i].building[j]);
                         }
                     }
@@ -225,22 +226,22 @@ namespace Taluva.Controller
 
         public GameManagment(string path)
         {
+            historic = new();
             using (FileStream file = File.Open(savePath + path, FileMode.Open, FileAccess.Read))
             using (BinaryReader reader = new(file))
             {
-                this.NbPlayers = reader.ReadInt16();
+                this.NbPlayers = reader.ReadInt32();
                 this.maxTurn = 12 * NbPlayers;
-                this.actualTurn = 1;
+                this.ActualPlayerIndex = 0;
                 this.gameBoard = new();
-                actualPlayer = players[0];
                 this.players = new Player[this.NbPlayers];
                 for (int i = 0; i < NbPlayers; i++)
                 {
-                    PlayerColor id = (PlayerColor)reader.ReadInt16();
+                    PlayerColor id = (PlayerColor)reader.ReadInt32();
                     bool ia = reader.ReadBoolean();
                     if (ia)
                     {
-                        Difficulty d = (Difficulty)reader.ReadInt16();
+                        Difficulty d = (Difficulty)reader.ReadInt32();
                         switch (d)
                         {
                             //a completer en declarant les nouvelles classes d'ia
@@ -262,55 +263,116 @@ namespace Taluva.Controller
                 }
 
                 List<Chunk> chunks = new();
+                int nbChunk = reader.ReadInt32();
 
-                for (int i = 0; i < reader.ReadInt16(); i++)
+                for (int i = 0; i < nbChunk; i++)
                 {
-                    Cell left = new((Biomes)reader.ReadInt16());
-                    Cell right = new((Biomes)reader.ReadInt16());
+                    Cell left = new((Biomes)reader.ReadInt32());
+                    Cell right = new((Biomes)reader.ReadInt32());
                     Chunk c = new(1, left, right);
                     chunks.Add(c);
                 }
 
-                pile = new(chunks.ToArray());
+                pile = new(chunks);
 
-                int historicCount = reader.ReadInt16();
+                int historicCount = reader.ReadInt32();
                 for (int i = 0; i < historicCount; i++)
                 {
+                    Vector2Int[] positions;
+                    Rotation r = Rotation.N;
+                    Chunk chunk = null;
+                    bool boolean = false;
+                    Cell[] newCells;
+                    Building[] buildings;
+
                     bool index = reader.ReadBoolean();
-                    if (!index)
+
+                    if (i % 2 == 0)
                     {
-                        if(i % 2 == 0)
+                        this.actualChunk = pile.Draw();
+                        int nbTiles = reader.ReadInt32();
+                        positions = new Vector2Int[nbTiles];
+                        for (int j = 0; j < nbTiles; j++)
                         {
-                            this.actualChunk = pile.Draw();
-                            int nbTiles = reader.ReadInt16();
-                            Vector2Int[] positions = new Vector2Int[nbTiles];
-                            for(int j = 0; i < nbTiles; j++)
+                            positions[i] = new(reader.ReadInt32(), reader.ReadInt32());
+                        }
+                        r = (Rotation)reader.ReadInt32();
+                        PlayerColor ID = (PlayerColor)reader.ReadInt32();
+                        Cell[] cells = new Cell[2];
+                        for (int j = 1; j < 3; j++)
+                        {
+                            cells[j - 1] = new((Biomes)reader.ReadInt32());
+                            cells[j - 1].ActualBuildings = (Building)reader.ReadInt32();
+                            if (cells[j - 1].ActualBuildings != Building.None)
                             {
-                                positions[i] = new(reader.ReadInt16(), reader.ReadInt16());
+                                cells[j - 1].Owner = (PlayerColor)reader.ReadInt32();
                             }
-                            Rotation r = (Rotation)reader.ReadInt16();
+                        }
+                        Rotation chunkRotation = (Rotation)reader.ReadInt32();
+                        int chunkLevel = reader.ReadInt32();
+                        chunk = new(chunkLevel, cells[0], cells[1]);
+                        chunk.rotation = chunkRotation;
+
+                        boolean = reader.ReadBoolean();
+                        buildings = new Building[3];
+                        newCells = new Cell[chunk.Coords.Length];
+                        if (boolean)
+                        {
+                            for (int j = 0; j < 3; j++)
+                            {
+                                newCells[j] = new((Biomes)reader.ReadInt32());
+                                newCells[j].ActualBuildings = (Building)reader.ReadInt32();
+                                if (newCells[j].ActualBuildings != Building.None)
+                                    newCells[j].Owner = (PlayerColor)reader.ReadInt32();
+                                buildings[j] = (Building)reader.ReadInt32();
+                            }
+                           
+                        } 
+                    } else
+                    {
+                        int nbTiles = reader.ReadInt32();
+                        positions = new Vector2Int[nbTiles];
+                        for (int j = 0; j < nbTiles; j++)
+                        {
+                            positions[j] = new(reader.ReadInt32(), reader.ReadInt32());
+                        }
+                        PlayerColor ID = (PlayerColor)reader.ReadInt32();
+                        buildings = new Building[nbTiles];
+                        newCells = new Cell[nbTiles];
+                        for (int j = 0; j < nbTiles; j++)
+                        {
+                            newCells[j] = new((Biomes)reader.ReadInt32());
+                            newCells[j].ActualBuildings = (Building)reader.ReadInt32();
+                            if (newCells[j].ActualBuildings != Building.None)
+                                newCells[j].Owner = (PlayerColor)reader.ReadInt32();
+                            buildings[j] = (Building)reader.ReadInt32();
+                        }
+                    }
+                    if (index)
+                    {
+                        if (i % 2 == 0)
+                        {
                             ValidateTile(new(positions[0], r), r);
                         } else
                         {
-                            int nbTiles = reader.ReadInt16();
-                            Vector2Int[] positions = new Vector2Int[nbTiles];
-                            for(int j = 0; i < nbTiles; j++)
-                            {
-                                positions[i] = new(reader.ReadInt16(), reader.ReadInt16());
-                            }
-                            int playerID = reader.ReadInt16();
-                            Building[] b = new Building[nbTiles];
-                            for(int j = 0;  j < nbTiles; j++)
-                            {
-                                reader.ReadInt16();
-                                reader.ReadInt16();
-                                bool bl = reader.ReadBoolean();
-                                if(bl)
-                                    reader.ReadInt16();
-                                b[i] = (Building)reader.ReadInt16();
-                            }
-                            ValidateBuilding(gameBoard.WorldMap[positions[0]], b[0]);
+                            ValidateBuilding(gameBoard.WorldMap[positions[0]], buildings[0]);
                         }
+                    } else
+                    {
+                        if(i % 2 == 0)
+                        {
+                            if (boolean)
+                            {
+                                historic.Add(new(positions, r, actualPlayer, new(chunk), newCells, buildings));
+                            } else
+                            {
+                                historic.Add(new(positions, r, actualPlayer, new(chunk)));
+                            }
+                        } else
+                        {
+                            historic.Add(new(positions, null, actualPlayer, newCells, buildings));
+                        }
+                        
                     }
                 }
             }
@@ -365,8 +427,8 @@ namespace Taluva.Controller
         {
             if (actualPhase != TurnPhase.IAPlays)
             {
-                int precedantPhaseValue = ((int) actualPhase - 1) % Enum.GetNames(typeof(TurnPhase)).Length - 1;
-                actualPhase = (TurnPhase) precedantPhaseValue;
+                int precedantPhaseValue = ((int)actualPhase - 1) % Enum.GetNames(typeof(TurnPhase)).Length - 1;
+                actualPhase = (TurnPhase)precedantPhaseValue;
                 OnChangePhase(actualPhase);
             } else
             {
@@ -379,8 +441,8 @@ namespace Taluva.Controller
         {
             if (actualPhase != TurnPhase.IAPlays)
             {
-                int nextPhaseValue = ((int) actualPhase + 1) % (Enum.GetNames(typeof(TurnPhase)).Length - 1);
-                actualPhase = (TurnPhase) nextPhaseValue;
+                int nextPhaseValue = ((int)actualPhase + 1) % (Enum.GetNames(typeof(TurnPhase)).Length - 1);
+                actualPhase = (TurnPhase)nextPhaseValue;
 
                 if (actualPhase == TurnPhase.PlaceBuilding)
                 {
@@ -417,8 +479,7 @@ namespace Taluva.Controller
                 }
 
                 pile.Stack(c.chunk);
-            }
-            else
+            } else
             {
                 ActualPlayerIndex = Array.IndexOf(players, c.player);
                 for (int i = 0; i < c.cells.Length; i++)
@@ -461,18 +522,14 @@ namespace Taluva.Controller
                 }
             } else
             {
-                gameBoard.AddChunk(c.chunk, c.player, new(c.positions[0], (Rotation)c.rotation), (Rotation)c.rotation);
-            }
-            else
-            {
-                gameBoard.AddChunk(c.chunk, c.player, new(c.positions[0], (Rotation) c.rotation),
-                    (Rotation) c.rotation);
+                gameBoard.AddChunk(c.chunk, c.player, new(c.positions[0], (Rotation)c.rotation),
+                    (Rotation)c.rotation);
                 pile.Draw();
             }
 
             for (int i = 0; i < NbPlayers; i++)
                 if (actualPlayer == players[i])
-                    ActualPlayerIndex = NbPlayers;
+                    ActualPlayerIndex = i;
 
             NextPhase();
             return c;
@@ -597,13 +654,11 @@ namespace Taluva.Controller
                         }
 
                         return winner3;
-                    }
-                    else
+                    } else
                     {
                         return winner2;
                     }
-                }
-                else
+                } else
                 {
                     return winner1;
                 }
@@ -622,7 +677,7 @@ namespace Taluva.Controller
             {
                 ActualPlayerIndex = 0;
             }
-            
+
             if (actualPlayer.Eliminated)
             {
                 ActualPlayerIndex++;
@@ -638,8 +693,7 @@ namespace Taluva.Controller
             {
                 actualPhase = TurnPhase.IAPlays;
                 AIMove(ai);
-            }
-            else
+            } else
             {
                 NextPhase();
             }
@@ -680,17 +734,17 @@ namespace Taluva.Controller
         {
             OnChangePhase(TurnPhase.IAPlays);
             actualPhase = TurnPhase.IAPlays;
-            PointRotation pr = ((AI) actualPlayer).PlayChunk();
+            PointRotation pr = ((AI)actualPlayer).PlayChunk();
             Rotation r = Rotation.N;
             for (int i = 0; i < 6; i++)
             {
                 if (pr.rotations[i])
-                    r = (Rotation) i;
+                    r = (Rotation)i;
             }
 
             OnAIChunkPlacement(pr);
             ValidateTile(pr, r);
-            (Building b, Vector2Int pos) = ((AI) actualPlayer).PlayBuild();
+            (Building b, Vector2Int pos) = ((AI)actualPlayer).PlayBuild();
             PointRotation p = new PointRotation(pos);
             Cell c = gameBoard.WorldMap[p.point];
             OnAIBuildingPlacement(b, pos);

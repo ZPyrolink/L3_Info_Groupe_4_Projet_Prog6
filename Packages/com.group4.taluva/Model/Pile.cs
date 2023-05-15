@@ -20,6 +20,17 @@ namespace Taluva.Model
             _stack = new(list.OrderBy(_ => random.Next()));
         }
 
+        public Pile(List<T> list)
+        {
+            _stack = new(list.Count);
+            _played = new();
+
+            foreach(T item in list)
+            {
+                _stack.Push(item);
+            }
+        }
+
         public T Draw()
         {
             T c = _stack.Pop();
