@@ -1,4 +1,3 @@
-﻿
 using System;
 
 using Taluva.Utils;
@@ -23,5 +22,16 @@ namespace Taluva.Model
     public static class BiomeColorExt
     {
         public static Color GetColor(this BiomeColor bc) => ColorUtils.From((uint) bc);
+
+        public static Biomes Of(Color c) => (BiomeColor) (uint) c.ToInt() switch
+        {
+            BiomeColor.Plain => Biomes.Plain,
+            BiomeColor.Forest => Biomes.Forest,
+            BiomeColor.Lake => Biomes.Lake,
+            BiomeColor.Desert => Biomes.Desert,
+            BiomeColor.Mountain => Biomes.Mountain,
+            BiomeColor.Volcano => Biomes.Volcano,
+            _ => Biomes.None
+        };
     }
 }

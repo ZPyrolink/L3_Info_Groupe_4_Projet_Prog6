@@ -1,234 +1,218 @@
 using System;
 
 using Taluva.Model;
-using Taluva.Utils;
 
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-using UnityUtils.GameObjects;
+using Utils;
 
-using GameObject = UnityEngine.GameObject;
-using Random = UnityEngine.Random;
+using Wrapper;
 
 namespace UI
 {
-    public class UiMgr : MonoBehaviour
+    public class UiMgr : MonoBehaviourMgr<UiMgr>
     {
-        [Serializable]
-        public class Player
-        {
-            [SerializeField]
-            private string name;
-
-            public string Name => name;
-
-            [SerializeField]
-            private Color color;
-
-            public Color Color => color;
-
-            [SerializeField]
-            private int[] builds;
-
-            public int[] Builds => builds;
-
-            public Player(string name, Color color, int[] builds)
-            {
-                this.name = name;
-                this.color = color;
-                this.builds = builds;
-            }
-        }
-
-        [SerializeField]
-        private Player[] players =
-        {
-            new("P1", PlayerColor.Red.GetColor(), new[] { 0, 1, 2 }),
-            new("P2", PlayerColor.Green.GetColor(), new[] { 1, 1, 2 }),
-            new("P3", PlayerColor.Blue.GetColor(), new[] { 2, 1, 2 }),
-            new("P4", PlayerColor.Yellow.GetColor(), new[] { 3, 1, 2 })
-        };
-
-        [SerializeField]
-        private int currentPlayerIndex;
-
-        public int CurrentPlayerIndex
-        {
-            get => currentPlayerIndex;
-            set
-            {
-                if (value >= players.Length)
-                    currentPlayerIndex = 0;
-                else if (value < 0)
-                    currentPlayerIndex = players.Length - 1;
-                else
-                    currentPlayerIndex = value;
-            }
-        }
-
         [SerializeField]
         private Text uiNbTiles;
 
         private const string NB_TILES_PLACEHOLDER = "%nb% tuiles restantes";
 
-        [SerializeField]
-        private int nbTilesPerPlayers = 12;
-
-        private int _nbTiles;
-
         private int NbTiles
         {
-            get => _nbTiles;
-            set
-            {
-                _nbTiles = value;
-                uiNbTiles.text = NB_TILES_PLACEHOLDER.Replace("%nb%", value.ToString());
-            }
+            get => GameMgr.Instance.pile.NbKeeping;
+            set => uiNbTiles.text = NB_TILES_PLACEHOLDER.Replace("%nb%", value.ToString());
         }
-
-        private Player CurrentPlayer => players[currentPlayerIndex];
 
         [SerializeField]
         private GameObject playerPrefab;
 
         private readonly GameObject[] _guis = new GameObject[4];
 
+        [FormerlySerializedAs("currentPlayerBuild")]
         [SerializeField]
-        private Text[] currentPlayerBuild;
+        private Text[] currentPlayerBuildCount;
 
         [SerializeField]
-        private GameObject tile, builds;
+        private GameObject currentTile,
+            builds;
+
+        public GameObject CurrentTile => currentTile.transform.GetChild(0).gameObject;
+
+        private float _defaultBuildsY;
 
         [SerializeField]
-        private GameObject menuCanva; 
-
-        [Header("Debug keys")]
-        [SerializeField]
-        private KeyCode phase1 = KeyCode.Keypad1;
+        private GameObject menuCanva;
 
         [SerializeField]
-        private KeyCode phase2 = KeyCode.Keypad2,
-            nextPlayer = KeyCode.KeypadEnter,
-            nextPhase = KeyCode.Return,
-            menu = KeyCode.Escape;
+        private KeyCode nextPhase = KeyCode.Return, menu = KeyCode.Escape;
 
-        private sbyte _phase;
-        private sbyte Phase
+        [SerializeField]
+        private Button validateButton;
+
+        public bool EnableValidateBtn
         {
-            get => _phase;
-            set
-            {
-                switch (value)
-                {
-                    case > 2:
-                        NextPlayer();
-                        _phase = 1;
-                        break;
-                    case <= 0:
-                        PreviousPlayer();
-                        _phase = 2;
-                        break;
-                    default:
-                        _phase = value;
-                        break;
-                }
-
-                (_phase switch
-                {
-                    1 => Phase1,
-                    2 => Phase2,
-                    _ => (Action) null
-                })?.Invoke();
-            }
+            set => validateButton.interactable = value;
         }
 
         #region Unity events
 
+        protected override void Awake()
+        {
+            base.Awake();
+            SetUpGui();
+        }
+
         private void Start()
         {
-            Phase = 1;
-            NbTiles = nbTilesPerPlayers * players.Length;
+            NbTiles = NbTiles;
+            _defaultBuildsY = builds.transform.GetChild(0).GetComponent<RectTransform>().anchoredPosition.y;
         }
 
         private void Update()
         {
-            if (Input.GetKeyDown(nextPlayer))
-                NextPlayer();
-
             if (Input.GetKeyDown(nextPhase))
                 Next();
 
-            if (Input.GetKeyDown(phase1))
-                Phase = 1;
-
-            if (Input.GetKeyDown(phase2))
-                Phase = 2;
-            
             if (Input.GetKeyDown(menu))
                 ToggleMenu();
         }
 
-        // Start is called before the first frame update
-        private void OnGUI()
+        #endregion
+
+        private void SetUpGui()
         {
-            for (int i = 0; i < players.Length; i++)
+            for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
             {
-                _guis[i] ??= Instantiate(playerPrefab, transform);
-
-                _guis[i].GetComponent<Image>().color = i == currentPlayerIndex ? Color.white : new(.75f, .75f, .75f);
-
-                _guis[i].transform.GetChild(0).GetComponent<Text>().text = players[i].Name;
-                _guis[i].transform.GetChild(1).GetComponent<Image>().color = players[i].Color;
-
-                _guis[i].transform.GetChild(2).GetComponentInChildren<Text>().text = players[i].Builds[0].ToString();
-                _guis[i].transform.GetChild(3).GetComponentInChildren<Text>().text = players[i].Builds[1].ToString();
-                _guis[i].transform.GetChild(4).GetComponentInChildren<Text>().text = players[i].Builds[2].ToString();
-
+                _guis[i] = Instantiate(playerPrefab, transform);
                 RectTransform rt = _guis[i].GetComponent<RectTransform>();
 
                 rt.pivot = Vector2.one;
                 rt.anchorMin = Vector2.one;
                 rt.anchorMax = Vector2.one;
                 rt.anchoredPosition = new(-10, -10 - 110 * i);
-            }
 
-            currentPlayerBuild[0].text = CurrentPlayer.Builds[0].ToString();
-            currentPlayerBuild[1].text = CurrentPlayer.Builds[1].ToString();
-            currentPlayerBuild[2].text = CurrentPlayer.Builds[2].ToString();
+                foreach (MeshRenderer mr in _guis[i].GetComponentsInChildren<MeshRenderer>())
+                    mr.material.color = GameMgr.Instance.players[i].ID.GetColor();
+
+                _guis[i].transform.GetChild(0).GetComponent<Text>().text = $"Player {i}";
+                _guis[i].transform.GetChild(1).GetComponent<Image>().color = GameMgr.Instance.players[i].ID.GetColor();
+            }
         }
 
-        #endregion
-
-        public void Next() => Phase++;
-
-        private void Phase1()
+        public void UpdateCurrentPlayer()
         {
-            BiomeColor[] values = (BiomeColor[]) Enum.GetValues(typeof(BiomeColor));
-            MeshRenderer mr = tile.transform.GetComponentInChildren<MeshRenderer>();
-            mr.materials[1].color = values[Random.Range(0, values.Length - 1)].GetColor();
-            mr.materials[2].color = values[Random.Range(0, values.Length - 1)].GetColor();
-            mr.materials[3].color = values[Random.Range(0, values.Length - 1)].GetColor();
-            tile.SetActive(true);
+            for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
+            {
+                _guis[i].GetComponent<Image>().color =
+                    i == GameMgr.Instance.ActualPlayerIndex ? Color.white : new(.75f, .75f, .75f);
+
+                foreach (Animator anim in _guis[i].GetComponentsInChildren<Animator>())
+                    if (GameMgr.Instance.ActualPlayerIndex == i)
+                    {
+                        anim.enabled = true;
+                    }
+                    else
+                    {
+                        anim.enabled = false;
+                        anim.transform.localRotation = Quaternion.Euler(-90, 0, 0);
+                    }
+            }
+        }
+
+        public void UpdatePlayersBuild()
+        {
+            for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
+            {
+                _guis[i].transform.GetChild(2).GetComponentInChildren<Text>().text =
+                    GameMgr.Instance.players[i].nbBarrack.ToString();
+                _guis[i].transform.GetChild(3).GetComponentInChildren<Text>().text =
+                    GameMgr.Instance.players[i].nbTowers.ToString();
+                _guis[i].transform.GetChild(4).GetComponentInChildren<Text>().text =
+                    GameMgr.Instance.players[i].nbTemple.ToString();
+            }
+        }
+
+        public void UpdateCurrentPlayerBuild()
+        {
+            currentPlayerBuildCount[0].text = GameMgr.Instance.actualPlayer.nbBarrack.ToString();
+            currentPlayerBuildCount[1].text = GameMgr.Instance.actualPlayer.nbTowers.ToString();
+            currentPlayerBuildCount[2].text = GameMgr.Instance.actualPlayer.nbTemple.ToString();
+        }
+
+        public void Next()
+        {
+            (GameMgr.Instance.actualPhase switch
+            {
+                TurnPhase.SelectCells => (Action) TilesMgr.Instance.ValidateTile,
+                TurnPhase.PlaceBuilding => TilesMgr.Instance.ValidateBuild
+            }).Invoke();
+        }
+
+        public void Phase1()
+        {
+            UpdateCurrentPlayer();
+            UpdatePlayersBuild();
+
+            if (NbTiles == ListeChunk.Count)
+                TilesMgr.Instance.SetFeedForward(Vector3.zero);
+            else
+                TilesMgr.Instance.SetFeedForwards1();
+
+            CurrentTile.SetActive(true);
+
+            MeshRenderer mr = currentTile.transform.GetComponentInChildren<MeshRenderer>();
+            mr.materials[0].color = GameMgr.Instance.actualChunk.Coords[1].ActualBiome.GetColor();
+            mr.materials[2].color = Biomes.Volcano.GetColor();
+            mr.materials[3].color = GameMgr.Instance.actualChunk.Coords[2].ActualBiome.GetColor();
+
+            currentTile.SetActive(true);
             builds.SetActive(false);
         }
 
-        private void Phase2()
+        public void Phase2()
         {
-            tile.SetActive(false);
+            UpdateCurrentPlayerBuild();
+            currentTile.SetActive(false);
             builds.SetActive(true);
+
+            foreach (MeshRenderer mr in builds.GetComponentsInChildren<MeshRenderer>())
+                mr.material.color = GameMgr.Instance.actualPlayer.ID.GetColor();
+
             NbTiles--;
+            UpBuild(0);
         }
 
-        public void Undo() => Phase--;
-        public void Redo() => Phase++;
-
-        private void NextPlayer() => CurrentPlayerIndex++;
-        private void PreviousPlayer() => CurrentPlayerIndex--;
+        public void Undo() => GameMgr.Instance.Undo();
+        public void Redo() => GameMgr.Instance.Redo();
 
         public void ToggleMenu()
         {
             menuCanva.SetActive(!menuCanva.activeSelf);
+        }
+
+        public void UpBuild(int i)
+        {
+            RectTransform child;
+            Animator anim;
+
+            foreach (Transform t in builds.transform)
+            {
+                child = t.GetComponent<RectTransform>();
+                child.anchoredPosition = child.anchoredPosition.With(y: _defaultBuildsY);
+
+                anim = t.GetComponentInChildren<Animator>();
+                anim.enabled = false;
+                anim.transform.localRotation = Quaternion.Euler(-90, -90, 0);
+            }
+
+            TilesMgr.Instance.SetFeedForwards2((Building) i + 1);
+
+            child = builds.transform.GetChild(i).GetComponent<RectTransform>();
+            child.anchoredPosition = child.anchoredPosition.With(y: 20);
+            anim = child.GetComponentInChildren<Animator>();
+            anim.enabled = true;
         }
     }
 }

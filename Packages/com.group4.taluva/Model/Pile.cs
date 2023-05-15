@@ -32,5 +32,7 @@ namespace Taluva.Model
             _stack.Push(chunk);
             _played.Remove(chunk);
         }
+
+        public int NbKeeping => _stack.Count;
     }
 }

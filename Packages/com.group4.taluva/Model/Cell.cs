@@ -19,7 +19,7 @@
             this.ActualBiome = c.ActualBiome;
             this.ActualBuildings = c.ActualBuildings;
             this.Owner = c.Owner;
-            this.ParentCunk = c.ParentCunk;
+            this.ParentCunk = new(c.ParentCunk);
         }
 
         public Cell(Biomes biome)
