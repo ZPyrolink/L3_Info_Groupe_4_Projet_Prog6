@@ -78,10 +78,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         if (_currentPreviews is null)
         {
             GameObject tmp = UiMgr.Instance.CurrentTile;
-            _currentPreviews = new[]
-            {
-                Instantiate(tmp, boardParent)
-            };
+            _currentPreviews = new[] { Instantiate(tmp, boardParent) };
             tmp.SetActive(false);
             _currentPreviews[0].transform.localScale = new(100, 100, 100);
             _currentPreviews[0].layer = LayerMask.NameToLayer("Default");
@@ -117,7 +114,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
         Rotation rot = RotationExt.Of(Mathf.Round(_currentPreviews[0].transform.rotation.eulerAngles.y));
 
-        _currentPreviews[0] = null;
+        _currentPreviews = null;
         GameMgr.Instance.Phase1(new(_gos[_currentFf].point, rot), rot);
     }
 
@@ -125,7 +122,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     {
         Vector2Int currentPos = _gos[_currentFf].point;
         List<Vector2Int> tmp = GameMgr.Instance.FindBiomesAroundVillage(currentPos);
-        if (_currentPreviews.Length < tmp.Count)
+        if (_currentPreviews is null || _currentPreviews.Length < tmp.Count)
             _currentPreviews = new GameObject[tmp.Count];
 
         for (int i = 0; i < tmp.Count; i++)
@@ -147,7 +144,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                     mat.color = GameMgr.Instance.actualPlayer.ID.GetColor().With(a: .75f);
                 }
             }
-            
+
             _currentPreviews[i].transform.position = _gos
                 .First(go => go.Value.point == tmp[i])
                 .Key.transform.position;
@@ -203,10 +200,11 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     public void SetFeedForwards2(Building build)
     {
-        if (_currentPreviews[0] is not null)
+        if (_currentPreviews is not null)
         {
-            Destroy(_currentPreviews[0]);
-            _currentPreviews[0] = null;
+            foreach (GameObject go in _currentPreviews)
+                Destroy(go);
+            _currentPreviews = null;
         }
 
         ClearFeedForward();
@@ -243,5 +241,15 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         _gos = new();
         foreach (Transform t in feedForwardParent)
             Destroy(t.gameObject);
+    }
+
+    public void RemoveTile(Vector2Int pos)
+    {
+        Vector3 p = new(pos.x, 0, pos.y);
+        if (!GameMgr.Instance.IsVoid(pos))
+            p.y = GameMgr.Instance.LevelAt(pos) * yOffset;
+        p.Scale(new(xOffset, 1, zOffset));
+
+        Destroy(boardParent.transform.Cast<Transform>().First(t => t.position == p).gameObject);
     }
 }
