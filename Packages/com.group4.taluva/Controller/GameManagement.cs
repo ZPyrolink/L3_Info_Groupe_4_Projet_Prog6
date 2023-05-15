@@ -556,7 +556,7 @@ namespace Taluva.Controller
 
         public Player CheckWinner()
         {
-            Player p;
+            Player p = null;
             if (maxTurn == 0)
             {
                 p = NormalEnd;
@@ -573,13 +573,14 @@ namespace Taluva.Controller
             }
 
             var tmp2 = players.Where(p => !p.Eliminated);
-
+     
             if (tmp2.Count() == 1)
             {
+                p = tmp2.First();
                 OnEndGame(tmp2.First(), GameEnd.LastPlayerStanding);
             }
 
-            return null;
+            return p;
         }
 
         private Player EarlyEnd
