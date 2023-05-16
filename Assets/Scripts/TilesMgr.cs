@@ -103,7 +103,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         UiMgr.Instance.EnableValidateBtn = true;
     }
 
-    public void ValidateTile()
+    public void ValidateTile(bool sendToLogic = true)
     {
         Material[] mats = _currentPreviews[0].GetComponent<MeshRenderer>().materials;
         foreach (Material mat in mats.Where((_, i) => i != 1))
@@ -115,7 +115,30 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         Rotation rot = RotationExt.Of(Mathf.Round(_currentPreviews[0].transform.rotation.eulerAngles.y));
 
         _currentPreviews = null;
-        GameMgr.Instance.Phase1(new(_gos[_currentFf].point, rot), rot);
+        if (sendToLogic)
+            GameMgr.Instance.Phase1(new(_gos[_currentFf].point, rot), rot);
+    }
+
+    public void ReputTile(Vector2Int pos, Rotation rot)
+    {
+        _gos = null;
+        Vector3 p = new(pos.x, 0, pos.y);
+        if (!GameMgr.Instance.IsVoid(pos))
+            p.y = (GameMgr.Instance.LevelAt(pos) - 1) * yOffset;
+        p.Scale(new(xOffset, 1, zOffset));
+
+        if (pos.x % 2 != 0)
+            p.z += zOffset / 2;
+
+        _currentFf = new();
+        _gos = new()
+        {
+            [_currentFf] = new(pos, rot)
+        };
+        PutTile(p);
+        ValidateTile(false);
+        Destroy(_currentFf);
+        _currentFf = null;
     }
 
     private void PutBuild(Vector3 pos)
@@ -156,7 +179,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         UiMgr.Instance.EnableValidateBtn = true;
     }
 
-    public void ValidateBuild()
+    public void ValidateBuild(bool sendToLogic = true)
     {
         foreach (GameObject currentPreview in _currentPreviews)
         {
@@ -169,7 +192,23 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         }
 
         _currentPreviews = null;
-        GameMgr.Instance.Phase2(new(_gos[_currentFf].point), _currentBuild);
+        if (sendToLogic)
+            GameMgr.Instance.Phase2(new(_gos[_currentFf].point), _currentBuild);
+    }
+
+    public void ReputBuild(Vector2Int pos)
+    {
+        _gos = null;
+        Vector3 p = new(pos.x, 0, pos.y);
+        if (!GameMgr.Instance.IsVoid(pos))
+            p.y = GameMgr.Instance.LevelAt(pos) * yOffset;
+        p.Scale(new(xOffset, 1, zOffset));
+
+        if (pos.x % 2 != 0)
+            p.z += zOffset / 2;
+
+        PutBuild(p);
+        ValidateBuild(false);
     }
 
     private void RotateTile()
