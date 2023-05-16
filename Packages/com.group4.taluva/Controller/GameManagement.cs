@@ -560,10 +560,6 @@ namespace Taluva.Controller
                     (Rotation) c.rotation);
             }
 
-            for (int i = 0; i < NbPlayers; i++)
-                if (actualPlayer == players[i])
-                    ActualPlayerIndex = i;
-
             NextPhase();
             return c;
         }
