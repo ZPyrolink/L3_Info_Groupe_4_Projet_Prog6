@@ -201,7 +201,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         _gos = null;
         Vector3 p = new(pos.x, 0, pos.y);
         if (!GameMgr.Instance.IsVoid(pos))
-            p.y = GameMgr.Instance.LevelAt(pos) * yOffset;
+            p.y = (GameMgr.Instance.LevelAt(pos) + 1) * yOffset;
         p.Scale(new(xOffset, 1, zOffset));
 
         if (pos.x % 2 != 0)
