@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 
 using Taluva.Utils;
 
@@ -7,6 +6,9 @@ using UnityEngine;
 
 namespace Taluva.Model
 {
+    /// <summary>
+    /// [Obsolete] Use the Biome enum instead!
+    /// </summary>
     [Obsolete("Use the Biome enum instead!")]
     public enum BiomeColor : uint
     {
@@ -19,9 +21,16 @@ namespace Taluva.Model
         None = 0xFFFFFFFF
     }
 
+    /// <summary>
+    /// [Obsolete] Use the BiomeExt instead!
+    /// </summary>
     [Obsolete("Use the BiomeExt instead!")]
     public static class BiomeColorExt
     {
-        public static Color GetColor(this BiomeColor bc) => ColorUtils.From((uint) bc);
+        /// <summary>
+        /// [Obsolete] Use the GetColor() method from the BiomeExt class instead!
+        /// </summary>
+        [Obsolete("Use the GetColor() method from the BiomeExt class instead!")]
+        public static Color GetColor(this BiomeColor bc) => ColorUtils.From((uint)bc);
     }
 }

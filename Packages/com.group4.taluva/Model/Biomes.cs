@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace Taluva.Model
 {
+    /// <summary>
+    /// Represents the different biomes in the game.
+    /// </summary>
     public enum Biomes
     {
         None,
@@ -17,6 +20,9 @@ namespace Taluva.Model
         Volcano
     }
 
+    /// <summary>
+    /// Extension class for the Biomes enum providing color information for each biome.
+    /// </summary>
     public static class BiomeExt
     {
         private static readonly Dictionary<Biomes, Color> Colors = new()
@@ -30,6 +36,11 @@ namespace Taluva.Model
             [Biomes.None] = ColorUtils.From(0xFFFFFFFF)
         };
 
+        /// <summary>
+        /// Gets the color associated with a specific biome.
+        /// </summary>
+        /// <param name="bc">The biome.</param>
+        /// <returns>The color associated with the biome.</returns>
         public static Color GetColor(this Biomes bc) => Colors[bc];
     }
 }

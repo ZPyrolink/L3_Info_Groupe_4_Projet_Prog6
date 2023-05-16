@@ -15,6 +15,9 @@ using System.Globalization;
 
 namespace Taluva.Controller
 {
+    /// <summary>
+    /// Manages the overall game logic and flow.
+    /// </summary>
     public class GameManagment
     {
         private readonly string savePath = Directory.GetCurrentDirectory() + "/Save/";
@@ -32,22 +35,17 @@ namespace Taluva.Controller
         public Chunk actualChunk;
         private bool AIRandom = false;
         private Player Winner { get; set; }
-        //Actions
-        //Notify phase change
-        public Action<TurnPhase> ChangePhase { get; set; }
-        private void OnChangePhase(TurnPhase phase) => ChangePhase?.Invoke(phase);
-        
-        //Notify end of game
-        public Action<bool> NotifyEndGame { get; set; }
-        private void OnEndGame(bool endgame) => NotifyEndGame?.Invoke(endgame);
-        
-        //Notify where the AI places the chunk
-        public Action<PointRotation> NotifyAIChunkPlacement { get; set; }
-        private void OnAIChunkPlacement(PointRotation pr) => NotifyAIChunkPlacement?.Invoke(pr);
-        //Notify where the AI places the building
-        public Action<(Building, Vector2Int)> NotifyAIBuildingPlacement { get; set; }
-        private void OnAIBuildingPlacement(Building b, Vector2Int pos) => NotifyAIBuildingPlacement?.Invoke((b, pos));
 
+        // Actions
+        public Action<TurnPhase> ChangePhase { get; set; }
+        public Action<bool> NotifyEndGame { get; set; }
+        public Action<PointRotation> NotifyAIChunkPlacement { get; set; }
+        public Action<(Building, Vector2Int)> NotifyAIBuildingPlacement { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the GameManagment class with the specified number of players.
+        /// </summary>
+        /// <param name="nbPlayers">The number of players in the game.</param>
         public GameManagment(int nbPlayers)
         {
             historic = new();
@@ -56,28 +54,36 @@ namespace Taluva.Controller
             this.gameBoard = new();
             this.NbPlayers = nbPlayers;
             this.maxTurn = 12 * nbPlayers;
-            for (int i = 0; i < this.NbPlayers; i++) {
+
+            for (int i = 0; i < this.NbPlayers; i++)
+            {
                 players[i] = new((PlayerColor)i);
-                if (this.AIRandom && i == 1) {
+                if (this.AIRandom && i == 1)
+                {
                     players[i].playerIA = true;
                     break;
                 }
             }
+
             actualPlayer = players[0];
         }
 
+        /// <summary>
+        /// Sets the game to have AI players and randomizes the number of players to 2.
+        /// </summary>
         public void setAI()
         {
             this.AIRandom = true;
             this.NbPlayers = 2;
         }
+
+        /// <summary>
+        /// Represents a move made by a player.
+        /// </summary>
         public class Coup
         {
-            //New Chunk or cells
             public Vector2Int[] positions;
             public Rotation? rotation;
-
-            //Last Chunk or last cells
             public Cell[] cells;
             public Chunk chunk;
             public Player player;
@@ -90,19 +96,46 @@ namespace Taluva.Controller
                 this.player = actualPlayer;
             }
 
-            public Coup(Vector2Int[] positions, Rotation rotation, Player actualPlayer, Chunk chunk) : this(positions, rotation, actualPlayer)
+            /// <summary>
+            /// Initializes a new instance of the Coup class for placing a chunk on the board.
+            /// </summary>
+            /// <param name="positions">The positions of the chunk on the board.</param>
+            /// <param name="rotation">The rotation of the chunk.</param>
+            /// <param name="actualPlayer">The player making the move.</param>
+            /// <param name="chunk">The chunk being placed.</param>
+            public Coup(Vector2Int[] positions, Rotation rotation, Player actualPlayer, Chunk chunk) : this(positions,
+                rotation, actualPlayer)
             {
                 this.chunk = chunk;
                 this.cells = new Cell[1];
                 cells[0] = null;
             }
 
-            public Coup(Vector2Int[] positions, Rotation rotation, Player actualPlayer, Chunk chunk, Cell[] cells, Building[] b) : this(positions, rotation, actualPlayer, cells, b)
+            /// <summary>
+            /// Initializes a new instance of the Coup class for placing buildings on the board.
+            /// </summary>
+            /// <param name="positions">The positions of the buildings on the board.</param>
+            /// <param name="rotation">The rotation of the chunk.</param>
+            /// <param name="actualPlayer">The player making the move.</param>
+            /// <param name="chunk">The chunk associated with the placement.</param>
+            /// <param name="cells">The cells affected by the placement.</param>
+            /// <param name="b">The buildings being placed.</param>
+            public Coup(Vector2Int[] positions, Rotation rotation, Player actualPlayer, Chunk chunk, Cell[] cells,
+                Building[] b) : this(positions, rotation, actualPlayer, cells, b)
             {
                 this.chunk = chunk;
             }
 
-            public Coup(Vector2Int[] positions, Rotation? rotation, Player actualPlayer, Cell[] cells, Building[] b) : this(positions, rotation, actualPlayer)
+            /// <summary>
+            /// Initializes a new instance of the Coup class for placing buildings on the board.
+            /// </summary>
+            /// <param name="positions">The positions of the buildings on the board.</param>
+            /// <param name="rotation">The rotation of the chunk.</param>
+            /// <param name="actualPlayer">The player making the move.</param>
+            /// <param name="cells">The cells affected by the placement.</param>
+            /// <param name="b">The buildings being placed.</param>
+            public Coup(Vector2Int[] positions, Rotation? rotation, Player actualPlayer, Cell[] cells, Building[] b) :
+                this(positions, rotation, actualPlayer)
             {
                 this.cells = cells;
                 building = b;
@@ -110,51 +143,59 @@ namespace Taluva.Controller
         }
 
         /// <summary>
-        /// Check if we can undo
+        /// Checks if the game can be undone.
         /// </summary>
         public bool CanUndo => historic.CanUndo;
 
         /// <summary>
-        /// Check if we can redo
+        /// Checks if the game can be redone.
         /// </summary>
         public bool CanRedo => historic.CanRedo;
 
         /// <summary>
-        ///Saves in a file the history of all the actions of the game
+        /// Saves the game state.
         /// </summary>
         public void Save()
         {
-            using (FileStream file = File.Open(savePath + DateTime.Now.ToString(new CultureInfo("de-DE")), FileMode.Create, FileAccess.Write))
-            using (BinaryWriter writer = new(file)) {
+            using (FileStream file = File.Open(savePath + DateTime.Now.ToString(new CultureInfo("de-DE")),
+                       FileMode.Create, FileAccess.Write))
+            using (BinaryWriter writer = new(file))
+            {
                 writer.Write(NbPlayers);
-                for(int i = 0; i < NbPlayers; i++) {
+                for (int i = 0; i < NbPlayers; i++)
+                {
                     writer.Write((uint)players[i].ID);
                     writer.Write(players[i] is AI);
-                    // if (players[i].playerIA)
-                    //     writer.Write((int)players[i].difficulty);
                 }
-                
+
                 writer.Write(historic.Count);
-                for (int i = 0; i < historic.Count; i++) {
+                for (int i = 0; i < historic.Count; i++)
+                {
                     writer.Write(i == historic.Index);
                     writer.Write(historic[i].positions.Length);
-                    for (int j = 0; j < historic[i].positions.Length; j++) {
+                    for (int j = 0; j < historic[i].positions.Length; j++)
+                    {
                         writer.Write(historic[i].positions[i].x);
                         writer.Write(historic[i].positions[i].y);
                     }
+
                     writer.Write((int)historic[i].rotation);
                     writer.Write((uint)historic[i].player.ID);
-                    for(int j = 1; j < historic[i].chunk.Coords.Length; j++) {
+                    for (int j = 1; j < historic[i].chunk.Coords.Length; j++)
+                    {
                         writer.Write((int)historic[i].chunk.Coords[j].ActualBiome);
                         writer.Write((int)historic[i].chunk.Coords[j].ActualBuildings);
-                        if(historic[i].chunk.Coords[j].ActualBuildings != Building.None)
+                        if (historic[i].chunk.Coords[j].ActualBuildings != Building.None)
                             writer.Write((int)historic[i].chunk.Coords[j].Owner);
                     }
+
                     writer.Write((int)historic[i].chunk.rotation);
                     writer.Write((int)historic[i].chunk.Level);
                     writer.Write(historic[i].cells.Length > 0);
-                    if(historic[i].cells.Length > 0) {
-                        for(int j = 0; j < historic[i].cells.Length; j++) {
+                    if (historic[i].cells.Length > 0)
+                    {
+                        for (int j = 0; j < historic[i].cells.Length; j++)
+                        {
                             writer.Write((int)historic[i].cells[j].ActualBiome);
                             writer.Write((int)historic[i].cells[j].ActualBuildings);
                             if (historic[i].chunk.Coords[j].ActualBuildings != Building.None)
@@ -162,312 +203,74 @@ namespace Taluva.Controller
                             writer.Write((int)historic[i].building[j]);
                         }
                     }
+
                     i++;
                     if (i >= historic.Count)
                         break;
-
                     writer.Write(i == historic.Index);
-                    for (int j = 0; j < historic[i].positions.Length; j++) {
+                    for (int j = 0; j < historic[i].positions.Length; j++)
+                    {
                         writer.Write(historic[i].positions[j].x);
                         writer.Write(historic[i].positions[j].y);
                     }
+
                     writer.Write((int)historic[i].player.ID);
-                    for(int j = 0; j < historic[i].cells.Length; j++) {
+                    for (int j = 0; j < historic[i].cells.Length; j++)
+                    {
                         writer.Write((int)historic[i].cells[j].ActualBiome);
                         writer.Write((int)historic[i].cells[j].ActualBuildings);
                         if (historic[i].chunk.Coords[j].ActualBuildings != Building.None)
                             writer.Write((int)historic[i].chunk.Coords[j].Owner);
                         writer.Write((int)historic[i].building[j]);
                     }
-
-                    //T'ES GRAND AUJOURD'HUI! T'ES TRES GRAND!
-
-                }
-            }
-
-        }
-
-        /// <summary>
-        /// Use this when you're in phase 1 during the placement of the chunk.
-        /// It will also store the possible cells under the chunk.
-        /// </summary>
-        /// <param name="position">Position of the chunk</param>
-        /// <param name="rotation">Rotation of the chunk</param>
-        /// <param name="chunk">The chunk played at the round</param>
-        public void AddHistoric(Vector2Int position, Rotation rotation, Chunk chunk)
-        {
-            if (!gameBoard.WorldMap.IsVoid(position)) {
-                Vector2Int[] positions = gameBoard.GetChunksCoords(position, rotation);
-                Cell[] newCells = new Cell[gameBoard.WorldMap[position].ParentCunk.Coords.Length];
-                Building[] buildings = new Building[gameBoard.WorldMap[position].ParentCunk.Coords.Length];
-                for (int i = 0; i < gameBoard.WorldMap[position].ParentCunk.Coords.Length; i++) {
-                    newCells[i] = new(gameBoard.WorldMap[positions[i]].ParentCunk.Coords[i]);
-                    buildings[i] = gameBoard.WorldMap[positions[i]].ActualBuildings;
-                }
-                historic.Add(new(gameBoard.GetChunksCoords(position, rotation), rotation, actualPlayer, new(chunk), newCells, buildings));
-            } else {
-                historic.Add(new(new[] { position }, rotation, actualPlayer, new(chunk)));
-            }
-
-        }
-
-        /// <summary>
-        /// Use this when you're in phase 2 during the placement of a building.
-        /// It will store the different information on the cells.
-        /// </summary>
-        /// <param name="positions">Buildings positions</param>
-        /// <param name="cells">Cells with the buildings</param>
-        public void AddHistoric(Vector2Int[] positions, Cell[] cells, Building b)
-        {
-            Cell[] newCells = new Cell[cells.Length];
-            Building[] buildings = new Building[cells.Length];
-            for (int i = 0; i < cells.Length; i++) {
-                newCells[i] = new(cells[i]);
-                buildings[i] = b;
-            }
-            historic.Add(new(positions, null, actualPlayer, newCells, buildings));
-        }
-
-        /// <summary>
-        ///go back to the previous phase after a Undo
-        /// </summary>
-        public void PrecedentPhase()
-        {
-            int precedantPhaseValue = ((int)actualPhase + 1) % Enum.GetNames(typeof(TurnPhase)).Length - 1;
-            actualPhase = (TurnPhase)precedantPhaseValue;
-        }
-
-        /// <summary>
-        ///go to the next phase
-        /// </summary>
-        public void NextPhase()
-        {
-            int nextPhaseValue = ((int)actualPhase + 1) % Enum.GetNames(typeof(TurnPhase)).Length - 1;
-            actualPhase = (TurnPhase)nextPhaseValue;
-        }
-
-        /// <summary>
-        ///restore the previous moove, restore the pile, restore the players states and add this moove in the undo history
-        /// </summary> 
-        /// <returns>The last moove</returns>
-        public Coup Undo()
-        {
-            if (!historic.CanUndo)
-                return null;
-
-            Coup c = historic.Undo();
-            if (c.chunk != null) {
-                gameBoard.RemoveChunk(c.chunk);
-                if (c.cells[0] != null) {
-                    for (int i = 0; i < c.cells.Length; i++) {
-                        gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
-                        gameBoard.PlaceBuilding(c.cells[i], c.building[i], actualPlayer);
-                    }
-                }
-                pile.Stack(c.chunk);
-            } else {
-                actualPlayer = c.player;
-                for (int i = 0; i < c.cells.Length; i++) {
-                    switch (c.building[i]) {
-                        case Building.None:
-                            break;
-                        case Building.Temple:
-                            actualPlayer.nbTemple++; ;
-                            break;
-                        case Building.Tower:
-                            actualPlayer.nbTowers++;
-                            break;
-                        case Building.Barrack:
-                            actualPlayer.nbBarrack += gameBoard.WorldMap[c.positions[i]].ParentCunk.Level;
-                            break;
-                    }
-                    gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
-                }
-            }
-            PrecedentPhase();
-            return c;
-        }
-
-        /// <summary>
-        ///restore the last moove from the undo historic and add this moove in a redo history
-        /// </summary>
-        /// <returns>The last moove</returns>
-        public Coup Redo()
-        {
-            if (!historic.CanRedo)
-                return null;
-
-            Coup c = historic.Redo();
-            if (c.chunk == null) {
-                for (int i = 0; i < c.cells.Length; i++) {
-                    gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
-                    gameBoard.PlaceBuilding(c.cells[i], c.building[i], actualPlayer);
-                }
-            } else {
-                gameBoard.AddChunk(c.chunk, c.player, new(c.positions[0], (Rotation)c.rotation), (Rotation)c.rotation);
-                pile.Draw();
-            }
-            for (int i = 0; i < NbPlayers; i++)
-                if (actualPlayer == players[i])
-                    actualPlayer = players[i % NbPlayers];
-            
-            NextPhase();
-            return c;
-        }
-
-        /// <summary>
-        ///get the winner from the methodes earlyend or normalend
-        /// </summary>
-        /// <returns>The player returned by earlyend or normalend</returns>
-        public Player? GetWinner()
-        {
-            if (maxTurn == 0)
-            {
-                OnEndGame(true);
-                return NormalEnd; 
-            }
-
-            if (EarlyEnd != null)
-            {
-                OnEndGame(true);
-                return EarlyEnd;
-            }
-            return null;
-        }
-
-        /// <summary>
-        ///get the player who place all his building in at least 2 different types
-        /// </summary>
-        /// <returns>Return the winner</returns>
-        private Player? EarlyEnd
-        {
-            get
-            {
-                foreach (Player p in players) {
-                    int completedBuildingTypes = 0;
-
-                    if (gameBoard.GetTempleSlots(p).Length == p.nbTemple)
-                        completedBuildingTypes++;
-
-                    if (gameBoard.GetBarrackSlots(p).Length == p.nbBarrack)
-                        completedBuildingTypes++;
-
-                    if (gameBoard.GetTowerSlots(p).Length == p.nbTowers)
-                        completedBuildingTypes++;
-
-                    if (completedBuildingTypes >= 2)
-                        return p;
-                }
-
-                throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        ///Return the player who win the game after there is no longer piece in the stack by calculing who built most builds. Take into account egality. 
-        /// </summary>
-        /// <returns>Return the winner</returns>
-        private Player NormalEnd
-        {
-            get
-            {
-                int maxTemple = 0;
-                Player winner1 = null;
-                foreach (Player p in players) {
-                    if (p.nbBarrack == 0)
-                        continue;
-
-                    if (p.nbTemple > maxTemple) {
-                        maxTemple = p.nbTemple;
-                        winner1 = p;
-                    }
-                }
-
-                int egalityTemple = 0;
-                foreach (Player p in players) {
-                    if (p.nbBarrack == 0)
-                        continue;
-                    if (p.nbTemple == maxTemple)
-                        egalityTemple++;
-                }
-
-                if (egalityTemple >= 2) {
-                    int maxTower = 0;
-                    Player winner2 = null;
-                    foreach (Player p in players) {
-                        if (p.nbBarrack == 0)
-                            continue;
-                        if (p.nbTemple > maxTower) {
-                            maxTower = p.nbTemple;
-                            winner2 = p;
-                        }
-                    }
-
-                    int egalityTower = 0;
-                    foreach (Player p in players) {
-                        if (p.nbBarrack == 0)
-                            continue;
-                        if (p.nbTemple == maxTemple)
-                            egalityTower++;
-                    }
-
-                    if (egalityTower >= 2) {
-                        int maxBarrack = 0;
-                        Player winner3 = null;
-                        foreach (Player p in players) {
-                            if (p.nbBarrack == 0)
-                                continue;
-                            if (p.nbTemple > maxBarrack) {
-                                maxBarrack = p.nbTemple;
-                                winner3 = p;
-                            }
-                        }
-
-                        return winner3;
-                    } else {
-                        return winner2;
-                    }
-                } else {
-                    return winner1;
                 }
             }
         }
+
         /// <summary>
-        ///The Moove, the selction of who's playing
+        /// Initiates the play of the game.
         /// </summary>
         public void InitPlay()
         {
-            if (GetWinner() != null) {
+            if (GetWinner() != null)
+            {
                 EndGame();
                 OnEndGame(true);
                 return;
             }
+
             actualTurn++;
             this.actualChunk = pile.Draw();
-            if (actualTurn + 1 > NbPlayers) {
+            if (actualTurn + 1 > NbPlayers)
+            {
                 actualTurn = 0;
             }
 
             actualPlayer = players[actualTurn];
 
-            if (actualPlayer.nbBarrack == 0 && actualPlayer != Winner) {
+            if (actualPlayer.nbBarrack == 0 && actualPlayer != Winner)
+            {
                 actualTurn++;
-                if (actualTurn + 1 > NbPlayers) {
+                if (actualTurn + 1 > NbPlayers)
+                {
                     actualTurn = 0;
                 }
+
                 actualPlayer = players[actualTurn];
             }
 
-            if (actualPlayer is AI ai) {
+            if (actualPlayer is AI ai)
+            {
                 AIMove(ai);
-            } else {
+            }
+            else
+            {
                 OnChangePhase(TurnPhase.SelectCells);
-                // Phase1();
             }
         }
 
         /// <summary>
-        ///notify view to end game
+        /// Ends the game and determines the winner.
         /// </summary>
         public void EndGame()
         {
@@ -476,13 +279,14 @@ namespace Taluva.Controller
         }
 
         /// <summary>
-        ///Place tile
+        /// Handles Phase 1 of the game, which involves placing a chunk on the board.
         /// </summary>
-        /// <param name="pr">Point Rotation of the chunk</param>
-        /// <param name="r">Rotation of the chunk</param>
+        /// <param name="pr">The PointRotation representing the chunk position and rotation.</param>
+        /// <param name="r">The rotation of the chunk.</param>
         public void Phase1(PointRotation pr, Rotation r)
         {
-            if (ValidateTile(pr, r)) {
+            if (ValidateTile(pr, r))
+            {
                 actualPhase = TurnPhase.PlaceBuilding;
                 OnChangePhase(TurnPhase.PlaceBuilding);
                 this.maxTurn--;
@@ -490,53 +294,63 @@ namespace Taluva.Controller
         }
 
         /// <summary>
-        //Place building
+        /// Handles Phase 2 of the game, which involves placing a building on the board.
         /// </summary>
-        /// <param name="pr">Point Rotation of the chunk</param>
-        /// <param name="b">Building</param>
+        /// <param name="pr">The PointRotation representing the building position.</param>
+        /// <param name="b">The building to be placed.</param>
         public void Phase2(PointRotation pr, Building b)
         {
             Cell c = gameBoard.WorldMap[pr.point];
-            if (ValidateBuilding(c, b)) {
+            if (ValidateBuilding(c, b))
+            {
                 actualPhase = TurnPhase.NextPlayer;
                 OnChangePhase(TurnPhase.NextPlayer);
                 InitPlay();
             }
         }
+
         /// <summary>
-        ///Placement chunk et buildings by AI
+        /// Performs the AI move in the game.
         /// </summary>
-        /// <param name="ai">The IA who's playing</param>
+        /// <param name="ai">The AI player making the move.</param>
         public void AIMove(AI ai)
         {
             OnChangePhase(TurnPhase.IAPlays);
             actualPhase = TurnPhase.IAPlays;
             PointRotation pr = ((AI)actualPlayer).PlayChunk();
             Rotation r = Rotation.N;
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < 6; i++)
+            {
                 if (pr.rotations[i])
                     r = (Rotation)i;
             }
+
             OnAIChunkPlacement(pr);
             ValidateTile(pr, r);
             (Building b, Vector2Int pos) = ((AI)actualPlayer).PlayBuild();
             PointRotation p = new PointRotation(pos);
             Cell c = gameBoard.WorldMap[p.point];
-            OnAIBuildingPlacement(b, pos);  
+            OnAIBuildingPlacement(b, pos);
             ValidateBuilding(c, b);
             actualPhase = TurnPhase.NextPlayer;
             OnChangePhase(TurnPhase.NextPlayer);
-            InitPlay(); 
+            InitPlay();
         }
 
-        public List<Vector2Int> FindBiomesAroundVillage(Vector2Int cell) => gameBoard.FindBiomesAroundVillage(cell, actualPlayer);
+        /// <summary>
+        /// Finds the biomes surrounding a village cell.
+        /// </summary>
+        /// <param name="cell">The village cell.</param>
+        /// <returns>A list of vectors representing the positions of the surrounding biomes.</returns>
+        public List<Vector2Int> FindBiomesAroundVillage(Vector2Int cell) =>
+            gameBoard.FindBiomesAroundVillage(cell, actualPlayer);
 
         /// <summary>
-        ///Tile placement validity check
+        /// Validates the placement of a tile (chunk) on the board.
         /// </summary>
-        /// <param name="pr">Point Rotation of the chunk</param>
-        /// <param name="r">Rotation of the chunk</param>
-        /// <returns>True if it is possible</returns>
+        /// <param name="pr">The PointRotation representing the chunk position and rotation.</param>
+        /// <param name="r">The rotation of the chunk.</param>
+        /// <returns>True if the placement is valid, false otherwise.</returns>
         public bool ValidateTile(PointRotation pr, Rotation r)
         {
             AddHistoric(pr.point, r, actualChunk);
@@ -544,69 +358,109 @@ namespace Taluva.Controller
         }
 
         /// <summary>
-        ///Building placement validity check
+        /// Validates the placement of a building on the board.
         /// </summary>
-        /// <param name="c">The cell where the building can be placed</param>
-        /// <param name="b">The Building</param>
-        /// <returns>True if it is possible</returns>
+        /// <param name="c">The cell on which the building is to be placed.</param>
+        /// <param name="b">The building to be placed.</param>
+        /// <returns>True if the placement is valid, false otherwise.</returns>
         public bool ValidateBuilding(Cell c, Building b)
         {
             bool building = false;
 
             List<Cell> cells = new();
             List<Vector2Int> sameBiomes = FindBiomesAroundVillage(gameBoard.GetCellCoord(c));
-            if (sameBiomes.Count > 0) {
-                foreach (Vector2Int cell in sameBiomes) {
+            if (sameBiomes.Count > 0)
+            {
+                foreach (Vector2Int cell in sameBiomes)
+                {
                     cells.Add(new(gameBoard.WorldMap[cell]));
                 }
             }
+
             building = gameBoard.PlaceBuilding(c, b, actualPlayer);
 
             if (building)
-                AddHistoric(sameBiomes.Count > 0 ? sameBiomes.ToArray() : new[] { gameBoard.GetCellCoord(c) }, cells.Count > 0 ? cells.ToArray() : new[] { c }, b);
+                AddHistoric(sameBiomes.Count > 0 ? sameBiomes.ToArray() : new[] { gameBoard.GetCellCoord(c) },
+                    cells.Count > 0 ? cells.ToArray() : new[] { c }, b);
 
             return building;
         }
 
+        /// <summary>
+        /// Gets the slots available for placing barracks.
+        /// </summary>
+        /// <returns>An array of Vector2Int representing the available slots.</returns>
         public Vector2Int[] BarracksSlots()
         {
             return gameBoard.GetBarrackSlots(actualPlayer);
         }
 
+        /// <summary>
+        /// Gets the slots available for placing towers.
+        /// </summary>
+        /// <param name="actualPlayer">The current player.</param>
+        /// <returns>An array of Vector2Int representing the available slots.</returns>
         public Vector2Int[] TowerSlots(Player actualPlayer)
         {
             return gameBoard.GetTowerSlots(actualPlayer);
         }
 
+        /// <summary>
+        /// Gets the slots available for placing temples.
+        /// </summary>
+        /// <param name="actualPlayer">The current player.</param>
+        /// <returns>An array of Vector2Int representing the available slots.</returns>
         public Vector2Int[] TempleSlots(Player actualPlayer)
         {
             return gameBoard.GetTempleSlots(actualPlayer);
         }
 
+        /// <summary>
+        /// Gets the slots available for placing chunks.
+        /// </summary>
+        /// <returns>An array of PointRotation representing the available slots.</returns>
         public PointRotation[] ChunkSlots()
         {
             return gameBoard.GetChunkSlots();
         }
 
+        /// <summary>
+        /// Sets the level of a chunk.
+        /// </summary>
+        /// <param name="pr">The PointRotation representing the chunk position.</param>
         public void SetChunkLevel(PointRotation pr)
         {
             gameBoard.SetChunkLevel(pr);
         }
 
+        /// <summary>
+        /// Checks if a position on the board is void.
+        /// </summary>
+        /// <param name="p">The position to check.</param>
+        /// <returns>True if the position is void, false otherwise.</returns>
         public bool IsVoid(Vector2Int p)
         {
             return gameBoard.WorldMap.IsVoid(p);
         }
 
+        /// <summary>
+        /// Gets or sets the number of AI players.
+        /// </summary>
         public int NumberOfAI
         {
             set { throw new NotImplementedException(); }
         }
 
+        /// <summary>
+        /// Gets or sets the difficulty of the AI players.
+        /// </summary>
         public Difficulty AIDifficulty
         {
             set { throw new NotImplementedException(); }
         }
-
     }
 }
+
+
+
+
