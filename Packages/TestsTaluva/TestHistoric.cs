@@ -4,6 +4,7 @@ using System;
 using Taluva.Controller;
 using Taluva.Model;
 using UnityEngine;
+using Taluva.Model.AI;
 
 namespace TestsTaluva
 {
@@ -15,7 +16,7 @@ namespace TestsTaluva
         [SetUp]
         public void Init()
         {
-            _gm = new(2);
+            _gm = new(2, new AIType[0] {});
             _gm.InitPlay();
         }
 
