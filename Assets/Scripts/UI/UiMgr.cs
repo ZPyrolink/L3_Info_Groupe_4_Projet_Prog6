@@ -234,6 +234,7 @@ namespace UI
         private void RedoPhase2(GameManagment.Coup coup)
         {
             TilesMgr.Instance.ReputBuild(coup.positions[0]);
+            TilesMgr.Instance.SetFeedForwards1();
         }
 
         public void ToggleMenu()
