@@ -115,21 +115,30 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         Rotation rot = RotationExt.Of(Mathf.Round(_currentPreviews[0].transform.rotation.eulerAngles.y));
 
         _currentPreviews = null;
-        GameMgr.Instance.Phase1(new(_gos[_currentFf].point, rot), rot);
+        if (sendToLogic)
+            GameMgr.Instance.Phase1(new(_gos[_currentFf].point, rot), rot);
     }
 
-    public void ReputTile(Vector2Int pos)
+    public void ReputTile(Vector2Int pos, Rotation rot)
     {
+        _gos = null;
         Vector3 p = new(pos.x, 0, pos.y);
         if (!GameMgr.Instance.IsVoid(pos))
-            p.y = GameMgr.Instance.LevelAt(pos) * yOffset;
+            p.y = (GameMgr.Instance.LevelAt(pos) - 1) * yOffset;
         p.Scale(new(xOffset, 1, zOffset));
 
         if (pos.x % 2 != 0)
             p.z += zOffset / 2;
-        
+
+        _currentFf = new();
+        _gos = new()
+        {
+            [_currentFf] = new(pos, rot)
+        };
         PutTile(p);
         ValidateTile(false);
+        Destroy(_currentFf);
+        _currentFf = null;
     }
 
     private void PutBuild(Vector3 pos)
@@ -189,6 +198,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     public void ReputBuild(Vector2Int pos)
     {
+        _gos = null;
         Vector3 p = new(pos.x, 0, pos.y);
         if (!GameMgr.Instance.IsVoid(pos))
             p.y = GameMgr.Instance.LevelAt(pos) * yOffset;
@@ -196,7 +206,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
         if (pos.x % 2 != 0)
             p.z += zOffset / 2;
-        
+
         PutBuild(p);
         ValidateBuild(false);
     }

@@ -220,7 +220,8 @@ namespace UI
 
         private void RedoPhase1(GameManagment.Coup coup)
         {
-            TilesMgr.Instance.ReputTile(coup.positions[0]);
+            // ReSharper disable once PossibleInvalidOperationException
+            TilesMgr.Instance.ReputTile(coup.positions[0], (Rotation) coup.rotation);
         }
 
         private void RedoPhase2(GameManagment.Coup coup)
