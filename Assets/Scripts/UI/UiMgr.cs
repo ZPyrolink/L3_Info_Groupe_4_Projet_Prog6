@@ -152,9 +152,9 @@ namespace UI
         {
             (GameMgr.Instance.actualPhase switch
             {
-                TurnPhase.SelectCells => (Action) TilesMgr.Instance.ValidateTile,
+                TurnPhase.SelectCells => (Action<bool>) TilesMgr.Instance.ValidateTile,
                 TurnPhase.PlaceBuilding => TilesMgr.Instance.ValidateBuild
-            }).Invoke();
+            }).Invoke(true);
         }
 
         public void Phase1()
@@ -207,7 +207,26 @@ namespace UI
 
         private void UndoPhase2(GameManagment.Coup c) => TilesMgr.Instance.RemoveBuild(c.positions);
 
-        public void Redo() => GameMgr.Instance.Redo();
+        public void Redo()
+        {
+            GameManagment.Coup coup = GameMgr.Instance.Redo();
+            
+            (GameMgr.Instance.actualPhase switch
+            {
+                TurnPhase.PlaceBuilding => (Action<GameManagment.Coup>) RedoPhase1,
+                TurnPhase.NextPlayer => RedoPhase2
+            }).Invoke(coup);
+        }
+
+        private void RedoPhase1(GameManagment.Coup coup)
+        {
+            TilesMgr.Instance.ReputTile(coup.positions[0]);
+        }
+
+        private void RedoPhase2(GameManagment.Coup coup)
+        {
+            TilesMgr.Instance.ReputBuild(coup.positions[0]);
+        }
 
         public void ToggleMenu()
         {
