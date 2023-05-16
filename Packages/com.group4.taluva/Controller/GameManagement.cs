@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Taluva.Model;
 using Taluva.Utils;
@@ -119,6 +119,9 @@ namespace Taluva.Controller
         /// </summary>
         public bool CanRedo => historic.CanRedo;
 
+        /// <summary>
+        ///Saves in a file the history of all the actions of the game
+        /// </summary>
         public void Save()
         {
             using (FileStream file = File.Open(savePath + DateTime.Now.ToString(new CultureInfo("de-DE")), FileMode.Create, FileAccess.Write))
@@ -225,18 +228,28 @@ namespace Taluva.Controller
             historic.Add(new(positions, null, actualPlayer, newCells, buildings));
         }
 
+        /// <summary>
+        ///go back to the previous phase after a Undo
+        /// </summary>
         public void PrecedentPhase()
         {
             int precedantPhaseValue = ((int)actualPhase + 1) % Enum.GetNames(typeof(TurnPhase)).Length - 1;
             actualPhase = (TurnPhase)precedantPhaseValue;
         }
 
+        /// <summary>
+        ///go to the next phase
+        /// </summary>
         public void NextPhase()
         {
             int nextPhaseValue = ((int)actualPhase + 1) % Enum.GetNames(typeof(TurnPhase)).Length - 1;
             actualPhase = (TurnPhase)nextPhaseValue;
         }
-        
+
+        /// <summary>
+        ///restore the previous moove, restore the pile, restore the players states and add this moove in the undo history
+        /// </summary> 
+        /// <returns>The last moove</returns>
         public Coup Undo()
         {
             if (!historic.CanUndo)
@@ -275,6 +288,10 @@ namespace Taluva.Controller
             return c;
         }
 
+        /// <summary>
+        ///restore the last moove from the undo historic and add this moove in a redo history
+        /// </summary>
+        /// <returns>The last moove</returns>
         public Coup Redo()
         {
             if (!historic.CanRedo)
@@ -298,6 +315,10 @@ namespace Taluva.Controller
             return c;
         }
 
+        /// <summary>
+        ///get the winner from the methodes earlyend or normalend
+        /// </summary>
+        /// <returns>The player returned by earlyend or normalend</returns>
         public Player? GetWinner()
         {
             if (maxTurn == 0)
@@ -314,6 +335,10 @@ namespace Taluva.Controller
             return null;
         }
 
+        /// <summary>
+        ///get the player who place all his building in at least 2 different types
+        /// </summary>
+        /// <returns>Return the winner</returns>
         private Player? EarlyEnd
         {
             get
@@ -337,6 +362,11 @@ namespace Taluva.Controller
                 throw new NotImplementedException();
             }
         }
+
+        /// <summary>
+        ///Return the player who win the game after there is no longer piece in the stack by calculing who built most builds. Take into account egality. 
+        /// </summary>
+        /// <returns>Return the winner</returns>
         private Player NormalEnd
         {
             get
@@ -402,7 +432,9 @@ namespace Taluva.Controller
                 }
             }
         }
-
+        /// <summary>
+        ///The Moove, the selction of who's playing
+        /// </summary>
         public void InitPlay()
         {
             if (GetWinner() != null) {
@@ -434,13 +466,20 @@ namespace Taluva.Controller
             }
         }
 
+        /// <summary>
+        ///notify view to end game
+        /// </summary>
         public void EndGame()
         {
             this.Winner = GetWinner();
-            //notify view to end game
             OnEndGame(true);
         }
 
+        /// <summary>
+        ///Place tile
+        /// </summary>
+        /// <param name="pr">Point Rotation of the chunk</param>
+        /// <param name="r">Rotation of the chunk</param>
         public void Phase1(PointRotation pr, Rotation r)
         {
             if (ValidateTile(pr, r)) {
@@ -450,7 +489,11 @@ namespace Taluva.Controller
             }
         }
 
+        /// <summary>
         //Place building
+        /// </summary>
+        /// <param name="pr">Point Rotation of the chunk</param>
+        /// <param name="b">Building</param>
         public void Phase2(PointRotation pr, Building b)
         {
             Cell c = gameBoard.WorldMap[pr.point];
@@ -460,8 +503,10 @@ namespace Taluva.Controller
                 InitPlay();
             }
         }
-        
-        //Placement chunk et buildings
+        /// <summary>
+        ///Placement chunk et buildings by AI
+        /// </summary>
+        /// <param name="ai">The IA who's playing</param>
         public void AIMove(AI ai)
         {
             OnChangePhase(TurnPhase.IAPlays);
@@ -486,13 +531,24 @@ namespace Taluva.Controller
 
         public List<Vector2Int> FindBiomesAroundVillage(Vector2Int cell) => gameBoard.FindBiomesAroundVillage(cell, actualPlayer);
 
-
+        /// <summary>
+        ///Tile placement validity check
+        /// </summary>
+        /// <param name="pr">Point Rotation of the chunk</param>
+        /// <param name="r">Rotation of the chunk</param>
+        /// <returns>True if it is possible</returns>
         public bool ValidateTile(PointRotation pr, Rotation r)
         {
             AddHistoric(pr.point, r, actualChunk);
             return gameBoard.AddChunk(actualChunk, actualPlayer, pr, r);
         }
 
+        /// <summary>
+        ///Building placement validity check
+        /// </summary>
+        /// <param name="c">The cell where the building can be placed</param>
+        /// <param name="b">The Building</param>
+        /// <returns>True if it is possible</returns>
         public bool ValidateBuilding(Cell c, Building b)
         {
             bool building = false;
