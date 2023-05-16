@@ -81,6 +81,28 @@ namespace Taluva.Controller
             }
         }
 
+        public GameManagment(int nbPlayers)
+        {
+            historic = new();
+            this.players = new Player[nbPlayers];
+            this.ActualPlayerIndex = -1;
+            this.gameBoard = new();
+            this.NbPlayers = nbPlayers;
+            this.maxTurn = 12 * nbPlayers;
+
+            PlayerColor[] pc = (PlayerColor[])Enum.GetValues(typeof(PlayerColor));
+
+            for (int i = 0; i < this.NbPlayers; i++)
+            {
+                players[i] = new(pc[i]);
+                if (this.AIRandom && i == 1)
+                {
+                    players[i].playerIA = true;
+                    break;
+                }
+            }
+        }
+
         public void setAI()
         {
             this.AIRandom = true;
