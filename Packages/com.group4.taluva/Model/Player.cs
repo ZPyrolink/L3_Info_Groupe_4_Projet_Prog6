@@ -25,7 +25,7 @@ public class Player
         playerIA = true;
     }
 
-    public Player Clone()
+    public virtual Player Clone()
     {
         return new Player(this);
     }
