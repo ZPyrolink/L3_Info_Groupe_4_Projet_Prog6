@@ -501,7 +501,7 @@ namespace Taluva.Controller
                     }
                 }
                 Chunk chunk = new(c.chunk.Level, new(c.chunk.Coords[1].ActualBiome), new(c.chunk.Coords[2].ActualBiome));
-                pile.Stack(chunk, c.chunk);
+                pile.Stack(chunk);
                 actualChunk = pile.Draw();
                 if(c.player.Eliminated)
                 {
@@ -556,9 +556,8 @@ namespace Taluva.Controller
             }
             else
             {
-                gameBoard.AddChunk(c.chunk, c.player, new(c.positions[0], (Rotation) c.rotation),
+                gameBoard.AddChunk(actualChunk, c.player, new(c.positions[0], (Rotation) c.rotation),
                     (Rotation) c.rotation);
-                pile.Draw();
             }
 
             for (int i = 0; i < NbPlayers; i++)
@@ -714,7 +713,7 @@ namespace Taluva.Controller
         
         public void InitPlay()
         {
-            MeshRender();
+            //MeshRender();
             if (CheckWinner() != null)
             {
                 return;

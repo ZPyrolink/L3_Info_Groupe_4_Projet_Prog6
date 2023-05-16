@@ -39,10 +39,10 @@ namespace Taluva.Model
             return c;
         }
 
-        public void Stack(T stack, T remove)
+        public void Stack(T stack)
         {
             _stack.Push(stack);
-            Debug.Log("b " + _played.Remove(remove));
+            _played.RemoveAt(_played.Count - 1);
         }
 
         public int NbKeeping => _stack.Count;

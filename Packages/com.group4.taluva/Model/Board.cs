@@ -550,7 +550,6 @@ namespace Taluva.Model
         /// <returns>Return the position (x,y) of the cell</returns>
         public Vector2Int GetCellCoord(Cell c)
         {
-            Debug.Log("Suppr: " + c);
             for (int i = WorldMap.MinLine; i <= WorldMap.MaxLine; i++)
             {
                 if (!WorldMap.ContainsLine(i))
