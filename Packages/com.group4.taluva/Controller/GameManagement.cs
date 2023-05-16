@@ -558,6 +558,7 @@ namespace Taluva.Controller
             {
                 gameBoard.AddChunk(actualChunk, c.player, new(c.positions[0], (Rotation) c.rotation),
                     (Rotation) c.rotation);
+                c.chunk = actualChunk;
             }
 
             NextPhase();
