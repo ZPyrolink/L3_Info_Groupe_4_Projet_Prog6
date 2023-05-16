@@ -206,9 +206,16 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
         if (pos.x % 2 != 0)
             p.z += zOffset / 2;
+        
+        _currentFf = new();
+        _gos = new()
+        {
+            [_currentFf] = new(pos)
+        };
 
         PutBuild(p);
         ValidateBuild(false);
+        _currentFf = null;
     }
 
     private void RotateTile()
