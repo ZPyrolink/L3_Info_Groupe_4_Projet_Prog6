@@ -21,6 +21,7 @@ namespace Taluva.Controller
     {
         public Player[] players;
         public Player actualPlayer => players[ActualPlayerIndex];
+        public Player PreviousPlayer => players[Math.Abs((ActualPlayerIndex - 1) % NbPlayers)];
         private AI ActualAi => (AI) actualPlayer;
         private readonly string savePath = Directory.GetCurrentDirectory() + "/Save/";
 

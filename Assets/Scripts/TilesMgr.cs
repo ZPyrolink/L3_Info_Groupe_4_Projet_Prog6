@@ -141,7 +141,9 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         _currentFf = null;
     }
 
-    private void PutBuild(Vector3 pos)
+    private void PutBuild(Vector3 _) => PutBuild(GameMgr.Instance.actualPlayer.ID.GetColor());
+
+    private void PutBuild(Color color)
     {
         Vector2Int currentPos = _gos[_currentFf].point;
         List<Vector2Int> tmp = GameMgr.Instance.FindBiomesAroundVillage(currentPos);
@@ -164,7 +166,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                 foreach (Material mat in mats)
                 {
                     mat.SetRenderMode(MaterialExtensions.BlendMode.Transparent);
-                    mat.color = GameMgr.Instance.actualPlayer.ID.GetColor().With(a: .75f);
+                    mat.color = color.With(a: .75f);
                 }
             }
 
@@ -206,7 +208,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
         if (pos.x % 2 != 0)
             p.z += zOffset / 2;
-        
+
         _currentFf = new()
         {
             transform =
@@ -219,7 +221,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             [_currentFf] = new(pos)
         };
 
-        PutBuild(p);
+        PutBuild(GameMgr.Instance.PreviousPlayer.ID.GetColor());
         ValidateBuild(false);
         _currentFf = null;
     }
