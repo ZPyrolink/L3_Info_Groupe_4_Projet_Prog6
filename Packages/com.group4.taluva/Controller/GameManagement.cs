@@ -59,7 +59,7 @@ namespace Taluva.Controller
         public Action<Player> NotifyPlayerEliminated { get; set; }
         private void OnPlayerElimination(Player p) => NotifyPlayerEliminated?.Invoke(p);
 
-        public GameManagment(int nbPlayers)
+        public GameManagment(int nbPlayers, AIType[] typeAI)
         {
             historic = new();
             this.players = new Player[nbPlayers];
@@ -70,13 +70,13 @@ namespace Taluva.Controller
             
             PlayerColor[] pc = (PlayerColor[]) Enum.GetValues(typeof(PlayerColor));
 
-            for (int i = 0; i < this.NbPlayers; i++)
+            for (int i = 0; i < nbPlayers ; i++)
             {
                 players[i] = new(pc[i]);
-                if (this.AIRandom && i == 1)
+                if (i >= nbPlayers - typeAI.Length)
                 {
                     players[i].playerIA = true;
-                    break;
+                    players[i].typeAI = typeAI[typeAI.Length - i];
                 }
             }
         }
