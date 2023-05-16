@@ -214,7 +214,7 @@ namespace UI
             (GameMgr.Instance.actualPhase switch
             {
                 TurnPhase.PlaceBuilding => (Action<GameManagment.Coup>) RedoPhase1,
-                TurnPhase.NextPlayer => RedoPhase2
+                TurnPhase.SelectCells => RedoPhase2
             }).Invoke(coup);
         }
 

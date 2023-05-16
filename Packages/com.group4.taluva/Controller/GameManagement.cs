@@ -575,6 +575,8 @@ namespace Taluva.Controller
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
                     gameBoard.PlaceBuilding(c.cells[i], c.building[i], actualPlayer);
                 }
+                actualPhase = TurnPhase.NextPlayer;
+                NextPlayer();
             }
             else
             {
@@ -727,7 +729,7 @@ namespace Taluva.Controller
 
         private void PrecedentPlayer()
         {
-            ActualPlayerIndex = (ActualPlayerIndex - 1) % NbPlayers;
+            ActualPlayerIndex = Math.Abs((ActualPlayerIndex - 1) % NbPlayers);
         }
         
         public void InitPlay()
