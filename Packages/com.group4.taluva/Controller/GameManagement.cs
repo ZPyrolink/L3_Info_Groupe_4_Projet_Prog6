@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
 using System.Linq;
-using PlasticGui.WebApi.Responses;
 
 using UnityEngine.UIElements;
 
@@ -60,7 +59,7 @@ namespace Taluva.Controller
         public Action<Player> NotifyPlayerEliminated { get; set; }
         private void OnPlayerElimination(Player p) => NotifyPlayerEliminated?.Invoke(p);
 
-        public GameManagment(int nbPlayers, AIType[] typeAI)
+        public GameManagment(int nbPlayers, Type[] typeAI)
         {
             historic = new();
             this.players = new Player[nbPlayers];
@@ -68,47 +67,20 @@ namespace Taluva.Controller
             this.gameBoard = new();
             this.NbPlayers = nbPlayers;
             this.maxTurn = 12 * nbPlayers;
-            
+
             PlayerColor[] pc = (PlayerColor[]) Enum.GetValues(typeof(PlayerColor));
 
-            for (int i = 0; i < nbPlayers ; i++)
-            {
+            for (int i = 0; i < nbPlayers - typeAI.Length; i++)
                 players[i] = new(pc[i]);
-                if (i >= nbPlayers - typeAI.Length)
-                {
-                    players[i].playerIA = true;
-                    players[i].typeAI = typeAI[typeAI.Length - i];
-                }
-            }
+
+            for (int i = 0; i < typeAI.Length; i++)
+                if (typeAI[i] == typeof(AIRandom))
+                    players[^(i - 1)] = new AIRandom(pc[i], this);
+                else if (typeAI[i] == typeof(AIMonteCarlo))
+                    players[^(i - 1)] = new AIMonteCarlo(pc[i], this, pile);
         }
 
-        public GameManagment(int nbPlayers)
-        {
-            historic = new();
-            this.players = new Player[nbPlayers];
-            this.ActualPlayerIndex = -1;
-            this.gameBoard = new();
-            this.NbPlayers = nbPlayers;
-            this.maxTurn = 12 * nbPlayers;
-
-            PlayerColor[] pc = (PlayerColor[])Enum.GetValues(typeof(PlayerColor));
-
-            for (int i = 0; i < this.NbPlayers; i++)
-            {
-                players[i] = new(pc[i]);
-                if (this.AIRandom && i == 1)
-                {
-                    players[i].playerIA = true;
-                    break;
-                }
-            }
-        }
-
-        public void setAI()
-        {
-            this.AIRandom = true;
-            this.NbPlayers = 2;
-        }
+        public GameManagment(int nbPlayers) : this(nbPlayers, Array.Empty<Type>()) { }
 
         public class Coup
         {
@@ -518,7 +490,7 @@ namespace Taluva.Controller
             Coup c = historic.Undo();
             if (c.chunk != null)
             {
-                gameBoard.RemoveChunk(gameBoard.GetChunksCoords(c.positions[0], (Rotation)c.rotation));
+                gameBoard.RemoveChunk(gameBoard.GetChunksCoords(c.positions[0], (Rotation) c.rotation));
                 if (c.cells[0] != null)
                 {
                     for (int i = 0; i < c.cells.Length; i++)
@@ -581,6 +553,7 @@ namespace Taluva.Controller
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
                     gameBoard.PlaceBuilding(c.cells[i], c.building[i], actualPlayer);
                 }
+
                 actualPhase = TurnPhase.NextPlayer;
                 NextPlayer();
             }
@@ -617,7 +590,7 @@ namespace Taluva.Controller
             }
 
             var tmp2 = players.Where(p => !p.Eliminated);
-     
+
             if (tmp2.Count() == 1)
             {
                 p = tmp2.First();
@@ -828,13 +801,13 @@ namespace Taluva.Controller
         {
             var oldRT = RenderTexture.active;
             // Vector2Int center = CalculateCenter(gameBoard.GetChunksCoords(coord, r));
-            
+
             Material mat = new Material(Shader.Find("MatTest"));
             var tex = new Texture2D(1024, 1024);
-            tex.ReadPixels(new Rect(0,0,1024,1024), 0, 0);
+            tex.ReadPixels(new Rect(0, 0, 1024, 1024), 0, 0);
             RenderTexture.active = crt;
             mat.SetVector(Shader.PropertyToID("_Location"), new Vector2(-2, 0));
-            mat.SetTexture(Shader.PropertyToID("_BeachMask"),tex);
+            mat.SetTexture(Shader.PropertyToID("_BeachMask"), tex);
             crt.Update();
             tex.Apply();
             RenderTexture.active = oldRT;
@@ -851,7 +824,6 @@ namespace Taluva.Controller
             MeshRenderer mr = plane.transform.GetComponentInChildren<MeshRenderer>();
             mr.material = mat;
             mr.material.SetTexture(Shader.PropertyToID("_test"), tex);
-
         }
 
         Vector2Int CalculateCenter(Vector2Int[] TriangleCoords)
