@@ -722,7 +722,7 @@ namespace Taluva.Controller
             }
         }
 
-        private void NextPlayer()
+        public void NextPlayer()
         {
             ActualPlayerIndex = (ActualPlayerIndex + 1) % NbPlayers;
         }
