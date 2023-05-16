@@ -501,7 +501,7 @@ namespace Taluva.Controller
                     }
                 }
                 Chunk chunk = new(c.chunk.Level, new(c.chunk.Coords[1].ActualBiome), new(c.chunk.Coords[2].ActualBiome));
-                pile.Stack(chunk);
+                pile.Stack(chunk, c.chunk);
                 actualChunk = pile.Draw();
                 if(c.player.Eliminated)
                 {
