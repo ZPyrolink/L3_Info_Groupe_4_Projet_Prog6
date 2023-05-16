@@ -16,7 +16,7 @@ namespace TestsTaluva
         [SetUp]
         public void Init()
         {
-            _gm = new(2, new AIType[0] {});
+            _gm = new(2);
             _gm.InitPlay();
         }
 
