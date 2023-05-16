@@ -700,7 +700,7 @@ namespace Taluva.Controller
         
         public void InitPlay()
         {
-            MeshRender();
+            // MeshRender();
             if (CheckWinner() != null)
             {
                 return;
