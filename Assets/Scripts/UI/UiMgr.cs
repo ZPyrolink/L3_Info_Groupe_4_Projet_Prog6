@@ -161,8 +161,7 @@ namespace UI
         {
             undoButton.interactable = GameMgr.Instance.CanUndo;
             redoButton.interactable = GameMgr.Instance.CanRedo;
-            UpdateCurrentPlayer();
-            UpdatePlayersBuild();
+            UpdateGui();
 
             TilesMgr.Instance.SetFeedForwards1();
 
@@ -181,7 +180,7 @@ namespace UI
         {
             undoButton.interactable = GameMgr.Instance.CanUndo;
             redoButton.interactable = GameMgr.Instance.CanRedo;
-            UpdateCurrentPlayerBuild();
+            UpdateGui();
             currentTile.SetActive(false);
             builds.SetActive(true);
 
@@ -190,6 +189,13 @@ namespace UI
 
             NbTiles--;
             UpBuild(0);
+        }
+
+        private void UpdateGui()
+        {
+            UpdateCurrentPlayer();
+            UpdatePlayersBuild();
+            UpdateCurrentPlayerBuild();
         }
 
         public void Undo()
