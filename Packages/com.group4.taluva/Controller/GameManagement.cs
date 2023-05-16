@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
 using System.Linq;
-using PlasticGui.WebApi.Responses;
 
 using UnityEngine.UIElements;
 
@@ -60,7 +59,7 @@ namespace Taluva.Controller
         public Action<Player> NotifyPlayerEliminated { get; set; }
         private void OnPlayerElimination(Player p) => NotifyPlayerEliminated?.Invoke(p);
 
-        public GameManagment(int nbPlayers, AIType[] typeAI)
+      public GameManagment(int nbPlayers, Type[] typeAI)
         {
             historic = new();
             this.players = new Player[nbPlayers];
@@ -73,43 +72,24 @@ namespace Taluva.Controller
 
             for (int i = 0; i < nbPlayers ; i++)
             {
-                players[i] = new(pc[i]);
-                if (i >= nbPlayers - typeAI.Length)
+                if (i < nbPlayers - typeAI.Length)
                 {
-                    players[i].playerIA = true;
-                    players[i].typeAI = typeAI[typeAI.Length - i];
+                    players[i] = new(pc[i]);
+                }
+                else
+                {
+                    if (typeAI[i] == typeof(AIRandom))
+                        players[i] = new AIRandom(pc[i], this);
+                    else if (typeAI[i] == typeof(AIMonteCarlo))
+                        players[i] = new AIMonteCarlo(pc[i], this, pile);
+                    // else if (typeAI[i] == typeof(AITree))
+                    //     players[i] = new AITree(pc[i], this, pile);
                 }
             }
         }
 
-        public GameManagment(int nbPlayers)
-        {
-            historic = new();
-            this.players = new Player[nbPlayers];
-            this.ActualPlayerIndex = -1;
-            this.gameBoard = new();
-            this.NbPlayers = nbPlayers;
-            this.maxTurn = 12 * nbPlayers;
-
-            PlayerColor[] pc = (PlayerColor[])Enum.GetValues(typeof(PlayerColor));
-
-            for (int i = 0; i < this.NbPlayers; i++)
-            {
-                players[i] = new(pc[i]);
-                if (this.AIRandom && i == 1)
-                {
-                    players[i].playerIA = true;
-                    break;
-                }
-            }
-        }
-
-        public void setAI()
-        {
-            this.AIRandom = true;
-            this.NbPlayers = 2;
-        }
-
+        public GameManagment(int nbPlayers) : this (nbPlayers, null)  { }
+        
         public class Coup
         {
             //New Chunk or cells

@@ -13,8 +13,6 @@ public class Player
     public int nbTemple = 3;
     public int nbBarrack = 20;
     public bool playerIA = false;
-    public AIType typeAI;
-    public AIType type;
     public bool Eliminated { get; set; }
 
     public Player(PlayerColor id)
