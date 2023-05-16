@@ -173,6 +173,7 @@ namespace UI
             mr.materials[3].color = GameMgr.Instance.actualChunk.Coords[2].ActualBiome.GetColor();
 
             currentTile.SetActive(true);
+            currentTile.transform.GetChild(0).gameObject.SetActive(true);
             builds.SetActive(false);
         }
 
@@ -222,18 +223,30 @@ namespace UI
                 TurnPhase.PlaceBuilding => (Action<GameManagment.Coup>) RedoPhase1,
                 TurnPhase.SelectCells => RedoPhase2
             }).Invoke(coup);
+
         }
 
         private void RedoPhase1(GameManagment.Coup coup)
         {
             // ReSharper disable once PossibleInvalidOperationException
             TilesMgr.Instance.ReputTile(coup.positions[0], (Rotation) coup.rotation);
-            TilesMgr.Instance.SetFeedForwards2(Building.Barrack);
+            if(GameMgr.Instance.actualPhase == TurnPhase.PlaceBuilding)
+                TilesMgr.Instance.SetFeedForwards2(Building.Barrack);
+            else
+                CurrentTile.SetActive(true);
+
+            Phase1();
         }
 
         private void RedoPhase2(GameManagment.Coup coup)
         {
-            TilesMgr.Instance.ReputBuild(coup.positions[0]);
+            if (coup.player.Eliminated)
+            {
+                RedoPhase1(coup);
+            } else
+            {
+                TilesMgr.Instance.ReputBuild(coup.positions[0]);
+            }
             TilesMgr.Instance.SetFeedForwards1();
         }
 

@@ -477,8 +477,9 @@ namespace Taluva.Controller
             }
         }
 
-        public void NextPhase()
+        public void NextPhase(bool pioche = true)
         {
+            bool b = true;
             if (actualPhase != TurnPhase.IAPlays)
             {
                 int nextPhaseValue = ((int) actualPhase + 1) % (Enum.GetNames(typeof(TurnPhase)).Length - 1);
@@ -486,18 +487,21 @@ namespace Taluva.Controller
 
                 if (actualPhase == TurnPhase.PlaceBuilding)
                 {
-
+                    b = pioche;
                     PlayerEliminated();
 
                     if (actualPlayer.Eliminated)
                     {
                         actualPhase = TurnPhase.NextPlayer;
-                        InitPlay();
+                        InitPlay(b);
                     }
-                        
-                }
 
+                }
                 OnChangePhase(actualPhase);
+                if (!b)
+                {
+                    actualChunk = pile.Draw();
+                }
             }
             else
             {
@@ -523,17 +527,19 @@ namespace Taluva.Controller
                         gameBoard.PlaceBuilding(c.cells[i], c.building[i], actualPlayer);
                     }
                 }
-                Chunk chunk = new(c.chunk.Level, new(c.chunk.Coords[1].ActualBiome), new(c.chunk.Coords[2].ActualBiome));
-                pile.Stack(chunk);
-                actualChunk = pile.Draw();
-                if(c.player.Eliminated)
+                if (c.player.Eliminated)
                 {
+                    pile.Stack(actualChunk);
                     c.player.Eliminated = false;
                     actualPhase = TurnPhase.PlaceBuilding;
                     for (int i = 0; i < NbPlayers; i++)
                         if (c.player == players[i])
                             ActualPlayerIndex = i;
                 }
+                Chunk chunk = new(c.chunk.Level, new(c.chunk.Coords[1].ActualBiome), new(c.chunk.Coords[2].ActualBiome));
+                pile.Stack(chunk);
+                if (!c.player.Eliminated)
+                    actualChunk = pile.Draw();
             }
             else
             {
@@ -558,7 +564,6 @@ namespace Taluva.Controller
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
                 }
             }
-
             PrecedentPhase();
             return c;
         }
@@ -567,7 +572,7 @@ namespace Taluva.Controller
         {
             if (!historic.CanRedo)
                 return null;
-
+            Debug.Log(pile._stack.Count);
             Coup c = historic.Redo();
             if (c.chunk == null)
             {
@@ -584,9 +589,12 @@ namespace Taluva.Controller
                 gameBoard.AddChunk(actualChunk, c.player, new(c.positions[0], (Rotation) c.rotation),
                     (Rotation) c.rotation);
                 c.chunk = actualChunk;
+                if (c.player.Eliminated)
+                {
+                    actualPhase = TurnPhase.NextPlayer;
+                }
             }
-
-            NextPhase();
+            NextPhase(false);
             return c;
         }
 
@@ -733,7 +741,7 @@ namespace Taluva.Controller
             ActualPlayerIndex = Math.Abs((ActualPlayerIndex - 1) % NbPlayers);
         }
         
-        public void InitPlay()
+        public void InitPlay(bool pioche = true)
         {
             //MeshRender();
             if (CheckWinner() != null)
@@ -748,7 +756,8 @@ namespace Taluva.Controller
                 NextPlayer();
             }
 
-            this.actualChunk = pile.Draw();
+            if(pioche)
+                actualChunk = pile.Draw();
 
             if (actualPlayer is AI ai)
             {

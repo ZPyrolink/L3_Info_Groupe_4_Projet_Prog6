@@ -28,7 +28,7 @@ namespace Wrapper
         {
             Instance.ChangePhase = phase =>
             {
-                Debug.Log($"Change Phase into {phase}");
+                //Debug.Log($"Change Phase into {phase}");
                 UiMgr ui = UiMgr.Instance;
 
                 (phase switch
@@ -41,7 +41,8 @@ namespace Wrapper
 
             Instance.NotifyEndGame = (player, end) => { Debug.Log(player + " " + end); };
 
-            Instance.NotifyPlayerEliminated = player => { Debug.Log(player); };
+            Instance.NotifyPlayerEliminated = player => { //Debug.Log(player);
+                                                          };
 
             Instance.NotifyAIBuildingPlacement = (building, i) => throw new NotImplementedException();
             Instance.NotifyAIChunkPlacement = rotation => throw new NotImplementedException();
