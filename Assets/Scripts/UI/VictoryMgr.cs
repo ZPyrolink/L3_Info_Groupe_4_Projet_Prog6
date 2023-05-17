@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using Utils;
 
 namespace UI
@@ -11,6 +12,11 @@ namespace UI
         {
             this.gameObject.SetActive(false);
         }
+
+        [SerializeField]
+        private Text text;
+
+        public void SetWinnerText(string player) => text.text = "The player " + player + " win"; 
 
         public void Restart() => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 
