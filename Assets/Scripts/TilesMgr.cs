@@ -198,8 +198,9 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             GameMgr.Instance.Phase2(_gos[_currentFf].point, _currentBuild);
     }
 
-    public void ReputBuild(Vector2Int pos)
+    public void ReputBuild(Vector2Int pos, Building b)
     {
+        _currentBuild = b;
         _gos = null;
         Vector3 p = new(pos.x, 0, pos.y);
         if (!GameMgr.Instance.IsVoid(pos))

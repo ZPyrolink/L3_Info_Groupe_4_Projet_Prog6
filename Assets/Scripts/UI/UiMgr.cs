@@ -246,7 +246,7 @@ namespace UI
                 RedoPhase1(coup);
             } else
             {
-                TilesMgr.Instance.ReputBuild(coup.positions[0]);
+                TilesMgr.Instance.ReputBuild(coup.positions[0], coup.building[0]);
             }
             TilesMgr.Instance.SetFeedForwards1();
         }
