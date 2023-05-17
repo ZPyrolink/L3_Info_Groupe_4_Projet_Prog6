@@ -113,14 +113,15 @@ namespace UI
             for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
             {
                 _guis[i].GetComponent<Image>().color =
-                    i == GameMgr.Instance.ActualPlayerIndex ? Color.white : new(.75f, .75f, .75f);
+                    i == GameMgr.Instance.ActualPlayerIndex ? Color.white : GameMgr.Instance.players[i].Eliminated ? new(1, 0, 0, .5f) : new(.75f, .75f, .75f);
+
+
 
                 foreach (Animator anim in _guis[i].GetComponentsInChildren<Animator>())
                     if (GameMgr.Instance.ActualPlayerIndex == i)
                     {
                         anim.enabled = true;
-                    }
-                    else
+                    } else
                     {
                         anim.enabled = false;
                         anim.transform.localRotation = Quaternion.Euler(-90, 0, 0);
@@ -152,7 +153,7 @@ namespace UI
         {
             (GameMgr.Instance.actualPhase switch
             {
-                TurnPhase.SelectCells => (Action<bool>) TilesMgr.Instance.ValidateTile,
+                TurnPhase.SelectCells => (Action<bool>)TilesMgr.Instance.ValidateTile,
                 TurnPhase.PlaceBuilding => TilesMgr.Instance.ValidateBuild
             }).Invoke(true);
         }
@@ -205,7 +206,7 @@ namespace UI
 
             (GameMgr.Instance.actualPhase switch
             {
-                TurnPhase.SelectCells => (Action<GameManagment.Coup>) UndoPhase1,
+                TurnPhase.SelectCells => (Action<GameManagment.Coup>)UndoPhase1,
                 TurnPhase.PlaceBuilding => UndoPhase2
             }).Invoke(coup);
         }
@@ -217,10 +218,10 @@ namespace UI
         public void Redo()
         {
             GameManagment.Coup coup = GameMgr.Instance.Redo();
-            
+
             (GameMgr.Instance.actualPhase switch
             {
-                TurnPhase.PlaceBuilding => (Action<GameManagment.Coup>) RedoPhase1,
+                TurnPhase.PlaceBuilding => (Action<GameManagment.Coup>)RedoPhase1,
                 TurnPhase.SelectCells => RedoPhase2
             }).Invoke(coup);
 
@@ -229,8 +230,8 @@ namespace UI
         private void RedoPhase1(GameManagment.Coup coup)
         {
             // ReSharper disable once PossibleInvalidOperationException
-            TilesMgr.Instance.ReputTile(coup.positions[0], (Rotation) coup.rotation);
-            if(GameMgr.Instance.actualPhase == TurnPhase.PlaceBuilding)
+            TilesMgr.Instance.ReputTile(coup.positions[0], (Rotation)coup.rotation);
+            if (GameMgr.Instance.actualPhase == TurnPhase.PlaceBuilding)
                 TilesMgr.Instance.SetFeedForwards2(Building.Barrack);
             else
                 CurrentTile.SetActive(true);
@@ -270,7 +271,7 @@ namespace UI
                 anim.transform.localRotation = Quaternion.Euler(-90, -90, 0);
             }
 
-            TilesMgr.Instance.SetFeedForwards2((Building) i + 1);
+            TilesMgr.Instance.SetFeedForwards2((Building)i + 1);
 
             child = builds.transform.GetChild(i).GetComponent<RectTransform>();
             child.anchoredPosition = child.anchoredPosition.With(y: 20);
