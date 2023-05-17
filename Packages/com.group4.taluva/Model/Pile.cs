@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Taluva.Model
 {
@@ -13,7 +14,7 @@ namespace Taluva.Model
 
         public Pile(T[] list)
         {
-            Random random = new();
+            System.Random random = new();
             _stack = new(list.Length);
             _played = new();
 
@@ -38,10 +39,10 @@ namespace Taluva.Model
             return c;
         }
 
-        public void Stack(T chunk)
+        public void Stack(T stack)
         {
-            _stack.Push(chunk);
-            _played.Remove(chunk);
+            _stack.Push(stack);
+            _played.RemoveAt(_played.Count - 1);
         }
 
         public int NbKeeping => _stack.Count;
