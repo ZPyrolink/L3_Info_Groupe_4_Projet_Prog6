@@ -2915,7 +2915,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1404968199
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3301,8 +3301,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: UI.MainMenu, Assembly-CSharp
+      - m_Target: {fileID: 1686521970}
+        m_TargetAssemblyTypeName: UI.MainMenu.MainMenuMgr, Assembly-CSharp
         m_MethodName: ToggleContactUs
         m_Mode: 1
         m_Arguments:
@@ -3664,7 +3664,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1686521966
 MonoBehaviour:
   m_ObjectHideFlags: 0
