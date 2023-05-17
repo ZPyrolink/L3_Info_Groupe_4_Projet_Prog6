@@ -241,7 +241,7 @@ namespace UI
 
         private void RedoPhase2(GameManagment.Coup coup)
         {
-            if (coup.player.Eliminated)
+            if (GameMgr.Instance.players[coup.playerIndex].Eliminated)
             {
                 RedoPhase1(coup);
             } else

@@ -35,8 +35,11 @@ namespace Wrapper
                 else
                     load = true;
 
-                if (load)
-                    return new(Settings.LoadedFile);
+                if (load) {
+                    GameManagment gm = new(2, Enumerable.Repeat(typeof(AIRandom), 0).ToArray());
+                    gm.LoadGame(Settings.LoadedFile);
+                    return gm;
+                }
 
                 if (Settings.PlayerNb == 0)
                     Settings.PlayerNb = nbPlayers;
@@ -73,6 +76,8 @@ namespace Wrapper
 
             Instance.NotifyPlayerEliminated = player => { //Debug.Log(player);
                                                           };
+
+            Instance.NotifyReputTile = (pos, r) => TilesMgr.Instance.ReputTile(pos, r);
 
             Instance.NotifyAIBuildingPlacement = (building, i) => throw new NotImplementedException();
             Instance.NotifyAIChunkPlacement = rotation => throw new NotImplementedException();

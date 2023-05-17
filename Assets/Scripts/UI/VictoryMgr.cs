@@ -20,7 +20,7 @@ namespace UI
 
         public void Restart() => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 
-        public void MainMenu() => throw new NotImplementedException();
+        public void MainMenu() => SceneManager.LoadScene("MainMenu");
 
         public void Quit() =>
 #if UNITY_EDITOR
