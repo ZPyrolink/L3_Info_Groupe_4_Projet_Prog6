@@ -16,24 +16,28 @@ namespace Taluva.Controller
 {
     public class GameManagment
     {
+        public Board gameBoard { get; }
+        private Historic<Coup> historic;
+        
+        #region Players
+        
         public Player[] players;
         public Player actualPlayer => players[ActualPlayerIndex];
         public Player PreviousPlayer => players[Math.Abs((ActualPlayerIndex - 1) % NbPlayers)];
         private AI ActualAi => (AI) actualPlayer;
-        public string savePath { get; } = Directory.GetCurrentDirectory() + "/Save/";
-
-        public int NbPlayers { get; set; }
+        public int NbPlayers { get; }
         public int ActualPlayerIndex { get; private set; }
-        public int maxTurn;
-        public Board gameBoard;
-        public TurnPhase actualPhase { get; private set; } = TurnPhase.NextPlayer;
-        private Historic<Coup> historic;
-        public Pile<Chunk> pile = ListeChunk.Pile;
-        public Chunk actualChunk;
-        private bool AIRandom = false;
-        private Player Winner { get; set; }
+        
+        #endregion
 
-        private GameEnd victoryType { get; set; }
+        public string savePath { get; } = Directory.GetCurrentDirectory() + "/Save/";
+        
+        public Pile<Chunk> pile = ListeChunk.Pile;
+        public TurnPhase actualPhase { get; private set; } = TurnPhase.NextPlayer;
+        public int maxTurn { get; private set; }
+        public Chunk actualChunk { get; set; }
+        
+        #region Events
 
         //Actions
         //Notify phase change
@@ -56,6 +60,10 @@ namespace Taluva.Controller
         //Notify player eliminated
         public Action<Player> NotifyPlayerEliminated { get; set; }
         private void OnPlayerElimination(Player p) => NotifyPlayerEliminated?.Invoke(p);
+        
+        #endregion
+
+        #region Ctors
 
         public GameManagment(int nbPlayers, Type[] typeAI)
         {
@@ -72,13 +80,20 @@ namespace Taluva.Controller
                 players[i] = new(pc[i]);
 
             for (int i = 0; i < typeAI.Length; i++)
+            {
+                Index index = ^(i + 1);
+                ref Player ptr = ref players[index];
+                
                 if (typeAI[i] == typeof(AIRandom))
-                    players[^(i + 1)] = new AIRandom(pc[i], this);
+                    ptr = new AIRandom(pc[index], this);
                 else if (typeAI[i] == typeof(AIMonteCarlo))
-                    players[^(i + 1)] = new AIMonteCarlo(pc[i], this, pile);
+                    ptr = new AIMonteCarlo(pc[index], this, pile);
+            }
         }
 
         public GameManagment(int nbPlayers) : this(nbPlayers, Array.Empty<Type>()) { }
+
+        #endregion
 
         public class Coup
         {
@@ -585,7 +600,6 @@ namespace Taluva.Controller
             if (maxTurn == 0)
             {
                 p = NormalEnd;
-                this.victoryType = GameEnd.NormalEnd;
                 OnEndGame(p, GameEnd.NormalEnd);
             }
 
@@ -593,7 +607,6 @@ namespace Taluva.Controller
             if (tmp != null)
             {
                 p = tmp;
-                this.victoryType = GameEnd.EarlyEnd;
                 OnEndGame(p, GameEnd.EarlyEnd);
             }
 
@@ -753,7 +766,7 @@ namespace Taluva.Controller
 
         public void PlayerEliminated()
         {
-            if (BarracksSlots().Length == 0 && actualPlayer != this.Winner && TempleSlots(actualPlayer).Length == 0 &&
+            if (BarracksSlots().Length == 0 && TempleSlots(actualPlayer).Length == 0 &&
                 TowerSlots(actualPlayer).Length == 0)
             {
                 actualPlayer.Eliminate();
