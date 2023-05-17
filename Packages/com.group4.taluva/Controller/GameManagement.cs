@@ -351,12 +351,12 @@ namespace Taluva.Controller
                             buildings[j] = (Building) reader.ReadInt32();
                         }
                     }
-
                     if (index)
                     {
                         if (i % 2 == 0)
                         {
                             ValidateTile(new(positions[0], r), r);
+                            
                         }
                         else
                         {
