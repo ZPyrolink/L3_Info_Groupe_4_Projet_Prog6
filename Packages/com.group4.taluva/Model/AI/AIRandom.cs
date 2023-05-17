@@ -61,7 +61,7 @@ namespace Taluva.Model.AI
             if(temples.Length>0)
             {
                 rand = Random.Range(0, temples.Length);
-                return (Building.Barrack,temples[rand]);
+                return (Building.Temple,temples[rand]);
             } 
             Vector2Int[] towers = gm.gameBoard.GetTowerSlots(this);
             if(towers.Length>0)
