@@ -9,10 +9,8 @@ using UnityEngine;
 
 using System.Collections.Generic;
 using System.IO;
-using System.Globalization;
 using System.Linq;
 
-using UnityEngine.UIElements;
 
 namespace Taluva.Controller
 {
@@ -608,13 +606,13 @@ namespace Taluva.Controller
                 {
                     int completedBuildingTypes = 0;
 
-                    if (gameBoard.GetTempleSlots(p).Length == p.nbTemple)
+                    if (p.nbTemple == 0)
                         completedBuildingTypes++;
 
-                    if (gameBoard.GetBarrackSlots(p).Length == p.nbBarrack)
+                    if (p.nbBarrack == 0)
                         completedBuildingTypes++;
 
-                    if (gameBoard.GetTowerSlots(p).Length == p.nbTowers)
+                    if (p.nbTowers == 0)
                         completedBuildingTypes++;
 
                     if (completedBuildingTypes >= 2)
