@@ -770,6 +770,69 @@ namespace Taluva.Controller
                 NextPhase();
             }
         }
+        
+        public bool InitPlayIA()
+        {
+            if (CheckWinner() != null)
+            {
+                return false;
+            }
+
+            ActualPlayerIndex++;
+            if (ActualPlayerIndex + 1 > NbPlayers)
+            {
+                ActualPlayerIndex = 0;
+            }
+
+            if (actualPlayer.Eliminated)
+            {
+                ActualPlayerIndex++;
+                if (ActualPlayerIndex + 1 > NbPlayers)
+                {
+                    ActualPlayerIndex = 0;
+                }
+            }
+
+            this.actualChunk = pile.Draw();
+
+            NextPhaseIA();
+            return true;
+        }
+        public void NextPhaseIA()
+        {
+            int nextPhaseValue = ((int)actualPhase + 1) % (Enum.GetNames(typeof(TurnPhase)).Length - 1);
+                actualPhase = (TurnPhase)nextPhaseValue;
+
+                if (actualPhase == TurnPhase.PlaceBuilding)
+                {
+                    PlayerEliminated();
+
+                    if (actualPlayer.Eliminated)
+                        InitPlay();
+                }
+
+                OnChangePhase(actualPhase);
+        }
+        public void Phase1IA(PointRotation pr, Rotation r)
+        {
+            if (ValidateTile(pr, r))
+            {
+                NextPhaseIA();
+                this.maxTurn--;
+            }
+        }
+        public void Phase2IA(PointRotation pr, Building b)
+        {
+            Cell c = gameBoard.WorldMap[pr.point];
+            if (ValidateBuilding(c, b))
+            {
+                NextPhaseIA();
+                InitPlay();
+            }
+        }
+        
+        
+        
 
         public void PlayerEliminated()
         {
