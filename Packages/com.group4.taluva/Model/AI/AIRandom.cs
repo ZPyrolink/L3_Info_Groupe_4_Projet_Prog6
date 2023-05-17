@@ -5,7 +5,7 @@ namespace Taluva.Model.AI
 {
     public class AIRandom : AI
     {
-        public AIRandom(PlayerColor id,GameManagment gm) : base(id,gm,null)
+        public AIRandom(PlayerColor id,GameManagment gm) : base(id,gm)
         {
             
         }

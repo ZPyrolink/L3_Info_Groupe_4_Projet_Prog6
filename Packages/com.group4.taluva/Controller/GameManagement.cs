@@ -87,7 +87,7 @@ namespace Taluva.Controller
                 if (typeAI[i] == typeof(AIRandom))
                     ptr = new AIRandom(pc[index], this);
                 else if (typeAI[i] == typeof(AIMonteCarlo))
-                    ptr = new AIMonteCarlo(pc[index], this, pile);
+                    ptr = new AIMonteCarlo(pc[index], this);
             }
         }
 

@@ -5,7 +5,7 @@ namespace Taluva.Model.AI
 {
     public class AIMinMax : AITree
     {
-        public AIMinMax(PlayerColor id, GameManagment gm, Pile<Chunk> pile) : base(id, gm, pile)
+        public AIMinMax(PlayerColor id, GameManagment gm) : base(id, gm)
         {
         }
 

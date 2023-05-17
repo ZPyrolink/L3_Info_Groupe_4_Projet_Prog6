@@ -8,16 +8,16 @@ namespace Taluva.Model.AI
 {
     public abstract class AITree : AI
     {
-        public AITree(PlayerColor id,GameManagment gm,Pile<Chunk> pile) : base(id, gm,pile){}
+        public AITree(PlayerColor id,GameManagment gm) : base(id, gm){}
         public AITree(AITree orignal) : base(orignal){}
         
         private int TreeExplore(int depth)
         {
-            if (depth == 0)
+            if (depth == 0 /*|| gm.gameEnd*/)
             {
                 return Heuristic;
             }
-            Chunk[] possibleDraw = pile.GetRemaining();
+            Chunk[] possibleDraw = gm.pile.GetRemaining();
             PointRotation[] possibleChunk = gm.gameBoard.GetChunkSlots();
             int value = 0;
             List<GameManagment.Coup> possiblePlay;
