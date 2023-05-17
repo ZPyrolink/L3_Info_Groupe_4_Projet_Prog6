@@ -140,6 +140,30 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         Destroy(_currentFf);
         _currentFf = null;
     }
+    
+    public void PutAiTile(Vector2Int pos, Rotation rot)
+    {
+        UiMgr.Instance.Phase1();
+        
+        _gos = null;
+        Vector3 p = new(pos.x, 0, pos.y);
+        if (!GameMgr.Instance.IsVoid(pos))
+            p.y = GameMgr.Instance.LevelAt(pos) * yOffset;
+        p.Scale(new(xOffset, 1, zOffset));
+
+        if (pos.x % 2 != 0)
+            p.z += zOffset / 2;
+
+        _currentFf = new();
+        _gos = new()
+        {
+            [_currentFf] = new(pos, rot)
+        };
+        PutTile(p);
+        ValidateTile(false);
+        Destroy(_currentFf);
+        _currentFf = null;
+    }
 
     private void PutBuild(Vector3 _) => PutBuild(GameMgr.Instance.actualPlayer.ID.GetColor());
 
@@ -198,32 +222,41 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             GameMgr.Instance.Phase2(_gos[_currentFf].point, _currentBuild);
     }
 
-    public void ReputBuild(Vector2Int pos, Building b)
+    private static Vector3 V2IToV3(Vector2Int v)
+    {
+        Vector3 v3 = new(v.x, 0, v.y);
+        if (!GameMgr.Instance.IsVoid(v))
+            v3.y = GameMgr.Instance.LevelAt(v) * yOffset;
+        v3.Scale(new(xOffset, 1, zOffset));
+
+        if (v.x % 2 != 0)
+            v3.z += zOffset / 2;
+
+        return v3;
+    }
+
+    public void ReputBuild(Vector2Int pos, Building b, Player player)
     {
         _currentBuild = b;
         _gos = null;
-        Vector3 p = new(pos.x, 0, pos.y);
-        if (!GameMgr.Instance.IsVoid(pos))
-            p.y = GameMgr.Instance.LevelAt(pos) * yOffset;
-        p.Scale(new(xOffset, 1, zOffset));
 
-        if (pos.x % 2 != 0)
-            p.z += zOffset / 2;
-
-        _currentFf = new()
-        {
-            transform =
+        _gos = GameMgr.Instance.FindBiomesAroundVillage(pos).ToDictionary
+        (
+            static p => new GameObject
             {
-                position = p
-            }
-        };
-        _gos = new()
-        {
-            [_currentFf] = new(pos)
-        };
+                transform =
+                {
+                    position = V2IToV3(p)
+                }
+            },
+            static p => new PointRotation(p)
+        );
 
-        PutBuild(GameMgr.Instance.PreviousPlayer.ID.GetColor());
+        _currentFf = _gos.Keys.First();
+
+        PutBuild(player.ID.GetColor());
         ValidateBuild(false);
+        Destroy(_currentFf);
         _currentFf = null;
     }
 

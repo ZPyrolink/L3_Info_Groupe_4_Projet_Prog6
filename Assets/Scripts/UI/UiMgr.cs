@@ -59,6 +59,7 @@ namespace UI
 
         [SerializeField]
         private Button undoButton;
+
         [SerializeField]
         private Button redoButton;
 
@@ -112,16 +113,18 @@ namespace UI
         {
             for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
             {
-                _guis[i].GetComponent<Image>().color =
-                    i == GameMgr.Instance.ActualPlayerIndex ? Color.white : GameMgr.Instance.players[i].Eliminated ? new(1, 0, 0, .25f) : new(.75f, .75f, .75f);
-
-
+                _guis[i].GetComponent<Image>().color = i == GameMgr.Instance.ActualPlayerIndex ?
+                    Color.white :
+                    GameMgr.Instance.players[i].Eliminated ?
+                        new(1, 0, 0, .25f) :
+                        new(.75f, .75f, .75f);
 
                 foreach (Animator anim in _guis[i].GetComponentsInChildren<Animator>())
                     if (GameMgr.Instance.ActualPlayerIndex == i)
                     {
                         anim.enabled = true;
-                    } else
+                    }
+                    else
                     {
                         anim.enabled = false;
                         anim.transform.localRotation = Quaternion.Euler(-90, 0, 0);
@@ -153,7 +156,7 @@ namespace UI
         {
             (GameMgr.Instance.actualPhase switch
             {
-                TurnPhase.SelectCells => (Action<bool>)TilesMgr.Instance.ValidateTile,
+                TurnPhase.SelectCells => (Action<bool>) TilesMgr.Instance.ValidateTile,
                 TurnPhase.PlaceBuilding => TilesMgr.Instance.ValidateBuild
             }).Invoke(true);
         }
@@ -206,7 +209,7 @@ namespace UI
 
             (GameMgr.Instance.actualPhase switch
             {
-                TurnPhase.SelectCells => (Action<GameManagment.Coup>)UndoPhase1,
+                TurnPhase.SelectCells => (Action<GameManagment.Coup>) UndoPhase1,
                 TurnPhase.PlaceBuilding => UndoPhase2
             }).Invoke(coup);
         }
@@ -221,16 +224,15 @@ namespace UI
 
             (GameMgr.Instance.actualPhase switch
             {
-                TurnPhase.PlaceBuilding => (Action<GameManagment.Coup>)RedoPhase1,
+                TurnPhase.PlaceBuilding => (Action<GameManagment.Coup>) RedoPhase1,
                 TurnPhase.SelectCells => RedoPhase2
             }).Invoke(coup);
-
         }
 
         private void RedoPhase1(GameManagment.Coup coup)
         {
             // ReSharper disable once PossibleInvalidOperationException
-            TilesMgr.Instance.ReputTile(coup.positions[0], (Rotation)coup.rotation);
+            TilesMgr.Instance.ReputTile(coup.positions[0], (Rotation) coup.rotation);
             if (GameMgr.Instance.actualPhase == TurnPhase.PlaceBuilding)
                 TilesMgr.Instance.SetFeedForwards2(Building.Barrack);
             else
@@ -244,10 +246,12 @@ namespace UI
             if (coup.player.Eliminated)
             {
                 RedoPhase1(coup);
-            } else
-            {
-                TilesMgr.Instance.ReputBuild(coup.positions[0], coup.building[0]);
             }
+            else
+            {
+                TilesMgr.Instance.ReputBuild(coup.positions[0], coup.building[0], GameMgr.Instance.PreviousPlayer);
+            }
+
             TilesMgr.Instance.SetFeedForwards1();
         }
 
@@ -273,7 +277,7 @@ namespace UI
                 anim.transform.localRotation = Quaternion.Euler(-90, -90, 0);
             }
 
-            TilesMgr.Instance.SetFeedForwards2((Building)i + 1);
+            TilesMgr.Instance.SetFeedForwards2((Building) i + 1);
 
             child = builds.transform.GetChild(i).GetComponent<RectTransform>();
             child.anchoredPosition = child.anchoredPosition.With(y: 20);

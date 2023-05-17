@@ -40,10 +40,10 @@ namespace Wrapper
 
                 if (Settings.PlayerNb == 0)
                     Settings.PlayerNb = nbPlayers;
-                
+
                 if (Settings.AiNb == 0)
                     Settings.AiNb = nbAis;
-                
+
                 return new(Settings.PlayerNb, Enumerable.Repeat(typeof(AIRandom), Settings.AiNb).ToArray());
             }
         }
@@ -71,11 +71,16 @@ namespace Wrapper
 
             Instance.NotifyEndGame = (player, end) => { Debug.Log(player + " " + end); };
 
-            Instance.NotifyPlayerEliminated = player => { //Debug.Log(player);
-                                                          };
+            Instance.NotifyPlayerEliminated = player =>
+            {
+                //Debug.Log(player);
+            };
 
-            Instance.NotifyAIBuildingPlacement = (building, i) => throw new NotImplementedException();
-            Instance.NotifyAIChunkPlacement = rotation => throw new NotImplementedException();
+            Instance.NotifyAIBuildingPlacement = (building, pos) =>
+            {
+                TilesMgr.Instance.ReputBuild(pos, building, Instance.actualPlayer);
+            };
+            Instance.NotifyAIChunkPlacement = pr => TilesMgr.Instance.PutAiTile(pr.point, (Rotation) Array.IndexOf(pr.rotations, true));
         }
     }
 }
