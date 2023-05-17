@@ -135,6 +135,7 @@ namespace Taluva.Controller
 
         public void Save(string path)
         {
+            Debug.Log(savePath + path);
             Directory.CreateDirectory(savePath);
             using (FileStream file = File.Open(savePath + path, FileMode.OpenOrCreate, FileAccess.Write))
             using (BinaryWriter writer = new(file))
@@ -544,7 +545,7 @@ namespace Taluva.Controller
         {
             if (!historic.CanRedo)
                 return null;
-            Debug.Log(pile._stack.Count);
+
             Coup c = historic.Redo();
             if (c.chunk == null)
             {
