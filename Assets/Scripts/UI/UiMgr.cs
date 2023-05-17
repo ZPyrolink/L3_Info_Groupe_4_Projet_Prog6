@@ -1,5 +1,6 @@
 using System;
 
+using Taluva.Controller;
 using Taluva.Model;
 
 using UnityEngine;
@@ -163,10 +164,7 @@ namespace UI
             UpdateCurrentPlayer();
             UpdatePlayersBuild();
 
-            if (NbTiles == ListeChunk.Count)
-                TilesMgr.Instance.SetFeedForward(Vector3.zero);
-            else
-                TilesMgr.Instance.SetFeedForwards1();
+            TilesMgr.Instance.SetFeedForwards1();
 
             CurrentTile.SetActive(true);
 
@@ -194,7 +192,21 @@ namespace UI
             UpBuild(0);
         }
 
-        public void Undo() => GameMgr.Instance.Undo();
+        public void Undo()
+        {
+            GameManagment.Coup coup = GameMgr.Instance.Undo();
+
+            (GameMgr.Instance.actualPhase switch
+            {
+                TurnPhase.SelectCells => (Action<GameManagment.Coup>) UndoPhase1,
+                TurnPhase.PlaceBuilding => UndoPhase2
+            }).Invoke(coup);
+        }
+
+        private void UndoPhase1(GameManagment.Coup c) => TilesMgr.Instance.RemoveTile(c.positions[0]);
+
+        private void UndoPhase2(GameManagment.Coup c) => TilesMgr.Instance.RemoveBuild(c.positions);
+
         public void Redo() => GameMgr.Instance.Redo();
 
         public void ToggleMenu()

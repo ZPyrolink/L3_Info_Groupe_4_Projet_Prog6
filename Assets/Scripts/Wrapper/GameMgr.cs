@@ -28,6 +28,7 @@ namespace Wrapper
         {
             Instance.ChangePhase = phase =>
             {
+                Debug.Log($"Change Phase into {phase}");
                 UiMgr ui = UiMgr.Instance;
 
                 (phase switch
