@@ -22,7 +22,7 @@ namespace UI
 
         private int NbTiles
         {
-            get => GameMgr.Instance.pile.NbKeeping;
+            get => GameMgr.Instance.pile.NbKeeping + 1;
             set => uiNbTiles.text = NB_TILES_PLACEHOLDER.Replace("%nb%", value.ToString());
         }
 
