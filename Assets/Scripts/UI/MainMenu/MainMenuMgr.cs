@@ -1,8 +1,8 @@
-using UnityEngine;
+ using UnityEngine;
 
-namespace UI
+ namespace UI.MainMenu
 {
-    public class MainMenu : MonoBehaviour
+    public class MainMenuMgr : MonoBehaviour
     {
         private const string DISCORD_URL = "https://discordapp.com/users/";
         
@@ -12,14 +12,21 @@ namespace UI
         [SerializeField]
         private GameObject contactUs,
             main,
-            play;
+            play,
+            load;
         
         public void OpenSettings() { }
 
-        public void TogglePlay(bool ai)
+        public void TogglePlay()
         {
             ToggleMain();
-            play.SetActive(!play.activeSelf);
+            Toggle(play);
+        }
+
+        public void ToggleLoad()
+        {
+            ToggleMain();
+            Toggle(load);
         }
 
         public void Rules() { }
@@ -34,10 +41,12 @@ namespace UI
         public void ToggleContactUs()
         {
             ToggleMain();
-            contactUs.SetActive(!contactUs.activeSelf);
+            Toggle(contactUs);
         }
 
-        public void ToggleMain() => main.SetActive(!main.activeSelf);
+        public void ToggleMain() => Toggle(main);
+
+        private void Toggle(GameObject go) => go.SetActive(!go.activeSelf);
 
         public void Contact(int i) => Application.OpenURL(DISCORD_URL + userIds[i]);
     }

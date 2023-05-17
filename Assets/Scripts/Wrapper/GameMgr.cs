@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 
 using Taluva.Controller;
 using Taluva.Model;
+using Taluva.Model.AI;
 
 using UI;
 
@@ -9,14 +11,42 @@ using UnityEngine;
 
 using Utils;
 
+using Random = UnityEngine.Random;
+
 namespace Wrapper
 {
     public class GameMgr : MonoBehaviourMgr<GameManagment>
     {
         [SerializeField]
-        private int nbPlayers;
+        private sbyte nbPlayers, nbAis;
 
-        protected override GameManagment InitInstance => new(nbPlayers);
+        [SerializeField]
+        private string path;
+
+        [SerializeField]
+        private bool load;
+
+        protected override GameManagment InitInstance
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Settings.LoadedFile))
+                    Settings.LoadedFile = path;
+                else
+                    load = true;
+
+                if (load)
+                    return new(Settings.LoadedFile);
+
+                if (Settings.PlayerNb == 0)
+                    Settings.PlayerNb = nbPlayers;
+                
+                if (Settings.AiNb == 0)
+                    Settings.AiNb = nbAis;
+                
+                return new(Settings.PlayerNb, Enumerable.Repeat(typeof(AIRandom), Settings.AiNb).ToArray());
+            }
+        }
 
         private void Start()
         {
