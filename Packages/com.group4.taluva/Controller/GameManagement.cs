@@ -806,14 +806,17 @@ namespace Taluva.Controller
                 if (pr.rotations[i])
                     r = (Rotation) i;
             }
-
             OnAIChunkPlacement(pr);
             ValidateTile(pr, r);
             (Building b, Vector2Int pos) = ((AI) actualPlayer).PlayBuild();
             PointRotation p = new PointRotation(pos);
             Cell c = gameBoard.WorldMap[p.point];
-            OnAIBuildingPlacement(b, pos);
-            ValidateBuilding(c, b);
+
+            if (!actualPlayer.Eliminated)
+            {
+                OnAIBuildingPlacement(b, pos);
+                ValidateBuilding(c, b);
+            }
             NextPhase();
             InitPlay();
         }
