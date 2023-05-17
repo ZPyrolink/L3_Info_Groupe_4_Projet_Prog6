@@ -13,6 +13,10 @@ namespace Taluva.Model.AI
         
         private int TreeExplore(int depth)
         {
+            if (depth == 0)
+            {
+                return Heuristic;
+            }
             Chunk[] possibleDraw = pile.GetRemaining();
             PointRotation[] possibleChunk = gm.gameBoard.GetChunkSlots();
             int value = 0;
