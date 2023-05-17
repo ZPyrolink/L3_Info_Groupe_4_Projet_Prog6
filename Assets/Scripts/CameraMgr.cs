@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 
 using UnityEngine;
+using Utils;
 
-public class CameraMgr : MonoBehaviour
+public class CameraMgr : MonoBehaviourMgr<CameraMgr>
 {
     private Camera _cam;
 
