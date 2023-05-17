@@ -65,6 +65,12 @@ namespace Taluva.Controller
 
         #region Ctors
 
+        public GameManagment(GameManagment original)
+        {
+            this.gameBoard = new Board(original.gameBoard);
+            //this.historic = new Historic<Coup>(original.historic); TODO Copy constructor
+            //this.pile = new Pile<Chunk>(original.pile);   TODO copy constructor
+        }
         public GameManagment(int nbPlayers, Type[] typeAI)
         {
             historic = new();

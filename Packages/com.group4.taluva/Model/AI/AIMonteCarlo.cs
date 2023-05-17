@@ -28,6 +28,7 @@ namespace Taluva.Model.AI
             get
             {
                 int val = 0;
+                GameManagment virtualGM = new GameManagment(gm);
                 for (int i = 0; i < 500; i++)
                 {
                     while (true) //TODO condition go on till the games end.
