@@ -13,7 +13,7 @@ public class Player
     public int nbTemple = 3;
     public int nbBarrack = 20;
     public bool playerIA = false;
-    public bool Eliminated { get; private set; }
+    public bool Eliminated { get; set; }
 
     public Player(PlayerColor id)
     {

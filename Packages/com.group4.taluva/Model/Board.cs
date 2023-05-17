@@ -23,20 +23,14 @@ namespace Taluva.Model
         }
 
         /// <summary>
-        /// Remove the cell from the map
-        /// </summary>
-        /// <param name="c">The cell to remove</param>
-        private void RemoveCell(Cell c) => WorldMap.Remove(GetCellCoord(c));
-
-        /// <summary>
         /// Remove the chunk from the map.
         /// Be careful! This only remove the chunk and don't add the possible under cells
         /// </summary>
         /// <param name="c">The chunk to remove</param>
-        public void RemoveChunk(Chunk c)
+        public void RemoveChunk(Vector2Int[] positions)
         {
-            foreach (Cell cell in c.Coords)
-                RemoveCell(cell);
+            foreach (Vector2Int p in positions)
+                WorldMap.Remove(p);
         }
 
         /// <summary>
