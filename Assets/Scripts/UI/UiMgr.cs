@@ -254,6 +254,8 @@ namespace UI
         public void ToggleMenu()
         {
             menuCanva.SetActive(!menuCanva.activeSelf);
+            CameraMgr.Instance.enabled = !menuCanva.activeSelf;
+            UiMgr.Instance.enabled = !menuCanva.activeSelf;
         }
 
         public void UpBuild(int i)
