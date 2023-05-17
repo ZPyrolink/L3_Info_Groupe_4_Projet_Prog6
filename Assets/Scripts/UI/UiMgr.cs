@@ -113,7 +113,7 @@ namespace UI
             for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
             {
                 _guis[i].GetComponent<Image>().color =
-                    i == GameMgr.Instance.ActualPlayerIndex ? Color.white : GameMgr.Instance.players[i].Eliminated ? new(1, 0, 0, .5f) : new(.75f, .75f, .75f);
+                    i == GameMgr.Instance.ActualPlayerIndex ? Color.white : GameMgr.Instance.players[i].Eliminated ? new(1, 0, 0, .25f) : new(.75f, .75f, .75f);
 
 
 
