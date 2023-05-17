@@ -194,8 +194,8 @@ namespace Taluva.Controller
                             {
                                 writer.Write((int) historic[i].cells[j].ActualBiome);
                                 writer.Write((int) historic[i].cells[j].ActualBuildings);
-                                if (historic[i].chunk.Coords[j].ActualBuildings != Building.None)
-                                    writer.Write((int) historic[i].chunk.Coords[j].Owner);
+                                if (historic[i].cells[j].ActualBuildings != Building.None)
+                                    writer.Write((int) historic[i].cells[j].Owner);
                                 writer.Write((int) historic[i].building[j]);
                             }
                         }
@@ -203,6 +203,7 @@ namespace Taluva.Controller
                     else
                     {
                         writer.Write(historic[i].positions.Length);
+                        Debug.Log("taille ecrite " + historic[i].positions.Length);
                         for (int j = 0; j < historic[i].positions.Length; j++)
                         {
                             writer.Write(historic[i].positions[j].x);
@@ -283,6 +284,7 @@ namespace Taluva.Controller
                     bool boolean = false;
                     Cell[] newCells;
                     Building[] buildings;
+                    PlayerColor ID;
 
                     bool index = reader.ReadBoolean();
 
@@ -293,11 +295,11 @@ namespace Taluva.Controller
                         positions = new Vector2Int[nbTiles];
                         for (int j = 0; j < nbTiles; j++)
                         {
-                            positions[i] = new(reader.ReadInt32(), reader.ReadInt32());
+                            positions[j] = new(reader.ReadInt32(), reader.ReadInt32());
                         }
 
                         r = (Rotation) reader.ReadInt32();
-                        PlayerColor ID = (PlayerColor) reader.ReadInt32();
+                        ID = (PlayerColor) reader.ReadInt32();
                         Cell[] cells = new Cell[2];
                         for (int j = 1; j < 3; j++)
                         {
@@ -331,14 +333,15 @@ namespace Taluva.Controller
                     }
                     else
                     {
-                        int nbTiles = reader.ReadInt32();
+                        int nbTiles = reader.ReadInt32(); 
+                        Debug.Log("taille lu " + nbTiles);
                         positions = new Vector2Int[nbTiles];
                         for (int j = 0; j < nbTiles; j++)
                         {
                             positions[j] = new(reader.ReadInt32(), reader.ReadInt32());
                         }
 
-                        PlayerColor ID = (PlayerColor) reader.ReadInt32();
+                        ID = (PlayerColor) reader.ReadInt32();
                         buildings = new Building[nbTiles];
                         newCells = new Cell[nbTiles];
                         for (int j = 0; j < nbTiles; j++)
@@ -354,12 +357,12 @@ namespace Taluva.Controller
                     {
                         if (i % 2 == 0)
                         {
-                            ValidateTile(new(positions[0], r), r);
-                            
+                            Phase1(new(positions[0], r), r);
+                            ActualPlayerIndex = (int) ID;
                         }
                         else
                         {
-                            ValidateBuilding(gameBoard.WorldMap[positions[0]], buildings[0]);
+                            Phase2(positions[0], buildings[0]);
                         }
                     }
                     else
@@ -762,9 +765,9 @@ namespace Taluva.Controller
         }
 
         //Place building
-        public void Phase2(PointRotation pr, Building b)
+        public void Phase2(Vector2Int pr, Building b)
         {
-            Cell c = gameBoard.WorldMap[pr.point];
+            Cell c = gameBoard.WorldMap[pr];
             if (ValidateBuilding(c, b))
             {
                 NextPhase();

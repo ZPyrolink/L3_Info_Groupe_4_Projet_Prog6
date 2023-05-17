@@ -195,7 +195,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
         _currentPreviews = null;
         if (sendToLogic)
-            GameMgr.Instance.Phase2(new(_gos[_currentFf].point), _currentBuild);
+            GameMgr.Instance.Phase2(_gos[_currentFf].point, _currentBuild);
     }
 
     public void ReputBuild(Vector2Int pos)
