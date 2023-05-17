@@ -171,8 +171,8 @@ namespace Taluva.Controller
                         writer.Write(historic[i].positions.Length);
                         for (int j = 0; j < historic[i].positions.Length; j++)
                         {
-                            writer.Write(historic[i].positions[i].x);
-                            writer.Write(historic[i].positions[i].y);
+                            writer.Write(historic[i].positions[j].x);
+                            writer.Write(historic[i].positions[j].y);
                         }
 
                         writer.Write((int) historic[i].rotation);
