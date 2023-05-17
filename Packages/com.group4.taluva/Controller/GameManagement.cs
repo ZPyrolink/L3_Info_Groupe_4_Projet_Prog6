@@ -504,7 +504,8 @@ namespace Taluva.Controller
             PrecedentPhase();
             return c;
         }
-
+        
+        
         public Coup Redo()
         {
             if (!historic.CanRedo)
