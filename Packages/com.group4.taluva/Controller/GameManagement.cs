@@ -811,7 +811,7 @@ namespace Taluva.Controller
             (Building b, Vector2Int pos) = ((AI) actualPlayer).PlayBuild();
             PointRotation p = new PointRotation(pos);
             Cell c = gameBoard.WorldMap[p.point];
-
+            PlayerEliminated();
             if (!actualPlayer.Eliminated)
             {
                 OnAIBuildingPlacement(b, pos);
