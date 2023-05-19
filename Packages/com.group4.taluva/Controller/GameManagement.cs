@@ -28,7 +28,7 @@ namespace Taluva.Controller
         public Board gameBoard;
         public TurnPhase actualPhase { get; private set; } = TurnPhase.NextPlayer;
         private Historic<Coup> historic;
-        public Pile<Chunk> pile = ListeChunk.Pile;
+        public Pile<Chunk> pile;
         public Chunk actualChunk;
         private bool AIRandom = false;
         private Player Winner { get; set; }
@@ -66,6 +66,8 @@ namespace Taluva.Controller
         public GameManagment(int nbPlayers, Type[] typeAI)
         {
             historic = new();
+            pile = ListeChunk.Pile;
+            ListeChunk.ResetChunk(pile);
             this.players = new Player[nbPlayers];
             this.ActualPlayerIndex = -1;
             this.gameBoard = new();
