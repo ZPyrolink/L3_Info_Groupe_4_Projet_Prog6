@@ -71,7 +71,7 @@ namespace UI
         protected override void Awake()
         {
             base.Awake();
-            SetUpGui(4);
+            SetUpGui();
         }
 
         private void Start()
@@ -91,9 +91,9 @@ namespace UI
 
         #endregion
 
-        private void SetUpGui(int NbPlayers)
+        private void SetUpGui()
         {
-            for (int i = 0; i < NbPlayers; i++)
+            for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
             {
                 _guis[i] = Instantiate(playerPrefab, transform);
                 RectTransform rt = _guis[i].GetComponent<RectTransform>();
@@ -111,9 +111,9 @@ namespace UI
             }
         }
 
-        public void LoadSetUp()
+        public void UnloadSetUp()
         {
-            SetUpGui(GameMgr.Instance.NbPlayers);
+            //Enlever les joueurs affiché qui n'existe pas
         }
 
         public void UpdateCurrentPlayer()

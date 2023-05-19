@@ -37,7 +37,7 @@ namespace Wrapper
 
                 if (load)
                 {
-                    GameManagment gm = new(2);
+                    GameManagment gm = new(4);
                     return gm;
                 }
 
@@ -58,7 +58,7 @@ namespace Wrapper
             {
                 Instance.LoadGame(Settings.LoadedFile);
             }
-            UiMgr.Instance.LoadSetUp();
+            UiMgr.Instance.UnloadSetUp();
             if (Instance.gameBoard.WorldMap.Empty)
                 Instance.InitPlay();
             else if (Instance.actualPhase == TurnPhase.PlaceBuilding)
