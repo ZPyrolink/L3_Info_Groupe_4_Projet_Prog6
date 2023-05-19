@@ -22,7 +22,7 @@ namespace UI
 
         private int NbTiles
         {
-            get => GameMgr.Instance.pile.NbKeeping + 1;
+            get => GameMgr.Instance.maxTurn;
             set => uiNbTiles.text = NB_TILES_PLACEHOLDER.Replace("%nb%", value.ToString());
         }
 
@@ -45,6 +45,9 @@ namespace UI
 
         [SerializeField]
         private GameObject menuCanva;
+
+        [SerializeField]
+        private GameObject victoryCanva;
 
         [SerializeField]
         private KeyCode nextPhase = KeyCode.Return, menu = KeyCode.Escape;
@@ -106,6 +109,13 @@ namespace UI
                 _guis[i].transform.GetChild(0).GetComponent<Text>().text = $"Player {i}";
                 _guis[i].transform.GetChild(1).GetComponent<Image>().color = GameMgr.Instance.players[i].ID.GetColor();
             }
+        }
+
+        public void UnloadSetUp()
+        {
+            //Enlever les joueurs affiché qui n'existe pas
+            for (int i = GameMgr.Instance.NbPlayers; i < 4; i++)
+                Destroy(this.gameObject.transform.GetChild(i + 5).gameObject);
         }
 
         public void UpdateCurrentPlayer()
@@ -243,12 +253,11 @@ namespace UI
             else
                 CurrentTile.SetActive(true);
 
-            Phase1();
         }
 
         private void RedoPhase2(GameManagment.Coup coup)
         {
-            if (coup.player.Eliminated)
+            if (GameMgr.Instance.players[coup.playerIndex].Eliminated)
             {
                 RedoPhase1(coup);
             }
@@ -263,8 +272,20 @@ namespace UI
         public void ToggleMenu()
         {
             menuCanva.SetActive(!menuCanva.activeSelf);
-            CameraMgr.Instance.enabled = !menuCanva.activeSelf;
-            UiMgr.Instance.enabled = !menuCanva.activeSelf;
+            EnableScript();
+        }
+
+        public void ToggleVictory()
+        {
+            EnableScript();
+            victoryCanva.SetActive(true);
+        }
+
+        public void EnableScript()
+        {
+            CameraMgr.Instance.enabled = !CameraMgr.Instance.enabled;
+            Instance.enabled = !Instance.enabled;
+            TilesMgr.Instance.enabled = !TilesMgr.Instance.enabled;
         }
 
         public void UpBuild(int i)

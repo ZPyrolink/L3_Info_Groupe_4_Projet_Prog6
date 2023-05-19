@@ -1257,6 +1257,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nbPlayers: 4
+  nbAis: 0
+  path: 
+  load: 0
 --- !u!1 &342422411
 GameObject:
   m_ObjectHideFlags: 0
@@ -1518,6 +1521,7 @@ MonoBehaviour:
   currentTile: {fileID: 567591721}
   builds: {fileID: 514725167}
   menuCanva: {fileID: 1694325169}
+  victoryCanva: {fileID: 2053269521}
   nextPhase: 13
   menu: 27
   validateButton: {fileID: 1931092067}

@@ -44,7 +44,10 @@ namespace Wrapper
                     load = true;
 
                 if (load)
-                    return new(Settings.LoadedFile);
+                {
+                    GameManagment gm = new(4);
+                    return gm;
+                }
 
                 if (Settings.PlayerNb == 0)
                     Settings.PlayerNb = nbPlayers;
@@ -60,18 +63,42 @@ namespace Wrapper
         {
             _aiMoves = new();
             SetHandlers();
-            Instance.InitPlay();
+            if (load)
+            {
+                Instance.LoadGame(Settings.LoadedFile);
+                UiMgr.Instance.UnloadSetUp();
+            }
+            if (Instance.gameBoard.WorldMap.Empty)
+                Instance.InitPlay();
+            else if (Instance.actualPhase == TurnPhase.PlaceBuilding)
+                Instance.InitPlay(false, false);
+            else
+                Instance.InitPlay(true, false);
         }
 
         private void SetHandlers()
         {
             Instance.ChangePhase = ChangePhase;
 
-            Instance.NotifyEndGame = (player, end) => { Debug.Log(player + " " + end); };
+            Instance.NotifyEndGame = (player, end) => 
+            { 
+                VictoryMgr.Instance.SetWinnerText(player.ID.ToString());
+                UiMgr.Instance.ToggleVictory();
+            };
 
             Instance.NotifyPlayerEliminated = player =>
             {
                 //Debug.Log(player);
+            };
+            
+            Instance.NotifyReputTile = (pos, r) => 
+            { 
+                TilesMgr.Instance.ReputTile(pos, r); 
+            };
+
+            Instance.NotifyReputBuild = (pos, b) =>
+            {
+                TilesMgr.Instance.ReputBuild(pos, b, Instance.actualPlayer);
             };
 
             Instance.NotifyAIChunkPlacement = pr =>
@@ -97,7 +124,7 @@ namespace Wrapper
                     StartCoroutine(CTemporateAi());
             };
         }
-
+        
         private void ChangePhase(TurnPhase phase)
         {
             if (_AiWorking)

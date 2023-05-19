@@ -165,7 +165,10 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     private void PutBuild(Color color)
     {
         Vector2Int currentPos = _gos[_currentFf].point;
-        List<Vector2Int> tmp = GameMgr.Instance.FindBiomesAroundVillage(currentPos);
+        List<Vector2Int> tmp = new() { currentPos };
+        if (_currentBuild == Building.Barrack)
+            tmp = GameMgr.Instance.FindBiomesAroundVillage(currentPos);
+
         if (_currentPreviews is null || _currentPreviews.Length < tmp.Count)
             _currentPreviews = new GameObject[tmp.Count];
 
