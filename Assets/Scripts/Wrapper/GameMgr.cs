@@ -35,18 +35,18 @@ namespace Wrapper
                 else
                     load = true;
 
-                if (load) {
-                    GameManagment gm = new(2, Enumerable.Repeat(typeof(AIRandom), 0).ToArray());
-                    gm.LoadGame(Settings.LoadedFile);
+                if (load)
+                {
+                    GameManagment gm = new(2);
                     return gm;
                 }
 
                 if (Settings.PlayerNb == 0)
                     Settings.PlayerNb = nbPlayers;
-                
+
                 if (Settings.AiNb == 0)
                     Settings.AiNb = nbAis;
-                
+
                 return new(Settings.PlayerNb, Enumerable.Repeat(typeof(AIRandom), Settings.AiNb).ToArray());
             }
         }
@@ -54,7 +54,14 @@ namespace Wrapper
         private void Start()
         {
             SetHandlers();
-            Instance.InitPlay();
+            if(load)
+                Instance.LoadGame(Settings.LoadedFile);
+            if (Instance.gameBoard.WorldMap.Empty)
+                Instance.InitPlay();
+            else if (Instance.actualPhase == TurnPhase.PlaceBuilding)
+                Instance.InitPlay(false, false);
+            else
+                Instance.InitPlay(true, false);
         }
 
         private void SetHandlers()
@@ -66,18 +73,31 @@ namespace Wrapper
 
                 (phase switch
                 {
-                    TurnPhase.SelectCells => (Action) ui.Phase1,
+                    TurnPhase.SelectCells => (Action)ui.Phase1,
                     TurnPhase.PlaceBuilding => ui.Phase2,
                     _ => () => Debug.LogWarning($"The {Instance.actualPhase} is not implemented!")
                 }).Invoke();
             };
 
-            Instance.NotifyEndGame = (player, end) => { Debug.Log(player + " " + end); };
+            Instance.NotifyEndGame = (player, end) => 
+            { 
+                VictoryMgr.Instance.SetWinnerText(player.ID.ToString());
+                UiMgr.Instance.ToggleMenu();
+            };
 
-            Instance.NotifyPlayerEliminated = player => { //Debug.Log(player);
-                                                          };
+            Instance.NotifyPlayerEliminated = player =>
+            { //Debug.Log(player);
+            };
 
-            Instance.NotifyReputTile = (pos, r) => TilesMgr.Instance.ReputTile(pos, r);
+            Instance.NotifyReputTile = (pos, r) => 
+            { 
+                TilesMgr.Instance.ReputTile(pos, r); 
+            };
+
+            Instance.NotifyReputBuild = (pos, b) =>
+            {
+                TilesMgr.Instance.ReputBuild(pos, b);
+            };
 
             Instance.NotifyAIBuildingPlacement = (building, i) => throw new NotImplementedException();
             Instance.NotifyAIChunkPlacement = rotation => throw new NotImplementedException();

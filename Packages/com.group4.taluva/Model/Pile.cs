@@ -23,13 +23,9 @@ namespace Taluva.Model
 
         public Pile(List<T> list)
         {
-            _stack = new(list.Count);
+            _stack = new(list);
             _played = new();
 
-            foreach(T item in list)
-            {
-                _stack.Push(item);
-            }
         }
 
         public T Draw()
