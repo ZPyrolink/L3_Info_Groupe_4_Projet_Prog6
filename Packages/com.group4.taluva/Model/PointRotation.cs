@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Taluva.Model
 {
@@ -9,6 +6,7 @@ namespace Taluva.Model
     {
         public readonly Vector2Int point;
         public readonly bool[] rotations;
+        
 
         public PointRotation(Vector2Int point)
         {

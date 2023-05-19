@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace Taluva.Model
 {
@@ -14,7 +13,7 @@ namespace Taluva.Model
 
         public Pile(T[] list)
         {
-            System.Random random = new();
+            Random random = new();
             _stack = new(list.Length);
             _played = new();
 

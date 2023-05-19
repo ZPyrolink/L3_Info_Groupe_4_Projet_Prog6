@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using Taluva.Controller;
 
 namespace Taluva.Model.AI
@@ -13,7 +9,7 @@ namespace Taluva.Model.AI
         
         private int TreeExplore(GameManagment gm)
         {
-            Chunk[] possibleDraw = pile.GetRemaining();
+            Chunk[] possibleDraw = Pile.GetRemaining();
             PointRotation[] possibleChunk = gm.gameBoard.GetChunkSlots();
             foreach (PointRotation p in possibleChunk)
             {

@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 
-using UnityEngine.UIElements;
-
 namespace Taluva.Model
 {
     public static class ListeChunk

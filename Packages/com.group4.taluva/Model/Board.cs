@@ -365,7 +365,7 @@ namespace Taluva.Model
             if (!WorldMap.IsVoid(p.point))
                 c.Level = WorldMap[p.point].ParentCunk.Level + 1;
 
-            player.lastChunk = c;
+            player.LastChunk = c;
 
             Vector2Int[] neighbors = GetNeighbors(p.point);
 
@@ -414,7 +414,7 @@ namespace Taluva.Model
                 foreach(Vector2Int v in tmp2) {
                     nbBarrack += WorldMap[v].ParentCunk.Level;
                 }
-                if (nbBarrack > player.nbBarrack)
+                if (nbBarrack > player.NbBarrack)
                     return false;
             }
 
@@ -424,16 +424,16 @@ namespace Taluva.Model
                     foreach (Vector2Int v in tmp2)
                     {
                         SetC(WorldMap[v]);
-                        player.nbBarrack -= WorldMap[v].ParentCunk.Level;
+                        player.NbBarrack -= WorldMap[v].ParentCunk.Level;
                     }
                     break;
                 case Building.Temple when GetTempleSlots(player).Contains(coord):
                     SetC(c);
-                    player.nbTemple--;
+                    player.NbTemple--;
                     break;
                 case Building.Tower when GetTowerSlots(player).Contains(coord):
                     SetC(c);
-                    player.nbTowers--;
+                    player.NbTowers--;
                     break;
                 default:
                     return false;
@@ -472,7 +472,7 @@ namespace Taluva.Model
             .Select(GetCellCoord)
             .Where(p => !WorldMap.IsVoid(p) && (WorldMap[p].ParentCunk.Level == 1 || IsAdjacentToCity(p, player)) 
                         && WorldMap[p].ActualBuildings == Building.None &&
-                        WorldMap[p].ActualBiome != Biomes.Volcano && WorldMap[p].ParentCunk.Level <= player.nbBarrack)
+                        WorldMap[p].ActualBiome != Biomes.Volcano && WorldMap[p].ParentCunk.Level <= player.NbBarrack)
             .ToArray();
 
         /// <summary>

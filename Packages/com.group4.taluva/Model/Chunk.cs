@@ -1,7 +1,4 @@
-﻿using System;
-using UnityEngine;
-
-namespace Taluva.Model
+﻿namespace Taluva.Model
 {
     public class Chunk
     {
@@ -31,18 +28,5 @@ namespace Taluva.Model
             c.Coords[2].ParentCunk = c;
             this.Level = c.Level;
         }
-        
-
-        void RotateChunk()
-        {
-            throw new NotImplementedException();
-        }
-
-        private bool CanRotate()
-        {
-            throw new NotImplementedException();
-        }
-        
-        
     }
 }
