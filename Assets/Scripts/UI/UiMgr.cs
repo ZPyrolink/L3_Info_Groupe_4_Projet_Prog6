@@ -114,6 +114,8 @@ namespace UI
         public void UnloadSetUp()
         {
             //Enlever les joueurs affiché qui n'existe pas
+            for (int i = GameMgr.Instance.NbPlayers; i < 4; i++)
+                Destroy(this.gameObject.transform.GetChild(i + 5).gameObject);
         }
 
         public void UpdateCurrentPlayer()

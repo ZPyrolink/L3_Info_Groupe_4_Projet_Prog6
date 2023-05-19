@@ -57,8 +57,8 @@ namespace Wrapper
             if (load)
             {
                 Instance.LoadGame(Settings.LoadedFile);
+                UiMgr.Instance.UnloadSetUp();
             }
-            UiMgr.Instance.UnloadSetUp();
             if (Instance.gameBoard.WorldMap.Empty)
                 Instance.InitPlay();
             else if (Instance.actualPhase == TurnPhase.PlaceBuilding)
