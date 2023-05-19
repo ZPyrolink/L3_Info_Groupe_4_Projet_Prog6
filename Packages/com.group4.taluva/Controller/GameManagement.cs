@@ -433,11 +433,11 @@ namespace Taluva.Controller
             if (!gameBoard.WorldMap.IsVoid(position))
             {
                 Vector2Int[] positions = gameBoard.GetChunksCoords(position, rotation);
-                Cell[] newCells = new Cell[gameBoard.WorldMap[position].ParentCunk.Coords.Length];
-                Building[] buildings = new Building[gameBoard.WorldMap[position].ParentCunk.Coords.Length];
-                for (int i = 0; i < gameBoard.WorldMap[position].ParentCunk.Coords.Length; i++)
+                Cell[] newCells = new Cell[gameBoard.WorldMap[position].ParentChunk.Coords.Length];
+                Building[] buildings = new Building[gameBoard.WorldMap[position].ParentChunk.Coords.Length];
+                for (int i = 0; i < gameBoard.WorldMap[position].ParentChunk.Coords.Length; i++)
                 {
-                    newCells[i] = new(gameBoard.WorldMap[positions[i]].ParentCunk.Coords[i]);
+                    newCells[i] = new(gameBoard.WorldMap[positions[i]].ParentChunk.Coords[i]);
                     buildings[i] = gameBoard.WorldMap[positions[i]].ActualBuildings;
                 }
 
@@ -568,7 +568,7 @@ namespace Taluva.Controller
                             ActualPlayer.NbTowers++;
                             break;
                         case Building.Barrack:
-                            ActualPlayer.NbBarrack += gameBoard.WorldMap[c.positions[i]].ParentCunk.Level;
+                            ActualPlayer.NbBarrack += gameBoard.WorldMap[c.positions[i]].ParentChunk.Level;
                             break;
                     }
 
@@ -952,6 +952,6 @@ namespace Taluva.Controller
             set { throw new NotImplementedException(); }
         }
 
-        public int LevelAt(Vector2Int point) => gameBoard.WorldMap[point].ParentCunk.Level;
+        public int LevelAt(Vector2Int point) => gameBoard.WorldMap[point].ParentChunk.Level;
     }
 }

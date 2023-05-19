@@ -11,9 +11,9 @@
             this.Coords = new Cell[3];
             this.Coords[0] = new(Biomes.Volcano, this);
             this.Coords[1] = left;
-            left.ParentCunk = this;
+            left.ParentChunk = this;
             this.Coords[2] = right;
-            right.ParentCunk = this;
+            right.ParentChunk = this;
             this.Level = l;
 
         }
@@ -23,9 +23,9 @@
             this.Coords = new Cell[3];
             this.Coords[0] = c.Coords[0];
             this.Coords[1] = c.Coords[1];
-            c.Coords[1].ParentCunk = c;
+            c.Coords[1].ParentChunk = c;
             this.Coords[2] = c.Coords[2];
-            c.Coords[2].ParentCunk = c;
+            c.Coords[2].ParentChunk = c;
             this.Level = c.Level;
         }
     }

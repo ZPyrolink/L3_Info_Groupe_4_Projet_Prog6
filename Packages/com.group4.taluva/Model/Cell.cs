@@ -6,20 +6,20 @@
         public Building ActualBuildings { get; set; }
         public PlayerColor Owner { get; set; }
 
-        public Chunk ParentCunk;
+        public Chunk ParentChunk;
 
         public Cell(Biomes biome, Chunk c)
         {
             this.ActualBiome = biome;
             this.ActualBuildings = Building.None;
-            this.ParentCunk = c;
+            this.ParentChunk = c;
         }
         public Cell(Cell c)
         {
             this.ActualBiome = c.ActualBiome;
             this.ActualBuildings = c.ActualBuildings;
             this.Owner = c.Owner;
-            this.ParentCunk = new(c.ParentCunk);
+            this.ParentChunk = new(c.ParentChunk);
         }
 
         public Cell(Biomes biome)
