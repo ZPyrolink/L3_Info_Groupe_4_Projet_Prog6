@@ -18,25 +18,25 @@ namespace Taluva.Controller
     {
         public Board gameBoard { get; }
         private Historic<Coup> historic;
-        
+
         #region Players
-        
+
         public Player[] players;
         public Player actualPlayer => players[ActualPlayerIndex];
         public Player PreviousPlayer => players[Math.Abs((ActualPlayerIndex - 1) % NbPlayers)];
         private AI ActualAi => (AI) actualPlayer;
         public int NbPlayers { get; }
         public int ActualPlayerIndex { get; private set; }
-        
+
         #endregion
 
         public string savePath { get; } = Directory.GetCurrentDirectory() + "/Save/";
-        
+
         public Pile<Chunk> pile = ListeChunk.Pile;
         public TurnPhase actualPhase { get; private set; } = TurnPhase.NextPlayer;
         public int maxTurn { get; private set; }
         public Chunk actualChunk { get; set; }
-        
+
         #region Events
 
         //Actions
@@ -60,7 +60,7 @@ namespace Taluva.Controller
         //Notify player eliminated
         public Action<Player> NotifyPlayerEliminated { get; set; }
         private void OnPlayerElimination(Player p) => NotifyPlayerEliminated?.Invoke(p);
-        
+
         #endregion
 
         #region Ctors
@@ -83,7 +83,7 @@ namespace Taluva.Controller
             {
                 Index index = ^(i + 1);
                 ref Player ptr = ref players[index];
-                
+
                 if (typeAI[i] == typeof(AIRandom))
                     ptr = new AIRandom(pc[index], this);
                 else if (typeAI[i] == typeof(AIMonteCarlo))
@@ -756,7 +756,7 @@ namespace Taluva.Controller
             if (actualPlayer is AI ai)
             {
                 actualPhase = TurnPhase.IAPlays;
-                AIMove(ai);
+                AiChunk();
             }
             else
             {
@@ -794,8 +794,8 @@ namespace Taluva.Controller
             }
         }
 
-        //Placement chunk et buildings
-        public void AIMove(AI ai)
+
+        private void AiChunk()
         {
             OnChangePhase(TurnPhase.IAPlays);
             actualPhase = TurnPhase.IAPlays;
@@ -806,10 +806,21 @@ namespace Taluva.Controller
                 if (pr.rotations[i])
                     r = (Rotation) i;
             }
+
             OnAIChunkPlacement(pr);
             ValidateTile(pr, r);
+        }
+
+        public void ContinueAi()
+        {
+            NextPhase();
+            InitPlay();
+        }
+
+        public void AiBuild()
+        {
             (Building b, Vector2Int pos) = ((AI) actualPlayer).PlayBuild();
-            PointRotation p = new PointRotation(pos);
+            PointRotation p = new(pos);
             Cell c = gameBoard.WorldMap[p.point];
             PlayerEliminated();
             if (!actualPlayer.Eliminated)
@@ -817,8 +828,6 @@ namespace Taluva.Controller
                 OnAIBuildingPlacement(b, pos);
                 ValidateBuilding(c, b);
             }
-            NextPhase();
-            InitPlay();
         }
 
         public Texture2D ExportTexture(CustomRenderTexture crt)
@@ -885,8 +894,12 @@ namespace Taluva.Controller
             building = gameBoard.PlaceBuilding(c, b, actualPlayer);
 
             if (building)
-                AddHistoric(sameBiomes.Count > 0 ? sameBiomes.ToArray() : new[] { gameBoard.GetCellCoord(c) },
-                    cells.Count > 0 ? cells.ToArray() : new[] { c }, b);
+                AddHistoric
+                (
+                    sameBiomes.Count > 0 ? sameBiomes.ToArray() : new[] { gameBoard.GetCellCoord(c) },
+                    cells.Count > 0 ? cells.ToArray() : new[] { c },
+                    b
+                );
 
             return building;
         }

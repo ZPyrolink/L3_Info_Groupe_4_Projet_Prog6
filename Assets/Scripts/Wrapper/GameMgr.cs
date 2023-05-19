@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 using Taluva.Controller;
@@ -26,6 +28,12 @@ namespace Wrapper
         [SerializeField]
         private bool load;
 
+        private Queue<AiMove> _aiMoves;
+        private TurnPhase _nextPhase;
+        private bool _AiWorking => _aiMoves.Count != 0;
+
+        private bool _coroutineStarted;
+
         protected override GameManagment InitInstance
         {
             get
@@ -50,24 +58,14 @@ namespace Wrapper
 
         private void Start()
         {
+            _aiMoves = new();
             SetHandlers();
             Instance.InitPlay();
         }
 
         private void SetHandlers()
         {
-            Instance.ChangePhase = phase =>
-            {
-                //Debug.Log($"Change Phase into {phase}");
-                UiMgr ui = UiMgr.Instance;
-
-                (phase switch
-                {
-                    TurnPhase.SelectCells => (Action) ui.Phase1,
-                    TurnPhase.PlaceBuilding => ui.Phase2,
-                    _ => () => Debug.LogWarning($"The {Instance.actualPhase} is not implemented!")
-                }).Invoke();
-            };
+            Instance.ChangePhase = ChangePhase;
 
             Instance.NotifyEndGame = (player, end) => { Debug.Log(player + " " + end); };
 
@@ -76,11 +74,98 @@ namespace Wrapper
                 //Debug.Log(player);
             };
 
+            Instance.NotifyAIChunkPlacement = pr =>
+            {
+                Vector3 p = new(pr.point.x, 0, pr.point.y);
+                if (!Instance.IsVoid(pr.point))
+                    p.y = Instance.LevelAt(pr.point) * TilesMgr.yOffset;
+                p.Scale(new(TilesMgr.xOffset, 1, TilesMgr.zOffset));
+
+                if (pr.point.x % 2 != 0)
+                    p.z += TilesMgr.zOffset / 2;
+                
+                _aiMoves.Enqueue(new(pr.point, p, (Rotation) Array.IndexOf(pr.rotations, true),
+                    Instance.actualChunk));
+                if (!_coroutineStarted)
+                    StartCoroutine(CTemporateAi());
+            };
+
             Instance.NotifyAIBuildingPlacement = (building, pos) =>
             {
-                TilesMgr.Instance.ReputBuild(pos, building, Instance.actualPlayer);
+                _aiMoves.Enqueue(new(pos, building));
+                if (!_coroutineStarted)
+                    StartCoroutine(CTemporateAi());
             };
-            Instance.NotifyAIChunkPlacement = pr => TilesMgr.Instance.PutAiTile(pr.point, (Rotation) Array.IndexOf(pr.rotations, true));
+        }
+
+        private void ChangePhase(TurnPhase phase)
+        {
+            if (_AiWorking)
+            {
+                _nextPhase = phase;
+                return;
+            }
+
+            UiMgr ui = UiMgr.Instance;
+
+            (phase switch
+            {
+                TurnPhase.SelectCells => (Action) ui.Phase1,
+                TurnPhase.PlaceBuilding => ui.Phase2,
+                _ => () => Debug.LogWarning($"The {Instance.actualPhase} is not implemented!")
+            }).Invoke();
+        }
+
+        private IEnumerator CTemporateAi()
+        {
+            _coroutineStarted = true;
+            do
+            {
+                AiMove aiMove = _aiMoves.Dequeue();
+                yield return new WaitForSeconds(1);
+                switch (aiMove.Turn)
+                {
+                    case TurnPhase.SelectCells:
+                        TilesMgr.Instance.PutAiTile(aiMove.BoardPos, aiMove.GamePos, aiMove.Rot, aiMove.Chunk);
+                        Instance.AiBuild();
+                        break;
+                    case TurnPhase.PlaceBuilding:
+                        TilesMgr.Instance.ReputBuild(aiMove.BoardPos, aiMove.Build, Instance.actualPlayer);
+                        Instance.ContinueAi();
+                        break;
+                }
+            } while (_aiMoves.Count != 0);
+
+            ChangePhase(_nextPhase);
+            _coroutineStarted = false;
+        }
+
+        private class AiMove
+        {
+            public TurnPhase Turn { get; }
+            public Vector2Int BoardPos { get; }
+            
+            public Vector3 GamePos { get; }
+            public Rotation Rot { get; }
+            public Chunk Chunk { get; }
+
+            public Building Build { get; }
+
+            public AiMove(Vector2Int boardPos, Vector3 gamePos, Rotation rot, Chunk chunk)
+            {
+                Turn = TurnPhase.SelectCells;
+                BoardPos = boardPos;
+                GamePos = gamePos;
+                Rot = rot;
+                Chunk = chunk;
+            }
+
+            public AiMove(Vector2Int boardPos, Building build)
+            {
+                Turn = TurnPhase.PlaceBuilding;
+                Build = build;
+                BoardPos = boardPos;
+            }
         }
     }
 }

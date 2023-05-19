@@ -73,7 +73,5 @@ namespace Taluva.Model.AI
             rand = Random.Range(0, barracks.Length);
             return (Building.Barrack,barracks[rand]);
         }
-
-        
     }
 }

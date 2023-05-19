@@ -63,7 +63,6 @@ namespace UI
         [SerializeField]
         private Button redoButton;
 
-
         #region Unity events
 
         protected override void Awake()
@@ -166,19 +165,25 @@ namespace UI
             undoButton.interactable = GameMgr.Instance.CanUndo;
             redoButton.interactable = GameMgr.Instance.CanRedo;
             UpdateGui();
-
+            
             TilesMgr.Instance.SetFeedForwards1();
-
+            
             CurrentTile.SetActive(true);
-
-            MeshRenderer mr = currentTile.transform.GetComponentInChildren<MeshRenderer>();
-            mr.materials[0].color = GameMgr.Instance.actualChunk.Coords[1].ActualBiome.GetColor();
-            mr.materials[2].color = Biomes.Volcano.GetColor();
-            mr.materials[3].color = GameMgr.Instance.actualChunk.Coords[2].ActualBiome.GetColor();
-
+            
+            ChangeTileColor(GameMgr.Instance.actualChunk);
+            
             currentTile.SetActive(true);
             currentTile.transform.GetChild(0).gameObject.SetActive(true);
             builds.SetActive(false);
+        }
+
+        public void ChangeTileColor(Chunk chunk)
+        {
+            MeshRenderer mr = currentTile.transform.GetComponentInChildren<MeshRenderer>(true);
+            
+            mr.materials[0].color = chunk.Coords[1].ActualBiome.GetColor();
+            mr.materials[2].color = Biomes.Volcano.GetColor();
+            mr.materials[3].color = chunk.Coords[2].ActualBiome.GetColor();
         }
 
         public void Phase2()

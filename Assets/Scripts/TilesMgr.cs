@@ -14,7 +14,7 @@ using Wrapper;
 
 public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 {
-    private const float xOffset = 1.5f, yOffset = .41f, zOffset = 1.73205f;
+    public const float xOffset = 1.5f, yOffset = .41f, zOffset = 1.73205f;
 
     [SerializeField]
     private Transform boardParent;
@@ -140,25 +140,20 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         Destroy(_currentFf);
         _currentFf = null;
     }
-    
-    public void PutAiTile(Vector2Int pos, Rotation rot)
+
+    public void PutAiTile(Vector2Int pos, Vector3 p, Rotation rot, Chunk chunk)
     {
         UiMgr.Instance.Phase1();
         
         _gos = null;
-        Vector3 p = new(pos.x, 0, pos.y);
-        if (!GameMgr.Instance.IsVoid(pos))
-            p.y = GameMgr.Instance.LevelAt(pos) * yOffset;
-        p.Scale(new(xOffset, 1, zOffset));
-
-        if (pos.x % 2 != 0)
-            p.z += zOffset / 2;
 
         _currentFf = new();
         _gos = new()
         {
             [_currentFf] = new(pos, rot)
         };
+        
+        UiMgr.Instance.ChangeTileColor(chunk);
         PutTile(p);
         ValidateTile(false);
         Destroy(_currentFf);
