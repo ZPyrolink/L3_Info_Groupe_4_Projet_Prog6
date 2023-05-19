@@ -157,7 +157,6 @@ namespace Taluva.Controller
 
                 Chunk[] stackArray = pile._stack.ToArray();
                 writer.Write(stackArray.Length + pile._played.Count);
-                Debug.Log("size " + (stackArray.Length + pile._played.Count));
 
                 for (int i = stackArray.Length - 1; i >= 0; i--)
                 {
@@ -273,7 +272,6 @@ namespace Taluva.Controller
 
                 List<Chunk> chunks = new();
                 int nbChunk = reader.ReadInt32();
-                Debug.Log("size " + nbChunk);
                 for (int i = 0; i < nbChunk; i++)
                 {
                     Cell left = new((Biomes) reader.ReadInt32());
@@ -374,7 +372,6 @@ namespace Taluva.Controller
                             bool init = i  < intIndex;
                             Phase2(positions[0], buildings[0], init);
                             OnReputBuild(positions[0], buildings[0]);
-                            Debug.Log("index " + ActualPlayerIndex);
                         }
                     }
                     else

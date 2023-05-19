@@ -54,8 +54,11 @@ namespace Wrapper
         private void Start()
         {
             SetHandlers();
-            if(load)
+            if (load)
+            {
                 Instance.LoadGame(Settings.LoadedFile);
+            }
+            UiMgr.Instance.LoadSetUp();
             if (Instance.gameBoard.WorldMap.Empty)
                 Instance.InitPlay();
             else if (Instance.actualPhase == TurnPhase.PlaceBuilding)
@@ -82,7 +85,7 @@ namespace Wrapper
             Instance.NotifyEndGame = (player, end) => 
             { 
                 VictoryMgr.Instance.SetWinnerText(player.ID.ToString());
-                UiMgr.Instance.ToggleMenu();
+                UiMgr.Instance.ToggleVictory();
             };
 
             Instance.NotifyPlayerEliminated = player =>

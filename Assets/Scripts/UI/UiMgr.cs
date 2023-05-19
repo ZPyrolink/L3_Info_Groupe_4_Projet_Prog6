@@ -22,7 +22,7 @@ namespace UI
 
         private int NbTiles
         {
-            get => GameMgr.Instance.pile.NbKeeping + 1;
+            get => GameMgr.Instance.maxTurn;
             set => uiNbTiles.text = NB_TILES_PLACEHOLDER.Replace("%nb%", value.ToString());
         }
 
@@ -47,6 +47,9 @@ namespace UI
         private GameObject menuCanva;
 
         [SerializeField]
+        private GameObject victoryCanva;
+
+        [SerializeField]
         private KeyCode nextPhase = KeyCode.Return, menu = KeyCode.Escape;
 
         [SerializeField]
@@ -68,7 +71,7 @@ namespace UI
         protected override void Awake()
         {
             base.Awake();
-            SetUpGui();
+            SetUpGui(4);
         }
 
         private void Start()
@@ -88,9 +91,9 @@ namespace UI
 
         #endregion
 
-        private void SetUpGui()
+        private void SetUpGui(int NbPlayers)
         {
-            for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
+            for (int i = 0; i < NbPlayers; i++)
             {
                 _guis[i] = Instantiate(playerPrefab, transform);
                 RectTransform rt = _guis[i].GetComponent<RectTransform>();
@@ -106,6 +109,11 @@ namespace UI
                 _guis[i].transform.GetChild(0).GetComponent<Text>().text = $"Player {i}";
                 _guis[i].transform.GetChild(1).GetComponent<Image>().color = GameMgr.Instance.players[i].ID.GetColor();
             }
+        }
+
+        public void LoadSetUp()
+        {
+            SetUpGui(GameMgr.Instance.NbPlayers);
         }
 
         public void UpdateCurrentPlayer()
@@ -236,7 +244,6 @@ namespace UI
             else
                 CurrentTile.SetActive(true);
 
-            Phase1();
         }
 
         private void RedoPhase2(GameManagment.Coup coup)
@@ -254,8 +261,20 @@ namespace UI
         public void ToggleMenu()
         {
             menuCanva.SetActive(!menuCanva.activeSelf);
-            CameraMgr.Instance.enabled = !menuCanva.activeSelf;
-            UiMgr.Instance.enabled = !menuCanva.activeSelf;
+            EnableScript();
+        }
+
+        public void ToggleVictory()
+        {
+            EnableScript();
+            victoryCanva.SetActive(true);
+        }
+
+        public void EnableScript()
+        {
+            CameraMgr.Instance.enabled = !CameraMgr.Instance.enabled;
+            Instance.enabled = !Instance.enabled;
+            TilesMgr.Instance.enabled = !TilesMgr.Instance.enabled;
         }
 
         public void UpBuild(int i)
