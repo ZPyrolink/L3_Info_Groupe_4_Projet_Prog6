@@ -527,13 +527,33 @@ namespace Taluva.Model
         /// <param name="cell">Cell where we want to build a temple</param>
         /// <param name="actualPlayer">Actual Player</param>
         /// <returns>Return if we can build a temple on the cell cell for the player actualPlayer</returns>
-        public bool CanBuildTemple(Cell cell, Player actualPlayer) =>
-            cell.ActualBuildings == Building.None && cell.IsBuildable &&
-            IsAdjacentToCity(GetCellCoord(cell), actualPlayer) &&
-            GetAllVillage(GetCellCoord(cell))
-                .Any(village =>
-                    WorldMap[village[0]].Owner == actualPlayer.ID && !CityHasTemple(village) &&
-                    village.Count >= 3);
+        public bool CanBuildTemple(Cell cell, Player actualPlayer)
+        {
+            if(cell.ActualBuildings != Building.None && !cell.IsBuildable) 
+                return false;
+
+            List<List<Vector2Int>> allVillages = GetAllVillage(GetCellCoord(cell));
+
+            if(allVillages.Count == 0) return false;
+
+            bool build = false;
+
+            foreach(List<Vector2Int> village in allVillages)
+            {
+                if (WorldMap[village[0]].Owner != actualPlayer.ID)
+                    continue;
+
+                if (CityHasTemple(village))
+                    return false;
+
+                if (village.Count < 3)
+                    return false;
+
+                build = true;
+            }
+
+            return build;
+        }
 
         /// <summary>
         /// Check if a city has a temple

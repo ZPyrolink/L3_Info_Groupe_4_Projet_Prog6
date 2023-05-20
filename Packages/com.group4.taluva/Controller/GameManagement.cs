@@ -673,12 +673,12 @@ namespace Taluva.Controller
                 Player winner1 = null;
                 foreach (Player p in players)
                 {
-                    if (p.nbBarrack == 0)
+                    if (p.Eliminated)
                         continue;
 
-                    if (p.nbTemple > maxTemple)
+                    if ((3 - p.nbTemple) > maxTemple)
                     {
-                        maxTemple = p.nbTemple;
+                        maxTemple = (3 - p.nbTemple);
                         winner1 = p;
                     }
                 }
@@ -686,9 +686,10 @@ namespace Taluva.Controller
                 int egalityTemple = 0;
                 foreach (Player p in players)
                 {
-                    if (p.nbBarrack == 0)
+                    if (p.Eliminated)
                         continue;
-                    if (p.nbTemple == maxTemple)
+
+                    if ((3 - p.nbTemple) == maxTemple)
                         egalityTemple++;
                 }
 
@@ -698,11 +699,12 @@ namespace Taluva.Controller
                     Player winner2 = null;
                     foreach (Player p in players)
                     {
-                        if (p.nbBarrack == 0)
+                        if (p.Eliminated)
                             continue;
-                        if (p.nbTemple > maxTower)
+
+                        if ((2 - p.nbTowers) > maxTower)
                         {
-                            maxTower = p.nbTemple;
+                            maxTower = (2 - p.nbTowers);
                             winner2 = p;
                         }
                     }
@@ -710,9 +712,10 @@ namespace Taluva.Controller
                     int egalityTower = 0;
                     foreach (Player p in players)
                     {
-                        if (p.nbBarrack == 0)
+                        if (p.Eliminated)
                             continue;
-                        if (p.nbTemple == maxTemple)
+
+                        if ((2 - p.nbTowers) == maxTower)
                             egalityTower++;
                     }
 
@@ -722,11 +725,12 @@ namespace Taluva.Controller
                         Player winner3 = null;
                         foreach (Player p in players)
                         {
-                            if (p.nbBarrack == 0)
+                            if (p.Eliminated)
                                 continue;
-                            if (p.nbTemple > maxBarrack)
+
+                            if ((20 - p.nbBarrack) > maxBarrack)
                             {
-                                maxBarrack = p.nbTemple;
+                                maxBarrack = (20 - p.nbBarrack);
                                 winner3 = p;
                             }
                         }
