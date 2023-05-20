@@ -223,6 +223,7 @@ namespace UI
 
         public void Undo()
         {
+            TilesMgr.Instance.ClearFeedForward();
             GameManagment.Coup coup = GameMgr.Instance.Undo();
 
             (GameMgr.Instance.actualPhase switch
