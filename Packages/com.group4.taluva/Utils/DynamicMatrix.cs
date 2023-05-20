@@ -11,41 +11,39 @@ namespace Taluva.Utils
     public class DynamicMatrix<T> : IEnumerable<T>
     {
         private readonly Dictionary<int, Dictionary<int, T>> _matrix;
-        // Dans la théorie, cette liste devra ajouter 0.5 à ces coordonées en Y quand X % 2 == 1
 
         public DynamicMatrix() => _matrix = new();
+
         public DynamicMatrix(DynamicMatrix<T> dynMatrix)
         {
-            _matrix = new Dictionary<int, Dictionary<int, T>>();
-            foreach ((int index,Dictionary<int,T> row) in dynMatrix._matrix)
-            {
-                _matrix.Add(index,new Dictionary<int, T>(row));
-            }
+            _matrix = new();
+            foreach ((int index, Dictionary<int, T> row) in dynMatrix._matrix)
+                _matrix.Add(index, new(row));
         }
 
         /// <summary>
         /// Line maximum in the matrix
         /// </summary>
-        public int MaxLine => _matrix.Keys.Order().ElementAt(_matrix.Keys.Count - 1);
+        public int MaxLine => _matrix.Keys.Max();
 
         /// <summary>
         /// Line minimum in the matrix
         /// </summary>
-        public int MinLine => _matrix.Keys.Order().First();
+        public int MinLine => _matrix.Keys.Min();
 
         /// <summary>
         /// Column maximum of the line
         /// </summary>
         /// <param name="line">Line whose want the max column</param>
         /// <returns>Return the max column in the line</returns>
-        public int MaxColumn(int line) => _matrix[line].Keys.Order().ElementAt(_matrix[line].Keys.Count - 1);
+        public int MaxColumn(int line) => _matrix[line].Keys.Max();
 
         /// <summary>
         /// Column minimum of the line
         /// </summary>
         /// <param name="line">Line whose want the min column</param>
         /// <returns>Return the min column in the line</returns>
-        public int MinColumn(int line) => _matrix[line].Keys.Order().First();
+        public int MinColumn(int line) => _matrix[line].Keys.Min();
 
         /// <summary>
         /// Check if the matrix contains the line
@@ -77,16 +75,10 @@ namespace Taluva.Utils
         /// <param name="coordonees">Position whose we want to add</param>
         public void Add(T value, Vector2Int coordonees)
         {
-            if (!_matrix.ContainsKey(coordonees.x))
-            {
-                _matrix.Add(coordonees.x, new() { { coordonees.y, value } });
-                return;
-            }
+            if (!ContainsLine(coordonees.x))
+                _matrix.Add(coordonees.x, new());
 
-            if (_matrix[coordonees.x].ContainsKey(coordonees.y))
-                _matrix[coordonees.x][coordonees.y] = value;
-            else
-                _matrix[coordonees.x].Add(coordonees.y, value);
+            _matrix[coordonees.x][coordonees.y] = value;
         }
 
         /// <summary>
@@ -96,23 +88,12 @@ namespace Taluva.Utils
         /// <returns>Return if we have remove the object at the position</returns>
         public bool Remove(Vector2Int p)
         {
-            bool remove = ContainsLine(p.x) && ContainsColumn(p) && _matrix[p.x].Remove(p.y);
+            if (ContainsLine(p.x) && ContainsColumn(p) && _matrix[p.x].Remove(p.y) && _matrix.Count == 0)
+                return false;
 
-            if (remove && _matrix[p.x].Count == 0)
-                _matrix.Remove(p.x);
-
-            return remove;
+            _matrix.Remove(p.x);
+            return true;
         }
-
-        /// <summary>
-        /// Find a value in the matrix.
-        /// Be careful! We must check before if the position is a void or not.
-        /// We can't use this on a void.
-        /// </summary>
-        /// <param name="coordonnes">Coordonnes of the object</param>
-        /// <returns>Return the object at the position</returns>
-        [Obsolete("Use the getter of the indexer instead!", true)]
-        public T GetValue(Vector2Int coordonnes) => this[coordonnes];
 
         /// <summary>
         /// New version of GetValue and SetValue
@@ -143,9 +124,13 @@ namespace Taluva.Utils
         /// </summary>
         /// <returns>An enumerator for the map</returns>
         public IEnumerator<T> GetEnumerator() => _matrix
+            // On ordonne par ligne
             .OrderBy(x => x.Key)
+            // On récupère toutes les colonnes
             .SelectMany(x => x.Value
+                // On ordonne par colonnes et on ne garde que les valeurs 
                 .OrderBy(y => y.Key), (_, y) => y.Value)
+            // On retourne l'énumérateur
             .GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
