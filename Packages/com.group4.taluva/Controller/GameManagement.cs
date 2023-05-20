@@ -389,7 +389,9 @@ namespace Taluva.Controller
                         {
                             bool init = i  < intIndex;
                             Phase2(positions[0], buildings[0], init);
+                            ActualPlayerIndex = actualIndex;
                             OnReputBuild(positions[0], buildings[0]);
+                            NextPlayer();
                         }
                     }
                     else
