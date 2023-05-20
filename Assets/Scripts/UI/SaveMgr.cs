@@ -26,7 +26,7 @@ namespace UI
         public void ToggleMenu()
         {
             menuCanva.SetActive(!menuCanva.activeSelf);
-            this.gameObject.SetActive(!menuCanva.activeSelf);
+            this.gameObject.SetActive(!this.gameObject.activeSelf);
         }
     }
 }

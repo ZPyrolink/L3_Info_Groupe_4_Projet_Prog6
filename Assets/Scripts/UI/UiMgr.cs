@@ -55,6 +55,8 @@ namespace UI
         [SerializeField]
         private Button validateButton;
 
+        private bool inMenu = false;
+
         public bool EnableValidateBtn
         {
             set => validateButton.interactable = value;
@@ -82,10 +84,13 @@ namespace UI
 
         private void Update()
         {
-            undoButton.interactable = GameMgr.Instance.CanUndo;
-            redoButton.interactable = GameMgr.Instance.CanRedo;
-            if (Input.GetKeyDown(nextPhase))
-                Next();
+            if (!inMenu)
+            {
+                undoButton.interactable = GameMgr.Instance.CanUndo;
+                redoButton.interactable = GameMgr.Instance.CanRedo;
+                if (Input.GetKeyDown(nextPhase))
+                    Next();
+            }
 
             if (Input.GetKeyDown(menu))
                 ToggleMenu();
@@ -283,6 +288,7 @@ namespace UI
         public void ToggleMenu()
         {
             menuCanva.SetActive(!menuCanva.activeSelf);
+            SaveMgr.Instance.gameObject.SetActive(false);
             EnableScript();
         }
 
@@ -295,7 +301,7 @@ namespace UI
         public void EnableScript()
         {
             CameraMgr.Instance.enabled = !CameraMgr.Instance.enabled;
-            Instance.enabled = !Instance.enabled;
+            inMenu = !inMenu;
             TilesMgr.Instance.enabled = !TilesMgr.Instance.enabled;
         }
 
