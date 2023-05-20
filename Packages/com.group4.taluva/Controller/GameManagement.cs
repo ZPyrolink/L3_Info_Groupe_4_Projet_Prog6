@@ -772,7 +772,7 @@ namespace Taluva.Controller
                 }
             }
 
-            if (pioche)
+            if (pioche && pile.NbKeeping > 0)
                 actualChunk = pile.Draw();
 
             if (actualPlayer is AI ai)

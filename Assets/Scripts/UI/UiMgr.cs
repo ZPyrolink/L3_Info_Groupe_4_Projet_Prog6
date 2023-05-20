@@ -82,6 +82,8 @@ namespace UI
 
         private void Update()
         {
+            undoButton.interactable = GameMgr.Instance.CanUndo;
+            redoButton.interactable = GameMgr.Instance.CanRedo;
             if (Input.GetKeyDown(nextPhase))
                 Next();
 
@@ -113,7 +115,7 @@ namespace UI
 
         public void UnloadSetUp()
         {
-            //Enlever les joueurs affiché qui n'existe pas
+            //Enlever les joueurs affiché qui n'existe pas (utilisé pour le load)
             for (int i = GameMgr.Instance.NbPlayers; i < 4; i++)
                 Destroy(this.gameObject.transform.GetChild(i + 5).gameObject);
         }
@@ -171,10 +173,7 @@ namespace UI
 
         public void Phase1()
         {
-            undoButton.interactable = GameMgr.Instance.CanUndo;
-            redoButton.interactable = GameMgr.Instance.CanRedo;
             UpdateGui();
-
             TilesMgr.Instance.SetFeedForwards1();
 
             CurrentTile.SetActive(true);
@@ -197,8 +196,6 @@ namespace UI
 
         public void Phase2()
         {
-            undoButton.interactable = GameMgr.Instance.CanUndo;
-            redoButton.interactable = GameMgr.Instance.CanRedo;
             UpdateGui();
             currentTile.SetActive(false);
             builds.SetActive(true);
