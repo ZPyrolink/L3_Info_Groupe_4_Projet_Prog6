@@ -41,6 +41,28 @@ namespace Taluva.Model
 
         }
 
+        public static void ResetChunk(Pile<Chunk> pileChunk)
+        {
+            Stack<Chunk> stack = new();
+            int nb = pileChunk.NbKeeping;
+            for(int i = 0; i < nb; i++)
+            {
+                Chunk chunk = pileChunk._stack.Pop();
+                chunk.Coords[1].ActualBuildings = Building.None;
+                chunk.Coords[2].ActualBuildings = Building.None;
+                chunk.Level = 1;
+
+                stack.Push(chunk);
+            }
+            pileChunk._stack.Clear();
+
+            for(int i = 0; i < nb; i++)
+            {
+                Chunk chunk = stack.Pop();
+                pileChunk._stack.Push(chunk);
+            }
+        }
+
         //print one chunk contents
         public static void PrintChunkToString(Chunk c)
         {

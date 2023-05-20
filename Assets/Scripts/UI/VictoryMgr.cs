@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Utils;
+using Wrapper;
 
 namespace UI
 {
@@ -18,9 +19,13 @@ namespace UI
 
         public void SetWinnerText(string player) => text.text = "The player " + player + " win"; 
 
-        public void Restart() => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        public void Restart() => ResetGame();
+        public void ResetGame()
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
 
-        public void MainMenu() => throw new NotImplementedException();
+        public void MainMenu() => SceneManager.LoadScene("MainMenu");
 
         public void Quit() =>
 #if UNITY_EDITOR
