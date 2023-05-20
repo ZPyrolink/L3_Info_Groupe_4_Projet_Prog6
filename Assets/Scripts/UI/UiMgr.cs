@@ -279,7 +279,10 @@ namespace UI
                 RedoPhase1(coup);
             } else
             {
-                TilesMgr.Instance.ReputBuild(coup.positions[0], coup.building[0], GameMgr.Instance.PreviousPlayer);
+                for(int i = 0; i < coup.positions.Length; i++)
+                {
+                    TilesMgr.Instance.ReputBuild(coup.positions[i], coup.building[i], GameMgr.Instance.PreviousPlayer);
+                }
             }
 
             TilesMgr.Instance.SetFeedForwards1();

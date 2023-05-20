@@ -571,6 +571,7 @@ namespace Taluva.Controller
                     }
                     c.cells[i].ActualBuildings = Building.None;
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
+                    pile.Stack(actualChunk);
                 }
             }
 

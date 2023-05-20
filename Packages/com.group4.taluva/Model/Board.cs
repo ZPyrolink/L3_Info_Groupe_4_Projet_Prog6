@@ -529,7 +529,7 @@ namespace Taluva.Model
         /// <returns>Return if we can build a temple on the cell cell for the player actualPlayer</returns>
         public bool CanBuildTemple(Cell cell, Player actualPlayer)
         {
-            if(cell.ActualBuildings != Building.None && !cell.IsBuildable) 
+            if(!cell.IsBuildable) 
                 return false;
 
             List<List<Vector2Int>> allVillages = GetAllVillage(GetCellCoord(cell));
@@ -546,10 +546,8 @@ namespace Taluva.Model
                 if (CityHasTemple(village))
                     return false;
 
-                if (village.Count < 3)
-                    return false;
-
-                build = true;
+                if (village.Count >= 3)
+                    build = true;
             }
 
             return build;
