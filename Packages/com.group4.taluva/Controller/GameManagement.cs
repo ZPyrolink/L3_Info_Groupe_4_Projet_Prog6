@@ -107,7 +107,6 @@ namespace Taluva.Controller
             historic = new();
             pile = ListeChunk.Pile;
             ListeChunk.ResetChunk(pile);
-            this.players = new Player[nbPlayers];
             this.Players = new Player[nbPlayers];
             this.ActualPlayerIndex = -1;
             this.gameBoard = new();
@@ -559,6 +558,7 @@ namespace Taluva.Controller
             Coup c = historic.Undo();
             if (c.chunk != null)
             {
+                maxTurn++;
                 gameBoard.RemoveChunk(gameBoard.GetChunksCoords(c.positions[0], (Rotation) c.rotation));
                 if (c.cells[0] != null)
                 {
@@ -604,6 +604,7 @@ namespace Taluva.Controller
                     
                     c.cells[i].ActualBuildings = Building.None;
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
+                    pile.Stack(actualChunk);
                 }
             }
 
@@ -707,12 +708,12 @@ namespace Taluva.Controller
                 Player winner1 = null;
                 foreach (Player p in Players)
                 {
-                    if (p.NbBarrack == 0)
+                    if (p.Eliminated)
                         continue;
 
-                    if (p.NbTemple > maxTemple)
+                    if ((3 - p.NbTemple) > maxTemple)
                     {
-                        maxTemple = p.NbTemple;
+                        maxTemple = (3 - p.NbTemple);
                         winner1 = p;
                     }
                 }
@@ -720,9 +721,10 @@ namespace Taluva.Controller
                 int egalityTemple = 0;
                 foreach (Player p in Players)
                 {
-                    if (p.NbBarrack == 0)
+                    if (p.Eliminated)
                         continue;
-                    if (p.NbTemple == maxTemple)
+
+                    if ((3 - p.NbTemple) == maxTemple)
                         egalityTemple++;
                 }
 
@@ -732,11 +734,12 @@ namespace Taluva.Controller
                     Player winner2 = null;
                     foreach (Player p in Players)
                     {
-                        if (p.NbBarrack == 0)
+                        if (p.Eliminated)
                             continue;
-                        if (p.NbTemple > maxTower)
+
+                        if ((2 - p.NbTowers) > maxTower)
                         {
-                            maxTower = p.NbTemple;
+                            maxTower = (2 - p.NbTowers);
                             winner2 = p;
                         }
                     }
@@ -744,9 +747,10 @@ namespace Taluva.Controller
                     int egalityTower = 0;
                     foreach (Player p in Players)
                     {
-                        if (p.NbBarrack == 0)
+                        if (p.Eliminated)
                             continue;
-                        if (p.NbTemple == maxTemple)
+
+                        if ((2 - p.NbTowers) == maxTower)
                             egalityTower++;
                     }
 
@@ -756,11 +760,12 @@ namespace Taluva.Controller
                         Player winner3 = null;
                         foreach (Player p in Players)
                         {
-                            if (p.NbBarrack == 0)
+                            if (p.Eliminated)
                                 continue;
-                            if (p.NbTemple > maxBarrack)
+
+                            if ((20 - p.NbBarrack) > maxBarrack)
                             {
-                                maxBarrack = p.NbTemple;
+                                maxBarrack = (20 - p.NbBarrack);
                                 winner3 = p;
                             }
                         }
@@ -807,7 +812,7 @@ namespace Taluva.Controller
                 }
             }
 
-            if (pioche)
+            if (pioche && pile.NbKeeping > 0)
                 actualChunk = pile.Draw();
 
             if (ActualPlayer is AI)
@@ -815,6 +820,7 @@ namespace Taluva.Controller
                 if (checkIa)
                 {
                     actualPhase = TurnPhase.IAPlays;
+                    OnChangePhase(actualPhase);
                     AiChunk();
                 }
                 else
@@ -840,12 +846,13 @@ namespace Taluva.Controller
             }
         }
 
-        public void Phase1(PointRotation pr, Rotation r)
+        public void Phase1(PointRotation pr, Rotation r, bool ia = false)
         {
             if (ValidateTile(pr, r))
             {
-                NextPhase();
                 this.maxTurn--;
+                if (!ia)
+                    NextPhase();
             }
         }
 
@@ -874,7 +881,7 @@ namespace Taluva.Controller
             }
 
             OnAIChunkPlacement(pr);
-            ValidateTile(pr, r);
+            Phase1(pr, r, true);
         }
 
         public void ContinueAi()

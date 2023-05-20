@@ -163,6 +163,7 @@ namespace Wrapper
                 switch (aiMove.Turn)
                 {
                     case TurnPhase.SelectCells:
+                        UiMgr.Instance.UpdateTiles();
                         TilesMgr.Instance.PutAiTile(aiMove.BoardPos, aiMove.GamePos, aiMove.Rot, aiMove.Chunk);
                         Instance.AiBuild();
                         break;

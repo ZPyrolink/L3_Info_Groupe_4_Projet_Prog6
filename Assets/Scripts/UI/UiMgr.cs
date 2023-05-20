@@ -55,6 +55,8 @@ namespace UI
         [SerializeField]
         private Button validateButton;
 
+        private bool inMenu = false;
+
         public bool EnableValidateBtn
         {
             set => validateButton.interactable = value;
@@ -82,8 +84,13 @@ namespace UI
 
         private void Update()
         {
-            if (Input.GetKeyDown(nextPhase))
-                Next();
+            if (!inMenu)
+            {
+                undoButton.interactable = GameMgr.Instance.CanUndo;
+                redoButton.interactable = GameMgr.Instance.CanRedo;
+                if (Input.GetKeyDown(nextPhase))
+                    Next();
+            }
 
             if (Input.GetKeyDown(menu))
                 ToggleMenu();
@@ -113,7 +120,7 @@ namespace UI
 
         public void UnloadSetUp()
         {
-            //Enlever les joueurs affiché qui n'existe pas
+            //Enlever les joueurs affiché qui n'existe pas (utilisé pour le load)
             for (int i = GameMgr.Instance.NbPlayers; i < 4; i++)
                 Destroy(this.gameObject.transform.GetChild(i + 5).gameObject);
         }
@@ -171,10 +178,7 @@ namespace UI
 
         public void Phase1()
         {
-            undoButton.interactable = GameMgr.Instance.CanUndo;
-            redoButton.interactable = GameMgr.Instance.CanRedo;
             UpdateGui();
-
             TilesMgr.Instance.SetFeedForwards1();
 
             CurrentTile.SetActive(true);
@@ -195,10 +199,10 @@ namespace UI
             mr.materials[3].color = chunk.Coords[2].ActualBiome.GetColor();
         }
 
+        public void UpdateTiles() => NbTiles = NbTiles;
+
         public void Phase2()
         {
-            undoButton.interactable = GameMgr.Instance.CanUndo;
-            redoButton.interactable = GameMgr.Instance.CanRedo;
             UpdateGui();
             currentTile.SetActive(false);
             builds.SetActive(true);
@@ -206,7 +210,7 @@ namespace UI
             foreach (MeshRenderer mr in builds.GetComponentsInChildren<MeshRenderer>())
                 mr.material.color = GameMgr.Instance.actualPlayer.ID.GetColor();
 
-            NbTiles--;
+            UpdateTiles();
             UpBuild(0);
         }
 
@@ -219,6 +223,7 @@ namespace UI
 
         public void Undo()
         {
+            TilesMgr.Instance.ClearFeedForward();
             GameManagment.Coup coup = GameMgr.Instance.Undo();
 
             (GameMgr.Instance.actualPhase switch
@@ -275,7 +280,10 @@ namespace UI
                 RedoPhase1(coup);
             } else
             {
-                TilesMgr.Instance.ReputBuild(coup.positions[0], coup.building[0], GameMgr.Instance.PreviousPlayer);
+                for(int i = 0; i < coup.positions.Length; i++)
+                {
+                    TilesMgr.Instance.ReputBuild(coup.positions[i], coup.building[i], GameMgr.Instance.PreviousPlayer);
+                }
             }
 
             TilesMgr.Instance.SetFeedForwards1();
@@ -284,6 +292,7 @@ namespace UI
         public void ToggleMenu()
         {
             menuCanva.SetActive(!menuCanva.activeSelf);
+            SaveMgr.Instance.gameObject.SetActive(false);
             EnableScript();
         }
 
@@ -296,7 +305,7 @@ namespace UI
         public void EnableScript()
         {
             CameraMgr.Instance.enabled = !CameraMgr.Instance.enabled;
-            Instance.enabled = !Instance.enabled;
+            inMenu = !inMenu;
             TilesMgr.Instance.enabled = !TilesMgr.Instance.enabled;
         }
 

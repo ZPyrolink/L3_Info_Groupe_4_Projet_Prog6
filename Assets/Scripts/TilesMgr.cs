@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Taluva.Model;
-
+using Taluva.Model.AI;
 using UI;
 
 using UnityEngine;
@@ -272,15 +272,18 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     public void SetFeedForwards1()
     {
         ClearFeedForward();
-        foreach (PointRotation pr in GameMgr.Instance.ChunkSlots())
+        if (!(GameMgr.Instance.actualPlayer is AI))
         {
-            Vector3 pos = new(pr.point.x, 0, pr.point.y);
-            if (!GameMgr.Instance.IsVoid(pr.point))
-                pos.y = GameMgr.Instance.LevelAt(pr.point) * yOffset;
-            pos.Scale(new(xOffset, 1, zOffset));
-            if (pr.point.x % 2 != 0)
-                pos.z += zOffset / 2;
-            _gos[SetFeedForward(pos)] = pr;
+            foreach (PointRotation pr in GameMgr.Instance.ChunkSlots())
+            {
+                Vector3 pos = new(pr.point.x, 0, pr.point.y);
+                if (!GameMgr.Instance.IsVoid(pr.point))
+                    pos.y = GameMgr.Instance.LevelAt(pr.point) * yOffset;
+                pos.Scale(new(xOffset, 1, zOffset));
+                if (pr.point.x % 2 != 0)
+                    pos.z += zOffset / 2;
+                _gos[SetFeedForward(pos)] = pr;
+            }
         }
     }
 
