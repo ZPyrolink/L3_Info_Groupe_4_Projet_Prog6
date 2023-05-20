@@ -151,12 +151,12 @@ namespace Taluva.Controller
         /// <summary>
         /// Check if we can undo
         /// </summary>
-        public bool CanUndo => historic.CanUndo && actualPhase != TurnPhase.IAPlays;
+        public bool CanUndo => historic.CanUndo && actualPhase != TurnPhase.IAPlays && actualPhase != TurnPhase.NextPlayer;
 
         /// <summary>
         /// Check if we can redo
         /// </summary>
-        public bool CanRedo => historic.CanRedo && actualPhase != TurnPhase.IAPlays;
+        public bool CanRedo => historic.CanRedo && actualPhase != TurnPhase.IAPlays && actualPhase != TurnPhase.NextPlayer;
 
         public void Save(string path)
         {
