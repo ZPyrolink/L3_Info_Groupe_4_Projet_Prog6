@@ -1,32 +1,44 @@
-﻿namespace Taluva.Model
+﻿using System;
+using System.Collections.Generic;
+
+namespace Taluva.Model
 {
     public class Chunk
     {
-        public Cell[] Coords { get; private set; }
-        public Rotation rotation;
-        public int Level = 1;
+        public Cell[] Coords { get; }
+        public Rotation Rotation { get; set; }
+        [Obsolete("Use Rotation instead")]
+        public Rotation rotation
+        {
+            get => Rotation;
+            set => Rotation = value;
+        }
+        public int Level { get; set; }
 
         public Chunk(int l, Cell left, Cell right)
         {
-            this.Coords = new Cell[3];
-            this.Coords[0] = new(Biomes.Volcano, this);
-            this.Coords[1] = left;
+            Coords = new Cell[3];
+            Coords[0] = new(Biomes.Volcano, this);
+            Coords[1] = left;
             left.ParentChunk = this;
-            this.Coords[2] = right;
+            Coords[2] = right;
             right.ParentChunk = this;
-            this.Level = l;
-
+            Level = l;
         }
-        
+
         public Chunk(Chunk c)
         {
-            this.Coords = new Cell[3];
-            this.Coords[0] = c.Coords[0];
-            this.Coords[1] = c.Coords[1];
+            Coords = new Cell[3];
+            Coords[0] = c.Coords[0];
+            Coords[1] = c.Coords[1];
             c.Coords[1].ParentChunk = c;
-            this.Coords[2] = c.Coords[2];
+            Coords[2] = c.Coords[2];
             c.Coords[2].ParentChunk = c;
-            this.Level = c.Level;
+            Level = c.Level;
         }
+
+        public override string ToString() => $"{Coords[0].ActualBiome}, {Coords[1].ActualBiome}, {Coords[2].ActualBiome}";
+
+        public static string ListToString(IEnumerable<Chunk> l) => string.Join("\n", l);
     }
 }
