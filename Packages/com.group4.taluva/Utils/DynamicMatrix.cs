@@ -23,6 +23,11 @@ namespace Taluva.Utils
             }
         }
 
+        public void Clear()
+        {
+            _matrix.Clear();
+        }
+
         /// <summary>
         /// Line maximum in the matrix
         /// </summary>
@@ -60,7 +65,7 @@ namespace Taluva.Utils
         /// <param name="line">The line to test</param>
         /// <param name="column">The column to test</param>
         /// <returns>Return if the column exist for the this line</returns>
-        public bool ContainsColumn(int line, int column) => _matrix[line].ContainsKey(column);
+        public bool ContainsColumn(int line, int column) => ContainsLine(line) && _matrix[line].ContainsKey(column);
 
         /// <summary>
         /// Check if a point exist on the matrix

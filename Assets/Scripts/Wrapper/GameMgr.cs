@@ -25,8 +25,8 @@ namespace Wrapper
         [SerializeField]
         private string path;
 
-        [SerializeField]
-        private bool load;
+        //[SerializeField]
+        public bool load;
 
         private Queue<AiMove> _aiMoves;
         private TurnPhase _nextPhase;
@@ -41,7 +41,10 @@ namespace Wrapper
                 if (string.IsNullOrEmpty(Settings.LoadedFile))
                     Settings.LoadedFile = path;
                 else
+                {
                     load = true;
+                }
+                    
 
                 if (load)
                 {
@@ -67,6 +70,13 @@ namespace Wrapper
             {
                 Instance.LoadGame(Settings.LoadedFile);
                 UiMgr.Instance.UnloadSetUp();
+                Settings.LoadedFile = null;
+                Settings.PlayerNb = (sbyte) Instance.NbPlayers;
+                int nbAi = 0;
+                foreach(Player p in Instance.players)
+                    if(p is AI)
+                        nbAi++;
+                Settings.AiNb = (sbyte)nbAi;
             }
             if (Instance.gameBoard.WorldMap.Empty)
                 Instance.InitPlay();
