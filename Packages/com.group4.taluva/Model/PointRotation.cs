@@ -1,54 +1,48 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Linq;
+using System.Text;
+
+using UnityEngine;
 
 namespace Taluva.Model
 {
     public class PointRotation
     {
-        public readonly Vector2Int point;
-        public readonly bool[] rotations;
-        
+        public Vector2Int Point { get; }
+        [Obsolete("Use Point instead")] public Vector2Int point => Point;
+        public bool[] Rotations { get; }
+        [Obsolete("Use Rotation instead")] public bool[] rotations => Rotations;
 
         public PointRotation(Vector2Int point)
         {
-            this.point = point;
-            this.rotations = new bool[6];
+            Point = point;
+            Rotations = new bool[6];
             for (int i = 0; i < rotations.Length; i++)
                 this.rotations[i] = false;
         }
 
         public PointRotation(Vector2Int point, bool[] rot) : this(point)
         {
-            rotations = rot;
+            Rotations = rot;
         }
 
         public PointRotation(Vector2Int point, Rotation rot) : this(point)
         {
-            this.rotations[(int) rot] = true;
+            rotations[(int) rot] = true;
         }
 
-        public bool RotationEquals(PointRotation rotations)
-        {
-            for (int i = 0; i < this.rotations.Length; i++)
-            {
-                if (this.rotations[i] != rotations.rotations[i])
-                    return false;
-            }
+        public bool RotationEquals(PointRotation rotations) => !this.rotations
+            // On ne garde que les rotations qui sont différentes
+            .Where((t, i) => t != rotations.rotations[i])
+            // On regardes s'il en existe un
+            .Any();
 
-            return true;
-        }
-
-        public bool HaveRotation()
-        {
-            foreach (bool b in rotations)
-                if (b)
-                    return true;
-            return false;
-        }
+        public bool HaveRotation() => rotations.Any(b => b);
 
         public void SetAllTrue()
         {
             for (int i = 0; i < rotations.Length; i++)
-                this.rotations[i] = true;
+                rotations[i] = true;
         }
 
         public void AddRotation(Rotation r)
@@ -56,38 +50,25 @@ namespace Taluva.Model
             rotations[(int) r] = true;
         }
 
-        public string RotationString()
+        [Obsolete("Use ToString() instead")]
+        public string RotationString() => ToString();
+
+        public override string ToString()
         {
-            string s = "";
+            StringBuilder sb = new();
             for (int i = 0; i < rotations.Length; i++)
                 if (rotations[i])
-                {
-                    switch ((Rotation) i)
+                    sb.Append((Rotation) i switch
                     {
-                        case Rotation.N:
-                            s += "N";
-                            break;
-                        case Rotation.S:
-                            s += "S";
-                            break;
-                        case Rotation.NE:
-                            s += "NE";
-                            break;
-                        case Rotation.NW:
-                            s += "NW";
-                            break;
-                        case Rotation.SE:
-                            s += "SE";
-                            break;
-                        case Rotation.SW:
-                            s += "SW";
-                            break;
-                    }
+                        Rotation.N => sb.Append("N"),
+                        Rotation.S => sb.Append("S"),
+                        Rotation.NE => sb.Append("NE"),
+                        Rotation.NW => sb.Append("NW"),
+                        Rotation.SE => sb.Append("SE"),
+                        Rotation.SW => sb.Append("SW")
+                    }).Append(' ');
 
-                    s += " ";
-                }
-
-            return s;
+            return sb.ToString();
         }
     }
 }

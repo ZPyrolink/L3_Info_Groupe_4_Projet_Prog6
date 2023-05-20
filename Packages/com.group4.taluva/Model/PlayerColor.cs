@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Taluva.Model
 {
+    // ToDo: Move it into Player
     public enum PlayerColor : uint
     {
         Red = 0xFFD20F28,
