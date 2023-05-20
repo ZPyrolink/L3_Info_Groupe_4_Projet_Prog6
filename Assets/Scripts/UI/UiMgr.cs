@@ -2,7 +2,7 @@ using System;
 
 using Taluva.Controller;
 using Taluva.Model;
-
+using Taluva.Model.AI;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -227,6 +227,21 @@ namespace UI
                 TurnPhase.SelectCells => (Action<GameManagment.Coup>) UndoPhase1,
                 TurnPhase.PlaceBuilding => UndoPhase2
             }).Invoke(coup);
+
+
+            if (GameMgr.Instance.actualPlayer is AI)
+            {
+                for(int i = 0; i < 2; i++)
+                {
+                    coup = GameMgr.Instance.Undo();
+
+                    (GameMgr.Instance.actualPhase switch
+                    {
+                        TurnPhase.SelectCells => (Action<GameManagment.Coup>)UndoPhase1,
+                        TurnPhase.PlaceBuilding => UndoPhase2
+                    }).Invoke(coup);
+                }
+            }
         }
 
         private void UndoPhase1(GameManagment.Coup c) => TilesMgr.Instance.RemoveTile(c.positions[0]);
@@ -240,7 +255,8 @@ namespace UI
             (GameMgr.Instance.actualPhase switch
             {
                 TurnPhase.PlaceBuilding => (Action<GameManagment.Coup>) RedoPhase1,
-                TurnPhase.SelectCells => RedoPhase2
+                TurnPhase.SelectCells => RedoPhase2,
+                TurnPhase.IAPlays => RedoPhase2
             }).Invoke(coup);
         }
 

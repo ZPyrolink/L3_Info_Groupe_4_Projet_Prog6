@@ -67,6 +67,8 @@ namespace Taluva.Controller
         public Action<Player> NotifyPlayerEliminated { get; set; }
         private void OnPlayerElimination(Player p) => NotifyPlayerEliminated?.Invoke(p);
 
+        private bool checkIa = true;
+
         #endregion
 
         #region Ctors
@@ -87,9 +89,11 @@ namespace Taluva.Controller
             for (int i = 0; i < nbPlayers - typeAI.Length; i++)
                 players[i] = new(pc[i]);
 
+            int nbHumanPlayer = nbPlayers - typeAI.Length;
+
             for (int i = 0; i < typeAI.Length; i++)
             {
-                Index index = ^(i + 1);
+                Index index = (i + nbHumanPlayer);
                 ref Player ptr = ref players[index];
 
                 if (typeAI[i] == typeof(AIRandom))
@@ -380,6 +384,7 @@ namespace Taluva.Controller
                     if (index)
                     {
                         ActualPlayerIndex = actualIndex;
+                        checkIa = false;
                         if (i % 2 == 0)
                         {
                             Phase1(new(positions[0], r), r);
@@ -563,7 +568,7 @@ namespace Taluva.Controller
                             actualPlayer.nbBarrack += gameBoard.WorldMap[c.positions[i]].ParentCunk.Level;
                             break;
                     }
-
+                    c.cells[i].ActualBuildings = Building.None;
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
                 }
             }
@@ -599,8 +604,12 @@ namespace Taluva.Controller
                     actualPhase = TurnPhase.NextPlayer;
                 }
             }
-
-            NextPhase(false);
+            if (actualPlayer is AI ai)
+            {
+                actualPhase = TurnPhase.IAPlays;
+                AiChunk();
+            } else
+                NextPhase(false);
             return c;
         }
 
@@ -768,13 +777,20 @@ namespace Taluva.Controller
 
             if (actualPlayer is AI ai)
             {
-                actualPhase = TurnPhase.IAPlays;
-                AiChunk();
+                if (checkIa)
+                {
+                    actualPhase = TurnPhase.IAPlays;
+                    AiChunk();
+                } else
+                {
+                    NextPhase();
+                }
             }
             else
             {
                 NextPhase();
             }
+            checkIa = true;
         }
 
         public void PlayerEliminated()
