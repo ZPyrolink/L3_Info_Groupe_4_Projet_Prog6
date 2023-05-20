@@ -6,23 +6,27 @@ namespace Taluva.Model
 {
     public class Pile<T>
     {
-        public Stack<T> _stack { get; set; }
-        public readonly List<T> _played;
+        public Stack<T> Content { get; }
+        [Obsolete("Use Content instead")]
+        public Stack<T> _stack => Content;
+        public List<T> Played { get; }
+        [Obsolete("Use Played instead")]
+        public List<T> _played => Played;
         
         public T[] GetRemaining() => _stack.ToArray();
 
         public Pile(T[] list)
         {
             Random random = new();
-            _played = new();
+            Played = new();
 
-            _stack = new(list.OrderBy(_ => random.Next()));
+            Content = new(list.OrderBy(_ => random.Next()));
         }
 
         public Pile(List<T> list)
         {
-            _stack = new(list);
-            _played = new();
+            Content = new(list);
+            Played = new();
 
         }
 
