@@ -526,6 +526,7 @@ namespace Taluva.Controller
             Coup c = historic.Undo();
             if (c.chunk != null)
             {
+                maxTurn++;
                 gameBoard.RemoveChunk(gameBoard.GetChunksCoords(c.positions[0], (Rotation) c.rotation));
                 if (c.cells[0] != null)
                 {
@@ -780,6 +781,7 @@ namespace Taluva.Controller
                 if (checkIa)
                 {
                     actualPhase = TurnPhase.IAPlays;
+                    OnChangePhase(actualPhase);
                     AiChunk();
                 } else
                 {
@@ -803,12 +805,13 @@ namespace Taluva.Controller
             }
         }
 
-        public void Phase1(PointRotation pr, Rotation r)
+        public void Phase1(PointRotation pr, Rotation r, bool ia = false)
         {
             if (ValidateTile(pr, r))
             {
-                NextPhase();
                 this.maxTurn--;
+                if (!ia)
+                    NextPhase();
             }
         }
 
@@ -837,7 +840,7 @@ namespace Taluva.Controller
             }
 
             OnAIChunkPlacement(pr);
-            ValidateTile(pr, r);
+            Phase1(pr, r, true);
         }
 
         public void ContinueAi()

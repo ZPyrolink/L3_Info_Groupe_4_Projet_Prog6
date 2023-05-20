@@ -194,6 +194,8 @@ namespace UI
             mr.materials[3].color = chunk.Coords[2].ActualBiome.GetColor();
         }
 
+        public void UpdateTiles() => NbTiles = NbTiles;
+
         public void Phase2()
         {
             UpdateGui();
@@ -203,7 +205,7 @@ namespace UI
             foreach (MeshRenderer mr in builds.GetComponentsInChildren<MeshRenderer>())
                 mr.material.color = GameMgr.Instance.actualPlayer.ID.GetColor();
 
-            NbTiles--;
+            UpdateTiles();
             UpBuild(0);
         }
 
