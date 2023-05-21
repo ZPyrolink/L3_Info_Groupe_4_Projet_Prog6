@@ -160,6 +160,15 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         _currentFf = null;
     }
 
+    public void ClearCurrentPreviews()
+    {
+        foreach(GameObject currentPreview in _currentPreviews)
+            Destroy(currentPreview);
+        _currentPreviews = null;
+    }
+
+    public bool CurrentPreviewsNotNull => _currentPreviews != null;
+
     private void PutBuild(Vector3 _) => PutBuild(GameMgr.Instance.actualPlayer.ID.GetColor());
 
     private void PutBuild(Color color)
