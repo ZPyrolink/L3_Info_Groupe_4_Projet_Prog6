@@ -20,7 +20,7 @@ namespace UI.MainMenu
 
         public void LoadGame(int i)
         {
-            Settings.LoadedFile = $"slot{i}";
+            StartSettings.LoadedFile = $"slot{i}";
             SceneManager.LoadScene("SampleScene");
         }
     }

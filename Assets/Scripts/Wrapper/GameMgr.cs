@@ -18,12 +18,15 @@ namespace Wrapper
     public class GameMgr : MonoBehaviourMgr<GameManagment>
     {
         [SerializeField]
-        private sbyte nbPlayers, nbAis;
+        private sbyte nbPlayers;
+
+        [SerializeField]
+        private Difficulty[] ais;
 
         [SerializeField]
         private string path;
 
-        //[SerializeField]
+        [SerializeField]
         public bool load;
 
         private Queue<AiMove> _aiMoves;
@@ -36,13 +39,11 @@ namespace Wrapper
         {
             get
             {
-                if (string.IsNullOrEmpty(Settings.LoadedFile))
-                    Settings.LoadedFile = path;
+                if (string.IsNullOrEmpty(StartSettings.LoadedFile))
+                    StartSettings.LoadedFile = path;
                 else
-                {
                     load = true;
-                }
-                    
+
 
                 if (load)
                 {
@@ -50,13 +51,17 @@ namespace Wrapper
                     return gm;
                 }
 
-                if (Settings.PlayerNb == 0)
-                    Settings.PlayerNb = nbPlayers;
+                if (StartSettings.PlayerNb == 0)
+                    StartSettings.PlayerNb = nbPlayers;
 
-                if (Settings.AiNb == 0)
-                    Settings.AiNb = nbAis;
+                if (StartSettings.Ais == null)
+                    StartSettings.Ais = ais;
 
-                return new(Settings.PlayerNb, Enumerable.Repeat(typeof(AIRandom), Settings.AiNb).ToArray());
+                return new(StartSettings.PlayerNb, StartSettings.Ais.Select(d => d switch
+                {
+                    Difficulty.BadPlayer => typeof(AIRandom),
+                    Difficulty.Normal => typeof(AIMonteCarlo)
+                }).ToArray());
             }
         }
 
@@ -66,16 +71,10 @@ namespace Wrapper
             SetHandlers();
             if (load)
             {
-                Instance.LoadGame(Settings.LoadedFile);
+                Instance.LoadGame(StartSettings.LoadedFile);
                 UiMgr.Instance.UnloadSetUp();
-                Settings.LoadedFile = null;
-                Settings.PlayerNb = (sbyte) Instance.NbPlayers;
-                int nbAi = 0;
-                foreach(Player p in Instance.players)
-                    if(p is AI)
-                        nbAi++;
-                Settings.AiNb = (sbyte)nbAi;
             }
+            
             if (Instance.gameBoard.WorldMap.Empty)
                 Instance.InitPlay();
             else if (Instance.actualPhase == TurnPhase.PlaceBuilding)

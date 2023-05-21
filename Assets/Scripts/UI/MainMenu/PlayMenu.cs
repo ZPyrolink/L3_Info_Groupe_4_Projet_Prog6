@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -7,42 +10,17 @@ namespace UI.MainMenu
     public class PlayMenu : MonoBehaviour
     {
         [SerializeField]
-        private Text nbPlayers,
-            nbAi;
-
-        [SerializeField]
-        private Slider nbPlayersSlider,
-            nbAiSlider;
-
-        [SerializeField]
-        private string nbPlayersPlaceholder,
-            nbAiPlaceholder;
-
-        private void Start()
-        {
-            if (string.IsNullOrEmpty(nbPlayersPlaceholder))
-                nbPlayersPlaceholder = nbPlayers.text;
-
-            if (string.IsNullOrEmpty(nbAiPlaceholder))
-                nbAiPlaceholder = nbAi.text;
-            
-            OnPlayerNbChanged(nbPlayersSlider.value);
-            OnAiNbChanged(nbAiSlider.value);
-        }
-
-        public void OnPlayerNbChanged(float i)
-        {
-            nbPlayers.text = nbPlayersPlaceholder.Replace("%nb%", i.ToString());
-            nbAiSlider.maxValue = i;
-        }
-
-        public void OnAiNbChanged(float i) =>
-            nbAi.text = nbAiPlaceholder.Replace("%nb%", i.ToString());
+        private GameObject playersSelectionParent;
 
         public void Play()
         {
-            Settings.PlayerNb = (sbyte) nbPlayersSlider.value;
-            Settings.AiNb = (sbyte) nbAiSlider.value;
+            PlayerSelection[] pss = playersSelectionParent.GetComponentsInChildren<PlayerSelection>();
+            StartSettings.PlayerNb = (sbyte) pss.Count(ps => ps.Registered);
+            StartSettings.Ais = pss
+                // On ignore les joueurs non enregistrés ou humain
+                .Where(ps => ps.Registered && ps.Ai >= 0)
+                // On récupère la difficulté
+                .Select(ps => ps.Ai).ToArray();
 
             SceneManager.LoadScene("SampleScene");
         }
