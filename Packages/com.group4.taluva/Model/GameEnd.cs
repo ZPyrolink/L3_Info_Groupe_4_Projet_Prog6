@@ -1,4 +1,4 @@
-namespace Taluva.Model.GameEnd
+namespace Taluva.Model
 {
     public enum GameEnd
     {

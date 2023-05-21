@@ -23,7 +23,7 @@ namespace Taluva.Model.AI
         {
             int rand;
             int max = 0;
-            PointRotation[] possible = this.gm.gameBoard.GetChunkSlots();
+            PointRotation[] possible = this.Gm.gameBoard.GetChunkSlots();
             foreach (PointRotation p in possible)
             {
                 foreach (bool rot in p.rotations)
@@ -57,19 +57,19 @@ namespace Taluva.Model.AI
         public override (Building buil, Vector2Int pos) PlayBuild()
         {
             int rand = Random.Range(0,1000);
-            Vector2Int[] temples = gm.gameBoard.GetTempleSlots(this);
+            Vector2Int[] temples = Gm.gameBoard.GetTempleSlots(this);
             if(temples.Length>0)
             {
                 rand = Random.Range(0, temples.Length);
                 return (Building.Temple,temples[rand]);
             } 
-            Vector2Int[] towers = gm.gameBoard.GetTowerSlots(this);
+            Vector2Int[] towers = Gm.gameBoard.GetTowerSlots(this);
             if(towers.Length>0)
             {
                 rand = Random.Range(0, towers.Length);
                 return (Building.Tower,towers[rand]);
             }
-            Vector2Int[] barracks = gm.gameBoard.GetBarrackSlots(this);
+            Vector2Int[] barracks = Gm.gameBoard.GetBarrackSlots(this);
             rand = Random.Range(0, barracks.Length);
             return (Building.Barrack,barracks[rand]);
         }

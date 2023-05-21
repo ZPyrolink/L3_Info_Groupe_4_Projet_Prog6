@@ -31,5 +31,16 @@ namespace Taluva.Model
         };
 
         public static Color GetColor(this Biomes bc) => Colors[bc];
+
+        public static char GetChar(this Biomes b) => b switch
+        {
+            Biomes.Desert => 'D',
+            Biomes.Forest => 'F',
+            Biomes.Lake => 'L',
+            Biomes.Mountain => 'M',
+            Biomes.Plain => 'P',
+            Biomes.Volcano => 'V',
+            _ => '\0'
+        };
     }
 }

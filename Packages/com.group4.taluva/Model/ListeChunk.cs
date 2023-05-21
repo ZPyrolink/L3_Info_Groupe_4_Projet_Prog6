@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
 
-using UnityEngine.UIElements;
-
 namespace Taluva.Model
 {
     public static class ListeChunk
     {   
         private static readonly List<Chunk> Chunks = new();
 
+        /// <summary>
+        /// Indexes: <see cref="Biomes"/> - 1
+        /// </summary>
         private static readonly int[,] OcurrenceMatrix =
         {
             { 1, 2, 4, 6, 2 },
@@ -16,33 +17,35 @@ namespace Taluva.Model
             { 4, 1, 1, 2, 2 },
             { 5, 1, 2, 1, 2 },
             { 2, 1, 1, 2, 1 }
-        }; //indexes : Forest = 0, Lake = 1, desert = 2, Plain = 3, Mountain = 4
+        };
 
+        /// <summary>
+        /// Get a new Pile
+        /// </summary>
         public static Pile<Chunk> Pile => new(Chunks.ToArray());
 
-        public static int Count => Chunks.Count;
-
-        //Create all chunks and store them in a list
+        // public static int Count => Chunks.Count;
+        
+        /// <summary>
+        /// Create all chunks and store them in a list
+        /// </summary>
         static ListeChunk()
         {
-            for (int i = 0; i < 5; i++)
-            {
-                for (int j = 0; j < 5; j++)
-                {
-                    int reps = 0;
-                    while (reps < OcurrenceMatrix[i, j])
+            for (int i = 0; i < OcurrenceMatrix.GetLength(0); i++)
+                for (int j = 0; j < OcurrenceMatrix.GetLength(1); j++)
+                    for (int reps = 0; reps < OcurrenceMatrix[i, j]; reps++)
                     {
                         Cell c1 = new((Biomes) (i + 1));
                         Cell c2 = new((Biomes) (j + 1));
                         Chunk c = new(1, c1, c2);
                         Chunks.Add(c);
-                        reps++;
                     }
-                }
-            }
-
         }
 
+        /// <summary>
+        /// Reset the chunks of a pile
+        /// </summary>
+        /// <param name="pileChunk">The pile to reset</param>
         public static void ResetChunk(Pile<Chunk> pileChunk)
         {
             Stack<Chunk> stack = new();
@@ -65,18 +68,10 @@ namespace Taluva.Model
             }
         }
 
-        //print one chunk contents
-        public static void PrintChunkToString(Chunk c)
-        {
-            Console.WriteLine($"{c.Coords[0].ActualBiome}, {c.Coords[1].ActualBiome}, {c.Coords[2].ActualBiome}");
-        }
+        [Obsolete("Use Chunk.ToString() instead")]
+        public static void PrintChunkToString(Chunk c) => Console.WriteLine(c);
 
-        public static void PrintChunkList(List<Chunk> l)
-        {
-            foreach (Chunk c in l)
-            {
-                PrintChunkToString(c);
-            }
-        }
+        [Obsolete("Use Chunk.ListToString(List<Chunk>) instead")]
+        public static void PrintChunkList(List<Chunk> l) => Console.WriteLine(Chunk.ListToString(l));
     }
 }

@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Taluva.Controller;
 using UnityEngine;
 
@@ -7,26 +5,26 @@ namespace Taluva.Model.AI
 {
     public abstract class AI : Player
     {
-        protected readonly GameManagment gm;
-        protected readonly Pile<Chunk> pile;
-        public Difficulty difficulty;
+        protected readonly GameManagment Gm;
+        protected readonly Pile<Chunk> Pile;
+        public Difficulty Difficulty;
 
         public AI(PlayerColor id, GameManagment gm, Pile<Chunk> pile) : base(id)
         {
-            this.gm = gm;
-            this.pile = pile;
+            this.Gm = gm;
+            this.Pile = pile;
         }
 
         public AI(AI original) :base(original.ID)
         {
-            this.gm = original.gm;
-            this.pile = original.pile;
-            this.lastChunk = original.lastChunk;
-            this.b_played = original.b_played;
-            this.nbTowers = original.nbTowers;
-            this.nbTemple = original.nbTemple;
-            this.nbBarrack = original.nbBarrack;
-            this.playerIA = original.playerIA;
+            this.Gm = original.Gm;
+            this.Pile = original.Pile;
+            this.LastChunk = original.LastChunk;
+            // this.BPlayed = original.BPlayed;
+            this.NbTowers = original.NbTowers;
+            this.NbTemple = original.NbTemple;
+            this.NbBarrack = original.NbBarrack;
+            // this.PlayerIA = original.PlayerIA;
         }
 
         public abstract Player Clone();

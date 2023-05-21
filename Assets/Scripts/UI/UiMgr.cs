@@ -152,19 +152,19 @@ namespace UI
             for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
             {
                 _guis[i].transform.GetChild(2).GetComponentInChildren<Text>().text =
-                    GameMgr.Instance.players[i].nbBarrack.ToString();
+                    GameMgr.Instance.players[i].NbBarrack.ToString();
                 _guis[i].transform.GetChild(3).GetComponentInChildren<Text>().text =
-                    GameMgr.Instance.players[i].nbTowers.ToString();
+                    GameMgr.Instance.players[i].NbTowers.ToString();
                 _guis[i].transform.GetChild(4).GetComponentInChildren<Text>().text =
-                    GameMgr.Instance.players[i].nbTemple.ToString();
+                    GameMgr.Instance.players[i].NbTemple.ToString();
             }
         }
 
         public void UpdateCurrentPlayerBuild()
         {
-            currentPlayerBuildCount[0].text = GameMgr.Instance.actualPlayer.nbBarrack.ToString();
-            currentPlayerBuildCount[1].text = GameMgr.Instance.actualPlayer.nbTowers.ToString();
-            currentPlayerBuildCount[2].text = GameMgr.Instance.actualPlayer.nbTemple.ToString();
+            currentPlayerBuildCount[0].text = GameMgr.Instance.actualPlayer.NbBarrack.ToString();
+            currentPlayerBuildCount[1].text = GameMgr.Instance.actualPlayer.NbTowers.ToString();
+            currentPlayerBuildCount[2].text = GameMgr.Instance.actualPlayer.NbTemple.ToString();
         }
 
         public void Next()

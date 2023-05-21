@@ -205,7 +205,7 @@ namespace Taluva.Model
         /// <returns>Return if we can put a chunk at the pt position with r rotation</returns>
         public bool PossibleVolcano(Vector2Int left, Vector2Int right, Rotation r, Vector2Int pt)
         {
-            int level = WorldMap[pt].ParentCunk.Level;
+            int level = WorldMap[pt].ParentChunk.Level;
 
             if (WorldMap.IsVoid(left) || WorldMap.IsVoid(right))
                 return false;
@@ -213,10 +213,10 @@ namespace Taluva.Model
             Cell leftCell = WorldMap[left];
             Cell rightCell = WorldMap[right];
 
-            if (leftCell.ParentCunk.Level != level || rightCell.ParentCunk.Level != level)
+            if (leftCell.ParentChunk.Level != level || rightCell.ParentChunk.Level != level)
                 return false;
 
-            if (WorldMap[pt].ParentCunk.rotation == r)
+            if (WorldMap[pt].ParentChunk.rotation == r)
                 return false;
 
 
@@ -363,9 +363,9 @@ namespace Taluva.Model
             }
 
             if (!WorldMap.IsVoid(p.point))
-                c.Level = WorldMap[p.point].ParentCunk.Level + 1;
+                c.Level = WorldMap[p.point].ParentChunk.Level + 1;
 
-            player.lastChunk = c;
+            player.LastChunk = c;
 
             Vector2Int[] neighbors = GetNeighbors(p.point);
 
@@ -412,9 +412,9 @@ namespace Taluva.Model
             if(b == Building.Barrack) {
                 int nbBarrack = 0;
                 foreach(Vector2Int v in tmp2) {
-                    nbBarrack += WorldMap[v].ParentCunk.Level;
+                    nbBarrack += WorldMap[v].ParentChunk.Level;
                 }
-                if (nbBarrack > player.nbBarrack)
+                if (nbBarrack > player.NbBarrack)
                     return false;
             }
 
@@ -424,16 +424,16 @@ namespace Taluva.Model
                     foreach (Vector2Int v in tmp2)
                     {
                         SetC(WorldMap[v]);
-                        player.nbBarrack -= WorldMap[v].ParentCunk.Level;
+                        player.NbBarrack -= WorldMap[v].ParentChunk.Level;
                     }
                     break;
                 case Building.Temple when GetTempleSlots(player).Contains(coord):
                     SetC(c);
-                    player.nbTemple--;
+                    player.NbTemple--;
                     break;
                 case Building.Tower when GetTowerSlots(player).Contains(coord):
                     SetC(c);
-                    player.nbTowers--;
+                    player.NbTowers--;
                     break;
                 default:
                     return false;
@@ -470,9 +470,9 @@ namespace Taluva.Model
         /// <returns>Return the possible possition for the barrack</returns>
         public Vector2Int[] GetBarrackSlots(Player player) => WorldMap
             .Select(GetCellCoord)
-            .Where(p => !WorldMap.IsVoid(p) && (WorldMap[p].ParentCunk.Level == 1 || IsAdjacentToCity(p, player)) 
+            .Where(p => !WorldMap.IsVoid(p) && (WorldMap[p].ParentChunk.Level == 1 || IsAdjacentToCity(p, player)) 
                         && WorldMap[p].ActualBuildings == Building.None &&
-                        WorldMap[p].ActualBiome != Biomes.Volcano && WorldMap[p].ParentCunk.Level <= player.nbBarrack)
+                        WorldMap[p].ActualBiome != Biomes.Volcano && WorldMap[p].ParentChunk.Level <= player.NbBarrack)
             .ToArray();
 
         /// <summary>
@@ -483,7 +483,7 @@ namespace Taluva.Model
         public Vector2Int[] GetTowerSlots(Player actualPlayer) => WorldMap
             .Select(GetCellCoord)
             .Where(p => !WorldMap.IsVoid(p) && WorldMap[p].ActualBuildings == Building.None && WorldMap[p].IsBuildable)
-            .Where(p => WorldMap[p].ParentCunk.Level >= 3)
+            .Where(p => WorldMap[p].ParentChunk.Level >= 3)
             .Where(p => IsAdjacentToCity(p, actualPlayer))
             .Where(p => !GetAllVillage(p)
                 .Where(village => WorldMap[village[0]].Owner == actualPlayer.ID)
@@ -583,7 +583,7 @@ namespace Taluva.Model
 
         public void SetChunkLevel(PointRotation pr)
         {
-            WorldMap[pr.point].ParentCunk.Level++;
+            WorldMap[pr.point].ParentChunk.Level++;
         }
     }
 }
