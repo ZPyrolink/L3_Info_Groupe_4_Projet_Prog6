@@ -13,8 +13,6 @@ using UnityEngine;
 
 using Utils;
 
-using Random = UnityEngine.Random;
-
 namespace Wrapper
 {
     public class GameMgr : MonoBehaviourMgr<GameManagment>

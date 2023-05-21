@@ -1,8 +1,4 @@
-﻿using System;
-
-using Taluva.Model;
-
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.UI;
 

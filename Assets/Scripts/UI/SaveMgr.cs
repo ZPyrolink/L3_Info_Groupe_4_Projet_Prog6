@@ -1,9 +1,5 @@
-﻿using System;
-using Taluva.Controller;
-using UI;
+﻿using UnityEngine;
 
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using Utils;
 using Wrapper;
 
