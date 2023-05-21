@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -30,6 +31,9 @@ public class CameraMgr : MonoBehaviourMgr<CameraMgr>
     private Quaternion _defaultRotation;
 
     private int _currentRotation;
+
+    [SerializeField]
+    private float rotationSpeed = 1;
     
     // Start is called before the first frame update
     private void Start()
@@ -131,6 +135,19 @@ public class CameraMgr : MonoBehaviourMgr<CameraMgr>
 
         _currentRotation++;
         _currentRotation %= rotationNb;
+    }
+
+    public void StartCRotate(float angle) => StartCoroutine(CRotate(angle));
+    
+    public IEnumerator CRotate(float angle)
+    {
+        float speed = rotationSpeed * Mathf.Sign(angle);
+        
+        for (float f = 0; speed > 0 ? f < angle : f > angle; f += speed)
+        {
+            Rotate(speed);
+            yield return 0;
+        }
     }
 
     public void ResetPosition()
