@@ -4,6 +4,7 @@ using System.Linq;
 
 using Taluva.Model;
 using Taluva.Model.AI;
+
 using UI;
 
 using UnityEngine;
@@ -11,6 +12,7 @@ using UnityEngine;
 using Utils;
 
 using Wrapper;
+
 using static UnityEditor.PlayerSettings;
 
 public class TilesMgr : MonoBehaviourMgr<TilesMgr>
@@ -266,6 +268,10 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         return v3;
     }
 
+    private static Vector3 V2IToEul(Vector2Int v) => new(270,
+        GameMgr.Instance.IsVoid(v) ? 270 : GameMgr.Instance.gameBoard.WorldMap[v].ParentChunk.Rotation.YDegree(),
+        GameMgr.Instance.CellPositionInChunk(v) switch { 1 => -120, 2 => 120, _ => 0 });
+
     public void ReputBuild(Vector2Int pos, Building b, Player player)
     {
         _currentBuild = b;
@@ -361,19 +367,11 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     public void SetFeedForwards1()
     {
         ClearFeedForward();
-        if (!(GameMgr.Instance.actualPlayer is AI))
-        {
-            foreach (PointRotation pr in GameMgr.Instance.ChunkSlots())
-            {
-                Vector3 pos = new(pr.point.x, 0, pr.point.y);
-                if (!GameMgr.Instance.IsVoid(pr.point))
-                    pos.y = GameMgr.Instance.LevelAt(pr.point) * yOffset;
-                pos.Scale(new(xOffset, 1, zOffset));
-                if (pr.point.x % 2 != 0)
-                    pos.z += zOffset / 2;
-                _gos[SetFeedForward(pos)] = pr;
-            }
-        }
+        if (GameMgr.Instance.ActualPlayer is AI)
+            return;
+
+        foreach (PointRotation pr in GameMgr.Instance.ChunkSlots())
+            _gos[SetFeedForward(V2IToV3(pr.Point), V2IToEul(pr.Point))] = pr;
     }
 
     public void SetFeedForwards2(Building build)
@@ -395,20 +393,12 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         };
 
         foreach (Vector2Int p in poss)
-        {
-            Vector3 pos = new(p.x, 0, p.y);
-            if (!GameMgr.Instance.IsVoid(p))
-                pos.y = GameMgr.Instance.LevelAt(p) * yOffset;
-            pos.Scale(new(xOffset, 1, zOffset));
-            if (p.x % 2 != 0)
-                pos.z += zOffset / 2;
-            _gos[SetFeedForward(pos)] = new(p);
-        }
+            _gos[SetFeedForward(V2IToV3(p), V2IToEul(p))] = new(p);
     }
 
-    public GameObject SetFeedForward(Vector3 pos)
+    public GameObject SetFeedForward(Vector3 pos, Vector3 euler)
     {
-        GameObject go = Instantiate(feedForward, pos, Quaternion.Euler(-90, -90, 0), feedForwardParent);
+        GameObject go = Instantiate(feedForward, pos, Quaternion.Euler(euler), feedForwardParent);
         go.GetComponent<MeshRenderer>().materials[1].color = GameMgr.Instance.actualPlayer.ID.GetColor();
         return go;
     }
