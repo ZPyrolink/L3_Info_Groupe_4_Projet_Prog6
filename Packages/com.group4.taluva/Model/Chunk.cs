@@ -12,16 +12,19 @@ namespace Taluva.Model
         /// Gets the array of cells in the chunk.
         /// </summary>
         public Cell[] Coords { get; }
+
         /// <summary>
         /// Gets or sets the rotation of the chunk.
         /// </summary>
         public Rotation Rotation { get; set; }
+
         [Obsolete("Use Rotation instead")]
         public Rotation rotation
         {
             get => Rotation;
             set => Rotation = value;
         }
+
         /// <summary>
         /// Gets or sets the level of the chunk.
         /// </summary>
@@ -36,7 +39,7 @@ namespace Taluva.Model
         public Chunk(int l, Cell left, Cell right)
         {
             Coords = new Cell[3];
-            Coords[0] = new(Biomes.Volcano, this);
+            Coords[0] = new Cell(Biomes.Volcano, this);
             Coords[1] = left;
             left.ParentChunk = this;
             Coords[2] = right;
@@ -44,7 +47,6 @@ namespace Taluva.Model
             Level = l;
         }
 
-        
         /// <summary>
         /// Initializes a new instance of the Chunk class from an existing chunk.
         /// </summary>
@@ -60,8 +62,17 @@ namespace Taluva.Model
             Level = c.Level;
         }
 
+        /// <summary>
+        /// Returns a string representation of the chunk.
+        /// </summary>
+        /// <returns>A string representation of the chunk.</returns>
         public override string ToString() => $"{Coords[0].ActualBiome}, {Coords[1].ActualBiome}, {Coords[2].ActualBiome}";
 
+        /// <summary>
+        /// Converts a list of chunks to a string representation.
+        /// </summary>
+        /// <param name="l">The list of chunks to convert.</param>
+        /// <returns>A string representation of the list of chunks.</returns>
         public static string ListToString(IEnumerable<Chunk> l) => string.Join("\n", l);
     }
 }

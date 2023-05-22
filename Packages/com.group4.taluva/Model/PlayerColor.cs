@@ -38,6 +38,6 @@ namespace Taluva.Model
         /// </summary>
         /// <param name="pc">The PlayerColor value.</param>
         /// <returns>The Color value corresponding to the PlayerColor.</returns>
-        public static Color GetColor(this PlayerColor pc) => ColorUtils.From((uint) pc);
+        public static Color GetColor(this PlayerColor pc) => ColorUtils.From((uint)pc);
     }
 }

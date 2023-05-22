@@ -17,24 +17,35 @@ namespace Taluva.Model
             get => LastChunk;
             set => LastChunk = value;
         }
+
         /// <summary>
         /// The ID representing the player's color.
         /// </summary>
         public PlayerColor ID { get; private set; }
+
+        /// <summary>
+        /// The color of the player's ID.
+        /// </summary>
         public Color IdColor => ID.GetColor();
+
         /// <summary>
         /// The number of remaining towers the player can place.
         /// </summary>
         public int NbTowers = 2;
+
         /// <summary>
         /// The number of remaining temples the player can place.
         /// </summary>
         public int NbTemple = 3;
+
         /// <summary>
         /// The number of remaining barracks the player can place.
         /// </summary>
         public int NbBarrack = 20;
 
+        /// <summary>
+        /// Indicates if the player has been eliminated from the game.
+        /// </summary>
         public bool Eliminated { get; set; }
 
         /// <summary>
@@ -46,8 +57,10 @@ namespace Taluva.Model
             ID = id;
         }
 
-        public Player Clone() => new(this);
-
+        /// <summary>
+        /// Creates a new instance of the Player class based on an existing player instance.
+        /// </summary>
+        /// <param name="original">The original player instance to clone.</param>
         public Player(Player original) : this(original.ID)
         {
             Player clone = new(ID);
@@ -57,6 +70,15 @@ namespace Taluva.Model
             clone.NbBarrack = NbBarrack;
         }
 
+        /// <summary>
+        /// Creates a clone of the player.
+        /// </summary>
+        /// <returns>A new instance of the Player class representing the clone.</returns>
+        public Player Clone() => new(this);
+
+        /// <summary>
+        /// Eliminates the player from the game.
+        /// </summary>
         public void Eliminate() => Eliminated = true;
     }
 }

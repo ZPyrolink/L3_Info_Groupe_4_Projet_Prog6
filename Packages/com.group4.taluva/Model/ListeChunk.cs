@@ -5,7 +5,7 @@ namespace Taluva.Model
 {
     public static class ListeChunk
     {   
-        private static readonly List<Chunk> Chunks = new();
+        private static readonly List<Chunk> Chunks = new List<Chunk>();
 
         /// <summary>
         /// Indexes: <see cref="Biomes"/> - 1
@@ -20,57 +20,71 @@ namespace Taluva.Model
         };
 
         /// <summary>
-        /// Get a new Pile
+        /// Get a new Pile containing the chunks.
         /// </summary>
-        public static Pile<Chunk> Pile => new(Chunks.ToArray());
+        public static Pile<Chunk> Pile => new Pile<Chunk>(Chunks.ToArray());
 
         // public static int Count => Chunks.Count;
         
         /// <summary>
-        /// Create all chunks and store them in a list
+        /// Creates all the chunks and stores them in a list.
         /// </summary>
         static ListeChunk()
         {
             for (int i = 0; i < OcurrenceMatrix.GetLength(0); i++)
+            {
                 for (int j = 0; j < OcurrenceMatrix.GetLength(1); j++)
+                {
                     for (int reps = 0; reps < OcurrenceMatrix[i, j]; reps++)
                     {
-                        Cell c1 = new((Biomes) (i + 1));
-                        Cell c2 = new((Biomes) (j + 1));
-                        Chunk c = new(1, c1, c2);
+                        Cell c1 = new Cell((Biomes)(i + 1));
+                        Cell c2 = new Cell((Biomes)(j + 1));
+                        Chunk c = new Chunk(1, c1, c2);
                         Chunks.Add(c);
                     }
+                }
+            }
         }
 
         /// <summary>
-        /// Reset the chunks of a pile
+        /// Resets the chunks of a pile.
         /// </summary>
-        /// <param name="pileChunk">The pile to reset</param>
+        /// <param name="pileChunk">The pile to reset.</param>
         public static void ResetChunk(Pile<Chunk> pileChunk)
         {
-            Stack<Chunk> stack = new();
+            Stack<Chunk> stack = new Stack<Chunk>();
             int nb = pileChunk.NbKeeping;
+
             for(int i = 0; i < nb; i++)
             {
-                Chunk chunk = pileChunk._stack.Pop();
+                Chunk chunk = pileChunk.Content.Pop();
                 chunk.Coords[1].ActualBuildings = Building.None;
                 chunk.Coords[2].ActualBuildings = Building.None;
                 chunk.Level = 1;
 
                 stack.Push(chunk);
             }
-            pileChunk._stack.Clear();
+
+            pileChunk.Content.Clear();
 
             for(int i = 0; i < nb; i++)
             {
                 Chunk chunk = stack.Pop();
-                pileChunk._stack.Push(chunk);
+                pileChunk.Content.Push(chunk);
             }
         }
 
+        /// <summary>
+        /// Prints the string representation of a chunk.
+        /// </summary>
+        /// <param name="c">The chunk to print.</param>
         [Obsolete("Use Chunk.ToString() instead")]
         public static void PrintChunkToString(Chunk c) => Console.WriteLine(c);
 
+        /// <summary>
+        /// Prints the string representation of a list of chunks.
+        /// </summary>
+        /// <param name="l">The list of chunks to print.</param>
         [Obsolete("Use Chunk.ListToString(List<Chunk>) instead")]
         public static void PrintChunkList(List<Chunk> l) => Console.WriteLine(Chunk.ListToString(l));
     }

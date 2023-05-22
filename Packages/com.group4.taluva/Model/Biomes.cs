@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-
 using Taluva.Utils;
-
 using UnityEngine;
 
 namespace Taluva.Model
@@ -25,7 +23,7 @@ namespace Taluva.Model
     /// </summary>
     public static class BiomeExt
     {
-        private static readonly Dictionary<Biomes, Color> Colors = new()
+        private static readonly Dictionary<Biomes, Color> Colors = new Dictionary<Biomes, Color>()
         {
             [Biomes.Plain] = ColorUtils.From(0xFFA8BA26),
             [Biomes.Forest] = ColorUtils.From(0xFF556B2F),
@@ -43,6 +41,11 @@ namespace Taluva.Model
         /// <returns>The color associated with the biome.</returns>
         public static Color GetColor(this Biomes bc) => Colors[bc];
 
+        /// <summary>
+        /// Gets the character representation associated with a specific biome.
+        /// </summary>
+        /// <param name="b">The biome.</param>
+        /// <returns>The character representation associated with the biome.</returns>
         public static char GetChar(this Biomes b) => b switch
         {
             Biomes.Desert => 'D',

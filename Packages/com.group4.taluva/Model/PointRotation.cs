@@ -58,6 +58,7 @@ namespace Taluva.Model
             .Where((t, i) => t != rotations.rotations[i])
             // On regardes s'il en existe un
             .Any();
+        
         /// <summary>
         /// Checks if there are any available rotations.
         /// </summary>
@@ -88,6 +89,10 @@ namespace Taluva.Model
         [Obsolete("Use ToString() instead")]
         public string RotationString() => ToString();
 
+        /// <summary>
+        /// Returns a string representation of the available rotations.
+        /// </summary>
+        /// <returns>A string representing the available rotations.</returns>
         public override string ToString()
         {
             StringBuilder sb = new();
