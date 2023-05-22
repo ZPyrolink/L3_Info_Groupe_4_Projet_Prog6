@@ -105,8 +105,14 @@ namespace Taluva.Model.AI
         {
             return (AITurn.BuildType, AITurn.BuildPos);
         }
-        
-        protected abstract int Heuristic { get; }
+
+        protected virtual int Heuristic
+        {
+            get
+            {
+                return this.NbBarrack * 5 + this.NbTowers * 100 + this.NbTemple * 1000;
+            }
+        }
 
         protected virtual (Turn, int) GetBest(Dictionary<Turn, int> possible)
         {
