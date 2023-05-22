@@ -93,11 +93,14 @@ namespace Taluva.Utils
         /// <returns>Return if we have remove the object at the position</returns>
         public bool Remove(Vector2Int p)
         {
-            if (ContainsLine(p.x) && ContainsColumn(p) && _matrix[p.x].Remove(p.y) && _matrix.Count == 0)
-                return false;
+            bool remove = ContainsColumn(p) && _matrix[p.x].Remove(p.y);
 
+            if (remove && _matrix[p.x].Count == 0)
+            {
+                remove = _matrix.Remove(p.x);
+            }
             
-            return _matrix.Remove(p.x); 
+            return remove; 
         }
 
         /// <summary>
