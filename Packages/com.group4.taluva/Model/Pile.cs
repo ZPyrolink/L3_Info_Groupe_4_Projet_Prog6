@@ -48,6 +48,7 @@ namespace Taluva.Model
             _played.Add(c);
             return c;
         }
+        
 
         public void Stack(T stack)
         {
