@@ -207,6 +207,7 @@ namespace UI
         public void Phase1()
         {
             UpdateGui();
+            InteractiveValidate = false;
             TilesMgr.Instance.SetFeedForwards1();
 
             CurrentTile.SetActive(true);
@@ -232,6 +233,7 @@ namespace UI
         public void Phase2()
         {
             UpdateGui();
+            InteractiveValidate = false;
             currentTile.SetActive(false);
             builds.SetActive(true);
 
