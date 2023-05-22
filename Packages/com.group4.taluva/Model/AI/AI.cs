@@ -17,11 +17,9 @@ namespace Taluva.Model.AI
         {
             this.Gm = original.Gm;
             this.LastChunk = original.LastChunk;
-            // this.BPlayed = original.BPlayed;
             this.NbTowers = original.NbTowers;
             this.NbTemple = original.NbTemple;
             this.NbBarrack = original.NbBarrack;
-            // this.PlayerIA = original.PlayerIA;
         }
 
         public abstract Player Clone();
