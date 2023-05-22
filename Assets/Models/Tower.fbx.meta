@@ -3,7 +3,12 @@ guid: 1bfe7bae8d80166468e94a363daf2bc5
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Towerbase
+    second: {fileID: 2100000, guid: 910c8cb0a592c1641b697527c685f63b, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

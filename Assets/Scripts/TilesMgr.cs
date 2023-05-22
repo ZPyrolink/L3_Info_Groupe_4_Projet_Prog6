@@ -36,7 +36,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     private Building _currentBuild;
 
-    private Dictionary<Building, Vector3> _buildsScale = new()
+    private readonly Dictionary<Building, Vector3> _buildsScale = new()
     {
         [Building.Barrack] = new(23, 27, 15),
         [Building.Tower] = new(120, 120, 29),
@@ -65,7 +65,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                 _currentFf = hit.transform.gameObject;
                 (GameMgr.Instance.actualPhase switch
                 {
-                    TurnPhase.SelectCells => (Action<Vector3>)PutTile,
+                    TurnPhase.SelectCells => (Action<Vector3>) PutTile,
                     TurnPhase.PlaceBuilding => PutBuild
                 }).Invoke(hit.transform.position);
                 break;
@@ -99,7 +99,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         {
             _currentPreviews[0].transform.position = pos;
             _currentPreviews[0].transform.rotation = Quaternion.Euler(270,
-                _gos == null ? 270 : ((Rotation)Array.IndexOf(_gos[_currentFf].rotations, true)).YDegree(),
+                _gos == null ? 270 : ((Rotation) Array.IndexOf(_gos[_currentFf].rotations, true)).YDegree(),
                 0);
         }
 
@@ -112,8 +112,9 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         for (int i = 0; i < pos.Rotations.Length; i++)
         {
             if (pos.Rotations[i])
-                r = (Rotation)i;
+                r = (Rotation) i;
         }
+
         PutAiTile(pos.Point, V2IToV3(pos.Point), r, GameMgr.Instance.ActualChunk, true);
     }
 
@@ -173,9 +174,10 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             {
                 [_currentFf] = new(pos, rot)
             };
-        } else
+        }
+        else
         {
-            for(int i = 0; i < feedForwardParent.childCount; ++i)
+            for (int i = 0; i < feedForwardParent.childCount; ++i)
             {
                 if (feedForwardParent.GetChild(i).transform.position == p)
                     _currentFf = feedForwardParent.GetChild(i).gameObject;
@@ -190,7 +192,6 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             Destroy(_currentFf);
             _currentFf = null;
         }
-        
     }
 
     public void ClearCurrentPreviews()
@@ -208,7 +209,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     {
         Vector2Int currentPos;
         if (position != null)
-            currentPos = (Vector2Int)position;
+            currentPos = (Vector2Int) position;
         else
         {
             currentPos = _gos[_currentFf].Point;
@@ -331,14 +332,15 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                 {
                     transform =
                     {
-                    position = V2IToV3(p)
+                        position = V2IToV3(p)
                     }
                 },
                 static p => new PointRotation(p)
             );
 
             _currentFf = _gos.Keys.First();
-        } else
+        }
+        else
         {
             for (int i = 0; i < feedForwardParent.childCount; ++i)
             {
@@ -346,7 +348,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                     _currentFf = feedForwardParent.GetChild(i).gameObject;
             }
         }
-        
+
 
         if (_currentPreviews is null || _currentPreviews.Length < pos.Length)
             _currentPreviews = new GameObject[pos.Length];
@@ -395,7 +397,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         {
             _currentPreviews[0].transform.Rotate(new(0, 360f / 6, 0), Space.World);
             rot = RotationExt.Of(Mathf.Round(_currentPreviews[0].transform.rotation.eulerAngles.y));
-        } while (_gos?[_currentFf]?.rotations?[(int)rot] == false);
+        } while (_gos?[_currentFf]?.rotations?[(int) rot] == false);
     }
 
     public void SetFeedForwards1()
