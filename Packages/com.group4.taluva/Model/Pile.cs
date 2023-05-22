@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Taluva.Model
 {
-    public class Pile<T>
+    public class Pile<T> where T: ICloneable
     {
         public Stack<T> Content { get; }
         [Obsolete("Use Content instead")]
@@ -34,11 +34,15 @@ namespace Taluva.Model
 
         public Pile(Pile<T> p)
         {
-            Content = new Stack<T>(p.Content.Reverse());
+            Content = new Stack<T>();
+            foreach (T tmp in p._stack)
+            {
+                Content.Push((T)tmp.Clone());
+            }
             Played = new List<T>(p.Played);
         }
 
-        public Pile<T> clone()
+        public Pile<T> Clone()
         {
             return new Pile<T>(this);
         }

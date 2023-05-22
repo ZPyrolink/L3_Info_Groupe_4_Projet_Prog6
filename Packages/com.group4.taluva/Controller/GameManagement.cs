@@ -107,7 +107,7 @@ namespace Taluva.Controller
         {
             this.gameBoard = new Board(original.gameBoard);
             //this.historic = new Historic<Coup>(original.historic); TODO Copy constructor
-            //this.pile = new Pile<Chunk>(original.pile);   TODO copy constructor
+            this.pile = new Pile<Chunk>(original.pile);
         }
         public GameManagment(int nbPlayers, Type[] typeAI)
         {
