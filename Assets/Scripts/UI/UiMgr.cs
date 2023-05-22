@@ -55,15 +55,25 @@ namespace UI
         [SerializeField]
         private Button validateButton;
 
-        private bool inMenu = false;
+        public bool inMenu { get; private set; }
 
-        public bool EnableValidateBtn
+        [SerializeField]
+        private Button undoButton;
+
+        public bool InteractiveValidate
         {
             set => validateButton.interactable = value;
         }
 
-        [SerializeField]
-        private Button undoButton;
+        public bool InteractiveUndo
+        {
+            set => undoButton.interactable = value;
+        }
+
+        public bool InteractiveRedo
+        {
+            set => redoButton.interactable = value;
+        }
 
         [SerializeField]
         private Button redoButton;
@@ -86,8 +96,6 @@ namespace UI
         {
             if (!inMenu)
             {
-                undoButton.interactable = GameMgr.Instance.CanUndo;
-                redoButton.interactable = GameMgr.Instance.CanRedo;
                 if (Input.GetKeyDown(nextPhase))
                     Next();
             }
@@ -120,7 +128,7 @@ namespace UI
 
         public void UnloadSetUp()
         {
-            //Enlever les joueurs affiché qui n'existe pas (utilisé pour le load)
+            //Enlever les joueurs affichï¿½ qui n'existe pas (utilisï¿½ pour le load)
             for (int i = GameMgr.Instance.NbPlayers; i < 4; i++)
                 Destroy(this.gameObject.transform.GetChild(i + 5).gameObject);
         }
@@ -219,6 +227,9 @@ namespace UI
             UpdateCurrentPlayer();
             UpdatePlayersBuild();
             UpdateCurrentPlayerBuild();
+
+            undoButton.interactable = GameMgr.Instance.CanUndo;
+            redoButton.interactable = GameMgr.Instance.CanRedo;
         }
 
         public void Undo()

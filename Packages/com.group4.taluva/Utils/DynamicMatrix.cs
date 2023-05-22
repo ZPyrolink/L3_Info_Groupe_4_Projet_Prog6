@@ -96,8 +96,8 @@ namespace Taluva.Utils
             if (ContainsLine(p.x) && ContainsColumn(p) && _matrix[p.x].Remove(p.y) && _matrix.Count == 0)
                 return false;
 
-            _matrix.Remove(p.x);
-            return true;
+            
+            return _matrix.Remove(p.x); 
         }
 
         /// <summary>

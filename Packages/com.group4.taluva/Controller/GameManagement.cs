@@ -89,8 +89,8 @@ namespace Taluva.Controller
         private void OnAIChunkPlacement(PointRotation pr) => NotifyAIChunkPlacement?.Invoke(pr);
 
         //Notify where the AI places the building
-        public Action<Building, Vector2Int> NotifyAIBuildingPlacement { get; set; }
-        private void OnAIBuildingPlacement(Building b, Vector2Int pos) => NotifyAIBuildingPlacement?.Invoke(b, pos);
+        public Action<Building, Vector2Int[]> NotifyAIBuildingPlacement { get; set; }
+        private void OnAIBuildingPlacement(Building b, Vector2Int[] pos) => NotifyAIBuildingPlacement?.Invoke(b, pos);
 
         //Notify player eliminated
         public Action<Player> NotifyPlayerEliminated { get; set; }
@@ -910,7 +910,8 @@ namespace Taluva.Controller
             PlayerEliminated();
             if (!ActualPlayer.Eliminated)
             {
-                OnAIBuildingPlacement(b, pos);
+                List<Vector2Int> build = FindBiomesAroundVillage(p.Point);
+                OnAIBuildingPlacement(b, build.ToArray());
                 ValidateBuilding(c, b);
             }
         }

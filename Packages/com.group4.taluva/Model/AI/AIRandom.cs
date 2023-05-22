@@ -1,3 +1,5 @@
+using System.Linq;
+
 using Taluva.Controller;
 using UnityEngine;
 
@@ -22,37 +24,22 @@ namespace Taluva.Model.AI
         public override PointRotation PlayChunk()
         {
             int rand;
-            int max = 0;
             PointRotation[] possible = this.Gm.gameBoard.GetChunkSlots();
-            foreach (PointRotation p in possible)
-            {
-                foreach (bool rot in p.rotations)
-                {
-                    if (rot)
-                    {
-                        max++;
-                    }
-                }
-            }
+            int max = possible.SelectMany(p => p.rotations).Count(rot => rot);
 
-            rand = Random.Range(0, max);
+            rand = Random.Range(1, max + 1);
             foreach (PointRotation p in possible)
-            {
-                for (int i = 0; i<6;i++)
+                for (int i = 0; i < 6; i++)
                 {
                     if (p.rotations[i])
-                    {
                         rand--;
-                    }
 
                     if (rand == 0)
-                    {
-                        return new PointRotation(p.point, (Rotation)i);
-                    }
+                        return new(p.point, (Rotation) i);
                 }
-            }
-            
-            return null;}
+
+            return null;
+        }
 
         public override (Building buil, Vector2Int pos) PlayBuild()
         {

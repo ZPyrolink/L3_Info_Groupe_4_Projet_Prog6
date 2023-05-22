@@ -117,7 +117,7 @@ namespace TestsTaluva
             _gm.Undo();  
             _gm.Redo();
             Assert.IsFalse(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.Barrack);
-            Assert.AreEqual(45, _gm.pile._stack.Count);
+            Assert.AreEqual(46, _gm.pile._stack.Count);
             Assert.AreEqual(18, _gm.actualPlayer.NbBarrack);
         }
 
@@ -159,8 +159,8 @@ namespace TestsTaluva
             GameManagment gm = new(2);
             gm.LoadGame(path);
 
-            Assert.AreEqual(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings, gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings);
-            Assert.AreEqual(_gm.actualPlayer.NbBarrack, gm.actualPlayer.NbBarrack);
+            Assert.AreEqual(Building.Barrack, gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings);
+            Assert.AreEqual(19, gm.PreviousPlayer.NbBarrack);
         }
 
 

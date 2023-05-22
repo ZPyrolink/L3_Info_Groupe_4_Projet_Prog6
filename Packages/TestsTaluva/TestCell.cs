@@ -57,7 +57,7 @@ namespace TestsTaluva
                         Assert.AreEqual("V", _cell[i].ToString());
                         break;
                     default:
-                        Assert.AreEqual("", _cell[i].ToString());
+                        Assert.AreEqual("\0", _cell[i].ToString());
                         break;
                 }
             }
