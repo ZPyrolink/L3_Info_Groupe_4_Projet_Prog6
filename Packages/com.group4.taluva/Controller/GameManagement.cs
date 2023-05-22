@@ -105,9 +105,17 @@ namespace Taluva.Controller
 
         public GameManagment(GameManagment original)
         {
+            this.NbPlayers = original.NbPlayers;
             this.gameBoard = new Board(original.gameBoard);
-            //this.historic = new Historic<Coup>(original.historic); TODO Copy constructor
+            this.historic = new Historic<Coup>(original.historic);
             this.pile = new Pile<Chunk>(original.pile);
+            this.Players = new Player[NbPlayers];
+            this.ActualPlayerIndex = original.ActualPlayerIndex;
+            this.maxTurn = original.MaxTurn;
+            for (int i = 0; i < NbPlayers; i++)
+            {
+                Players[i] = new Player(original.Players[i]);
+            }
         }
         public GameManagment(int nbPlayers, Type[] typeAI)
         {
@@ -190,9 +198,11 @@ namespace Taluva.Controller
                 positions = original.positions.ToArray();
                 rotation = original.rotation;
                 cells = original.cells.ToArray();
-                chunk = new Chunk(original.chunk);
+                if(original.chunk != null)
+                    chunk = new Chunk(original.chunk);
                 playerIndex = original.playerIndex;
-                building = original.building.ToArray();
+                if(original.building != null)
+                    building = original.building.ToArray();
                 
             }    
             
