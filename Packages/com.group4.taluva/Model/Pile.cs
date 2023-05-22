@@ -22,20 +22,8 @@ namespace Taluva.Model
 
             Content = new(list.OrderBy(_ => random.Next()));
         }
-        public Pile(Pile<T> p)
-        {
-            foreach (T tmp in _stack)
-            {
-                p._stack.Push(tmp);
-            }
-        }
 
-        public Pile<T> clone()
-        {
-            return new Pile<T>(this);
-        }
         
-
         public Pile(List<T> list)
         {
             Content = new(list);
@@ -43,6 +31,16 @@ namespace Taluva.Model
 
         }
 
+        public Pile(Pile<T> p)
+        {
+            Content = new Stack<T>(p.Content.Reverse());
+            Played = new List<T>(p.Played);
+        }
+
+        public Pile<T> clone()
+        {
+            return new Pile<T>(this);
+        }
         public T Draw()
         {
             T c = _stack.Pop();
