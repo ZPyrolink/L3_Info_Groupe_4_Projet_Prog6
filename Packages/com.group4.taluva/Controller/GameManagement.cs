@@ -1028,25 +1028,25 @@ namespace Taluva.Controller
             return tex;
         }
 
-        public void MeshRender()
-        {
-            CustomRenderTexture crt = new CustomRenderTexture(1024, 1024);
-            Texture2D tex = ExportTexture(crt);
-            GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            plane.SetActive(true);
-            Material mat = new Material(Shader.Find("MeshTest"));
-            MeshRenderer mr = plane.transform.GetComponentInChildren<MeshRenderer>();
-            mr.material = mat;
-            mr.material.SetTexture(Shader.PropertyToID("_test"), tex);
-        }
-
-        Vector2Int CalculateCenter(Vector2Int[] TriangleCoords)
-        {
-            Vector2Int center = new Vector2Int();
-            center.x = TriangleCoords[0].x + TriangleCoords[1].x + TriangleCoords[2].x;
-            center.y = TriangleCoords[0].y + TriangleCoords[1].y + TriangleCoords[2].y;
-            return center;
-        }
+        // public void MeshRender()
+        // {
+        //     CustomRenderTexture crt = new CustomRenderTexture(1024, 1024);
+        //     Texture2D tex = ExportTexture(crt);
+        //     GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        //     plane.SetActive(true);
+        //     Material mat = new Material(Shader.Find("MeshTest"));
+        //     MeshRenderer mr = plane.transform.GetComponentInChildren<MeshRenderer>();
+        //     mr.material = mat;
+        //     mr.material.SetTexture(Shader.PropertyToID("_test"), tex);
+        // }
+        //
+        // Vector2Int CalculateCenter(Vector2Int[] TriangleCoords)
+        // {
+        //     Vector2Int center = new Vector2Int();
+        //     center.x = TriangleCoords[0].x + TriangleCoords[1].x + TriangleCoords[2].x;
+        //     center.y = TriangleCoords[0].y + TriangleCoords[1].y + TriangleCoords[2].y;
+        //     return center;
+        // }
 
         public List<Vector2Int> FindBiomesAroundVillage(Vector2Int cell) =>
             gameBoard.FindBiomesAroundVillage(cell, ActualPlayer);
