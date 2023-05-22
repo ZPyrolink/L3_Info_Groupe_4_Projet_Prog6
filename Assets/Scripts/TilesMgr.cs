@@ -4,6 +4,7 @@ using System.Linq;
 
 using Taluva.Model;
 using Taluva.Model.AI;
+
 using UI;
 
 using UnityEngine;
@@ -11,6 +12,7 @@ using UnityEngine;
 using Utils;
 
 using Wrapper;
+
 using static UnityEditor.PlayerSettings;
 
 public class TilesMgr : MonoBehaviourMgr<TilesMgr>
@@ -63,7 +65,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                 _currentFf = hit.transform.gameObject;
                 (GameMgr.Instance.actualPhase switch
                 {
-                    TurnPhase.SelectCells => (Action<Vector3>) PutTile,
+                    TurnPhase.SelectCells => (Action<Vector3>)PutTile,
                     TurnPhase.PlaceBuilding => PutBuild
                 }).Invoke(hit.transform.position);
                 break;
@@ -97,11 +99,27 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         {
             _currentPreviews[0].transform.position = pos;
             _currentPreviews[0].transform.rotation = Quaternion.Euler(270,
-                _gos == null ? 270 : ((Rotation) Array.IndexOf(_gos[_currentFf].rotations, true)).YDegree(),
+                _gos == null ? 270 : ((Rotation)Array.IndexOf(_gos[_currentFf].rotations, true)).YDegree(),
                 0);
         }
 
         UiMgr.Instance.InteractiveValidate = GameMgr.Instance.actualPhase != TurnPhase.IAPlays;
+    }
+
+    public void PreviewTile(PointRotation pos)
+    {
+        Rotation r = Rotation.N;
+        for (int i = 0; i < pos.Rotations.Length; i++)
+        {
+            if (pos.Rotations[i])
+                r = (Rotation)i;
+        }
+        PutAiTile(pos.Point, V2IToV3(pos.Point), r, GameMgr.Instance.ActualChunk, true);
+    }
+
+    public void PreviewBuild(Vector2Int pos, Building b)
+    {
+        PutAiBuild(GameMgr.Instance.FindBiomesAroundVillage(pos).ToArray(), b, GameMgr.Instance.ActualPlayer, true);
     }
 
     public void ValidateTile(bool sendToLogic = true)
@@ -142,10 +160,10 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         _currentFf = null;
     }
 
-    public void PutAiTile(Vector2Int pos, Vector3 p, Rotation rot, Chunk chunk)
+    public void PutAiTile(Vector2Int pos, Vector3 p, Rotation rot, Chunk chunk, bool preview = false)
     {
         UiMgr.Instance.Phase1();
-        
+
         _gos = null;
 
         _currentFf = new();
@@ -153,17 +171,17 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         {
             [_currentFf] = new(pos, rot)
         };
-        
+
         UiMgr.Instance.ChangeTileColor(chunk);
         PutTile(p);
-        ValidateTile(false);
+        ValidateTile(preview);
         Destroy(_currentFf);
         _currentFf = null;
     }
 
     public void ClearCurrentPreviews()
     {
-        foreach(GameObject currentPreview in _currentPreviews)
+        foreach (GameObject currentPreview in _currentPreviews)
             Destroy(currentPreview);
         _currentPreviews = null;
     }
@@ -172,9 +190,16 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     private void PutBuild(Vector3 _) => PutBuild(GameMgr.Instance.actualPlayer.ID.GetColor());
 
-    private void PutBuild(Color color)
+    private void PutBuild(Color color, Vector2Int? position = null)
     {
-        Vector2Int currentPos = _gos[_currentFf].point;
+        Vector2Int currentPos;
+        if (position != null)
+            currentPos = (Vector2Int)position;
+        else
+        {
+            currentPos = _gos[_currentFf].Point;
+        }
+
         List<Vector2Int> tmp = new() { currentPos };
         if (_currentBuild == Building.Barrack)
             tmp = GameMgr.Instance.FindBiomesAroundVillage(currentPos);
@@ -243,6 +268,10 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         return v3;
     }
 
+    private static Vector3 V2IToEul(Vector2Int v) => new(270,
+        GameMgr.Instance.IsVoid(v) ? 270 : GameMgr.Instance.gameBoard.WorldMap[v].ParentChunk.Rotation.YDegree(),
+        GameMgr.Instance.CellPositionInChunk(v) switch { 1 => -120, 2 => 120, _ => 0 });
+
     public void ReputBuild(Vector2Int pos, Building b, Player player)
     {
         _currentBuild = b;
@@ -268,7 +297,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         _currentFf = null;
     }
 
-    public void PutAiBuild(Vector2Int[] pos, Building b, Player player)
+    public void PutAiBuild(Vector2Int[] pos, Building b, Player player, bool preview = false)
     {
         _currentBuild = b;
         _gos = null;
@@ -318,9 +347,10 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         for (int i = pos.Length; i < _currentPreviews.Length; i++)
             Destroy(_currentPreviews[i]);
 
-        ValidateBuild(false);
+        ValidateBuild(preview);
         Destroy(_currentFf);
         _currentFf = null;
+
     }
 
     private void RotateTile()
@@ -331,25 +361,17 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         {
             _currentPreviews[0].transform.Rotate(new(0, 360f / 6, 0), Space.World);
             rot = RotationExt.Of(Mathf.Round(_currentPreviews[0].transform.rotation.eulerAngles.y));
-        } while (_gos?[_currentFf]?.rotations?[(int) rot] == false);
+        } while (_gos?[_currentFf]?.rotations?[(int)rot] == false);
     }
 
     public void SetFeedForwards1()
     {
         ClearFeedForward();
-        if (!(GameMgr.Instance.actualPlayer is AI))
-        {
-            foreach (PointRotation pr in GameMgr.Instance.ChunkSlots())
-            {
-                Vector3 pos = new(pr.point.x, 0, pr.point.y);
-                if (!GameMgr.Instance.IsVoid(pr.point))
-                    pos.y = GameMgr.Instance.LevelAt(pr.point) * yOffset;
-                pos.Scale(new(xOffset, 1, zOffset));
-                if (pr.point.x % 2 != 0)
-                    pos.z += zOffset / 2;
-                _gos[SetFeedForward(pos)] = pr;
-            }
-        }
+        if (GameMgr.Instance.ActualPlayer is AI)
+            return;
+
+        foreach (PointRotation pr in GameMgr.Instance.ChunkSlots())
+            _gos[SetFeedForward(V2IToV3(pr.Point), V2IToEul(pr.Point))] = pr;
     }
 
     public void SetFeedForwards2(Building build)
@@ -371,20 +393,12 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         };
 
         foreach (Vector2Int p in poss)
-        {
-            Vector3 pos = new(p.x, 0, p.y);
-            if (!GameMgr.Instance.IsVoid(p))
-                pos.y = GameMgr.Instance.LevelAt(p) * yOffset;
-            pos.Scale(new(xOffset, 1, zOffset));
-            if (p.x % 2 != 0)
-                pos.z += zOffset / 2;
-            _gos[SetFeedForward(pos)] = new(p);
-        }
+            _gos[SetFeedForward(V2IToV3(p), V2IToEul(p))] = new(p);
     }
 
-    public GameObject SetFeedForward(Vector3 pos)
+    public GameObject SetFeedForward(Vector3 pos, Vector3 euler)
     {
-        GameObject go = Instantiate(feedForward, pos, Quaternion.Euler(-90, -90, 0), feedForwardParent);
+        GameObject go = Instantiate(feedForward, pos, Quaternion.Euler(euler), feedForwardParent);
         go.GetComponent<MeshRenderer>().materials[1].color = GameMgr.Instance.actualPlayer.ID.GetColor();
         return go;
     }

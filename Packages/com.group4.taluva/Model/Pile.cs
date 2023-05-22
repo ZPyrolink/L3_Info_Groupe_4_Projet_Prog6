@@ -22,6 +22,7 @@ namespace Taluva.Model
 
             Content = new(list.OrderBy(_ => random.Next()));
         }
+        
 
         public Pile(List<T> list)
         {
