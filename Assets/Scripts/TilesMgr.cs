@@ -38,7 +38,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     private readonly Dictionary<Building, Vector3> _buildsScale = new()
     {
-        [Building.Barrack] = new(23, 27, 15),
+        [Building.Barrack] = new(100, 100, 100),
         [Building.Tower] = new(120, 120, 29),
         [Building.Temple] = new(38, 27, 23)
     };
@@ -219,7 +219,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         if (_currentBuild == Building.Barrack)
             tmp = GameMgr.Instance.FindBiomesAroundVillage(currentPos);
 
-        if (!(_currentPreviews is null))
+        if (_currentPreviews is not null)
             foreach (GameObject currentPreview in _currentPreviews)
                 Destroy(currentPreview);
 
@@ -244,6 +244,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                 foreach (Material mat in mats)
                 {
                     mat.SetRenderMode(MaterialExtensions.BlendMode.Transparent);
+                    mat.SetFloat(Shader.PropertyToID("_Level"), GameMgr.Instance.LevelAt(tmp[i]));
                     mat.color = color.With(a: .75f);
                 }
             }
@@ -251,6 +252,8 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             _currentPreviews[i].transform.position = _gos
                 .First(go => go.Value.point == tmp[i])
                 .Key.transform.position;
+
+            _currentPreviews[i].transform.rotation = Quaternion.Euler(V2IToEul(tmp[i]));
         }
 
         for (int i = tmp.Count; i < _currentPreviews.Length; i++)

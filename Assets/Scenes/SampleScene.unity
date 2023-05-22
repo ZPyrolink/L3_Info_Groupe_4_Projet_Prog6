@@ -1237,7 +1237,7 @@ MonoBehaviour:
   boardParent: {fileID: 271154504}
   feedForward: {fileID: 1639800871305748350, guid: 8de9e8e8be058844cb8b88a4c9bbb137, type: 3}
   feedForwardParent: {fileID: 897227192}
-  barrack: {fileID: 919132149155446097, guid: 201d7437e6cfc2e43b34b300d8f41e34, type: 3}
+  barrack: {fileID: 919132149155446097, guid: 16751b1d9cb52f94b8c79d4879e31bab, type: 3}
   tower: {fileID: 919132149155446097, guid: 1bfe7bae8d80166468e94a363daf2bc5, type: 3}
   temple: {fileID: 919132149155446097, guid: 794f51dcf5464864e9689ecde6b5a02e, type: 3}
 --- !u!4 &338899226
