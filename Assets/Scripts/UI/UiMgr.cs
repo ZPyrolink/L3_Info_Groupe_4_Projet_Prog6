@@ -4,6 +4,7 @@ using Taluva.Controller;
 using Taluva.Model;
 using Taluva.Model.AI;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
@@ -197,14 +198,16 @@ namespace UI
                 case TurnPhase.PlaceBuilding:
                     (Building b, Vector2Int pos) = ai.PlayBuild();
                     TilesMgr.Instance.PreviewBuild(pos, b);
+                    validateButton.interactable = true;
                     break;
             }
-
+            EventSystem.current.SetSelectedGameObject(validateButton.gameObject);
         }
 
         public void Phase1()
         {
             UpdateGui();
+            InteractiveValidate = false;
             TilesMgr.Instance.SetFeedForwards1();
 
             CurrentTile.SetActive(true);
@@ -230,6 +233,7 @@ namespace UI
         public void Phase2()
         {
             UpdateGui();
+            InteractiveValidate = false;
             currentTile.SetActive(false);
             builds.SetActive(true);
 
