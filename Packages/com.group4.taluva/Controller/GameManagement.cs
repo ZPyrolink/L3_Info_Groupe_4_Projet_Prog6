@@ -145,7 +145,7 @@ namespace Taluva.Controller
 
         #endregion
 
-        public class Coup
+        public class Coup : ICloneable
         {
             //New Chunk or cells
             public Vector2Int[] positions;
@@ -183,6 +183,22 @@ namespace Taluva.Controller
             {
                 this.cells = cells;
                 building = b;
+            }
+
+            public Coup(Coup original)
+            {
+                positions = original.positions.ToArray();
+                rotation = original.rotation;
+                cells = original.cells.ToArray();
+                chunk = new Chunk(original.chunk);
+                playerIndex = original.playerIndex;
+                building = original.building.ToArray();
+                
+            }    
+            
+            public System.Object Clone()
+            {
+                return new Coup(this);
             }
         }
 

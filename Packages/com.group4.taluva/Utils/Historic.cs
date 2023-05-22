@@ -4,15 +4,18 @@ using System.Text;
 
 namespace Taluva.Utils
 {
-    public class Historic<T> : List<T>
+    public class Historic<T> : List<T> where T : ICloneable
     {
         public int Index { get; private set; } = -1;
 
         public Historic() { }
 
-        public Historic(Historic<T> original, int currentIndex) : base(original)
+        public Historic(Historic<T> original)
         {
-            Index = currentIndex;
+            foreach (var c in original)
+            {
+                this.Add((T)c.Clone());
+            }
         }
 
         public bool CanUndo => Index != -1;

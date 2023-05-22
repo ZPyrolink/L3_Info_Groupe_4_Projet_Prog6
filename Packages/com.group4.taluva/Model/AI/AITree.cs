@@ -54,30 +54,33 @@ namespace Taluva.Model.AI
 
                     foreach (Chunk c in possibleDraw)
                     {
-                        Gm.Phase1IA(c,p, (Rotation)i);
-                        Vector2Int[] possibleBarracks = AI_gm.gameBoard.GetBarrackSlots(Gm.actualPlayer);
+                        AI_gm.Phase1IA(c,p, (Rotation)i);
+                        Vector2Int[] possibleBarracks = AI_gm.gameBoard.GetBarrackSlots(AI_gm.actualPlayer);
                         foreach (Vector2Int pos in possibleBarracks)
                         {
-                            Gm.Phase2IA(new PointRotation(pos), Building.Barrack);
+                            AI_gm.Phase2IA(new PointRotation(pos), Building.Barrack);
+                            AI_gm.InitPlayIA();
                             possiblePlay.Add(new Turn(p,(Rotation)i,pos,Building.Barrack), TreeExplore(AI_gm,AI_gm.pile.GetRemaining(),--depth).Item2);
-                            Gm.Undo();
+                            AI_gm.Undo();
                         }
-                        Vector2Int[] possibleTower = AI_gm.gameBoard.GetTowerSlots(Gm.actualPlayer);
+                        Vector2Int[] possibleTower = AI_gm.gameBoard.GetTowerSlots(AI_gm.actualPlayer);
                         foreach (Vector2Int pos in possibleTower)
                         {
-                            Gm.Phase2IA(new PointRotation(pos), Building.Tower);
+                            AI_gm.Phase2IA(new PointRotation(pos), Building.Tower);
+                            AI_gm.InitPlayIA();
                             possiblePlay.Add(new Turn(p,(Rotation)i,pos,Building.Tower), TreeExplore(AI_gm,AI_gm.pile.GetRemaining(),--depth).Item2);
-                            Gm.Undo();
+                            AI_gm.Undo();
                         }
                         
-                        Vector2Int[] possibleTemple = AI_gm.gameBoard.GetTempleSlots(Gm.actualPlayer);
+                        Vector2Int[] possibleTemple = AI_gm.gameBoard.GetTempleSlots(AI_gm.actualPlayer);
                         foreach (Vector2Int pos in possibleTemple)
                         {
-                            Gm.Phase2IA(new PointRotation(pos), Building.Temple);
+                            AI_gm.Phase2IA(new PointRotation(pos), Building.Temple);
+                            AI_gm.InitPlayIA();
                             possiblePlay.Add(new Turn(p,(Rotation)i,pos,Building.Temple), TreeExplore(AI_gm,AI_gm.pile.GetRemaining(),--depth).Item2);
-                            Gm.Undo();
+                            AI_gm.Undo();
                         }
-                        Gm.Undo();
+                        AI_gm.Undo();
 
                     }
                 }
@@ -88,7 +91,7 @@ namespace Taluva.Model.AI
 
         private void ComputeBestMove()
         {
-            GameManagment AI_gm = new GameManagment(Gm); //TODO May have to copy Players too to avoid issues with end game states. 
+            GameManagment AI_gm = new GameManagment(Gm);
             AITurn = TreeExplore(AI_gm,new Chunk[]{AI_gm.ActualChunk},5).Item1;
         }
 
@@ -115,7 +118,6 @@ namespace Taluva.Model.AI
                     max = set;
                 }
             }
-
             return (max.Key,max.Value);
         }
     }
