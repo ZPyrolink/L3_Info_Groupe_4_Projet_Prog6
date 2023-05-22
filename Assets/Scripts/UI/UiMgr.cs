@@ -234,6 +234,8 @@ namespace UI
 
         public void Undo()
         {
+            InteractiveUndo = false;
+            InteractiveRedo = false;
             TilesMgr.Instance.ClearFeedForward();
             if(TilesMgr.Instance.CurrentPreviewsNotNull)
                 TilesMgr.Instance.ClearCurrentPreviews();
@@ -257,6 +259,8 @@ namespace UI
                 }).Invoke(coup);
 
             }
+            InteractiveUndo = GameMgr.Instance.CanUndo;
+            InteractiveRedo = GameMgr.Instance.CanRedo;
         }
 
         private void UndoPhase1(GameManagment.Coup c) => TilesMgr.Instance.RemoveTile(c.positions[0]);
@@ -265,6 +269,8 @@ namespace UI
 
         public void Redo()
         {
+            InteractiveUndo = false;
+            InteractiveRedo = false;
             GameManagment.Coup coup = GameMgr.Instance.Redo();
 
             (GameMgr.Instance.actualPhase switch
@@ -273,6 +279,9 @@ namespace UI
                 TurnPhase.SelectCells => RedoPhase2,
                 TurnPhase.IAPlays => RedoPhase2
             }).Invoke(coup);
+
+            InteractiveUndo = GameMgr.Instance.CanUndo;
+            InteractiveRedo = GameMgr.Instance.CanRedo;
         }
 
         private void RedoPhase1(GameManagment.Coup coup)
