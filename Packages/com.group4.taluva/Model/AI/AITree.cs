@@ -9,23 +9,53 @@ namespace Taluva.Model.AI
 {
     public abstract class AITree : AI
     {
-        public AITree(PlayerColor id,GameManagment gm) : base(id, gm){}
-        public AITree(AITree orignal) : base(orignal){}
-
-        //private AIMove; 
-
-        private int TreeExplore(int depth)
+        public AITree(PlayerColor id, GameManagment gm) : base(id, gm)
         {
-            if (depth == 0 /*|| TODO gm.gameEnd*/)
+            Computed = false;
+        }
+
+        public AITree(AITree orignal) : base(orignal)
+        {
+            Computed = false;
+        }
+
+        protected bool Computed;
+
+        protected PointRotation ChunkPos;
+        protected Vector2Int BuildPos;
+        protected Building BuildType;
+
+        protected Turn AITurn;
+        protected class Turn
+        {
+            public PointRotation ChunkPos;
+            public Rotation ChunkRot;
+            public Vector2Int BuildPos;
+            public Building BuildType;
+
+            public Turn(PointRotation ChunkPos, Rotation ChunkRot, Vector2Int BuildPos,Building BuildType)
             {
-                return Heuristic;
+                this.ChunkPos = ChunkPos;
+                this.ChunkRot = ChunkRot;
+                this.BuildPos = BuildPos;
+                this.BuildType = BuildType;
+                
+            }
+            
+        }
+
+
+        private (Turn,int) TreeExplore(int depth)
+        {
+            if (depth == 0 || gm.CheckWinner() == null)
+            {
+                return (null,Heuristic);
             }
 
             Chunk[] possibleDraw = gm.pile.GetRemaining();
             PointRotation[] possibleChunk = gm.gameBoard.GetChunkSlots();
             int value = 0;
-            Dictionary<PointRotation, Dictionary<Building, Dictionary<Vector2Int, int>>> possiblePlay =
-                new Dictionary<PointRotation, Dictionary<Building, Dictionary<Vector2Int, int>>>();
+            Dictionary<Turn, int> possiblePlay = new Dictionary<Turn, int>();
             foreach (PointRotation p in possibleChunk)
             {
                 for (int i = 0; i < p.rotations.Length; i++)
@@ -36,66 +66,45 @@ namespace Taluva.Model.AI
                     foreach (Chunk c in possibleDraw)
                     {
                         gm.Phase1IA(p, (Rotation)i);
-                        Dictionary<Building, Dictionary<Vector2Int, int>> possibleBuild =
-                            new Dictionary<Building, Dictionary<Vector2Int, int>>();
-
-                        Dictionary<Vector2Int, int> possibleBuildLocation = new Dictionary<Vector2Int, int>();
                         Vector2Int[] possibleBarracks = gm.gameBoard.GetBarrackSlots(gm.actualPlayer);
                         foreach (Vector2Int pos in possibleBarracks)
                         {
                             gm.Phase2IA(new PointRotation(pos), Building.Barrack);
-                            possibleBuildLocation.Add(pos, TreeExplore(--depth));
+                            possiblePlay.Add(new Turn(p,(Rotation)i,pos,Building.Barrack), TreeExplore(--depth).Item2);
                             gm.Undo();
                         }
-
-                        possibleBuild.Add(Building.Barrack, possibleBuildLocation);
-
-                        possibleBuildLocation = new Dictionary<Vector2Int, int>();
                         Vector2Int[] possibleTower = gm.gameBoard.GetTowerSlots(gm.actualPlayer);
                         foreach (Vector2Int pos in possibleTower)
                         {
                             gm.Phase2IA(new PointRotation(pos), Building.Tower);
-                            possibleBuildLocation.Add(pos, TreeExplore(--depth));
+                            possiblePlay.Add(new Turn(p,(Rotation)i,pos,Building.Tower), TreeExplore(--depth).Item2);
                             gm.Undo();
                         }
-
-                        possibleBuild.Add(Building.Tower, possibleBuildLocation);
-
-                        possibleBuildLocation = new Dictionary<Vector2Int, int>();
+                        
                         Vector2Int[] possibleTemple = gm.gameBoard.GetTempleSlots(gm.actualPlayer);
                         foreach (Vector2Int pos in possibleTemple)
                         {
                             gm.Phase2IA(new PointRotation(pos), Building.Temple);
-                            possibleBuildLocation.Add(pos, TreeExplore(--depth));
+                            possiblePlay.Add(new Turn(p,(Rotation)i,pos,Building.Temple), TreeExplore(--depth).Item2);
                             gm.Undo();
                         }
-
-                        possibleBuild.Add(Building.Temple, possibleBuildLocation);
-                        possiblePlay.Add(new PointRotation(p.point, (Rotation)i), possibleBuild);
-
                         gm.Undo();
 
                     }
                 }
             }
-
-            int max = 0;
-            foreach (var a in possiblePlay)
+            
+            KeyValuePair<Turn, int> max = new KeyValuePair<Turn, int>(null,0);
+            foreach (var set in possiblePlay)
             {
-                foreach (var b in a.Value)
+                if (set.Value > max.Value)
                 {
-                    foreach (var c in b.Value)
-                    {
-                        if (c.Value > max)
-                        {
-                            max = c.Value;
-                        }
-                    }
+                    max = set;
                 }
             }
 
 
-            return (max);
+            return (max.Key,max.Value);
     }
 
         public override PointRotation PlayChunk()
@@ -110,7 +119,7 @@ namespace Taluva.Model.AI
         
         
         protected abstract int Heuristic { get; }
-        protected abstract GameManagment.Coup GetBest(Dictionary<int,GameManagment.Coup> possible);
+        protected abstract (Turn,int) GetBest(Dictionary<Turn,int> possible);
     }
     
 }

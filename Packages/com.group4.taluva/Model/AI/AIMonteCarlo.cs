@@ -46,9 +46,8 @@ namespace Taluva.Model.AI
             }
         }
 
-        protected override GameManagment.Coup GetBest(Dictionary<int,GameManagment.Coup> possible)
+        protected override (Turn,int) GetBest(Dictionary<Turn,int> possible)
         {
-            return possible.Max().Value;
             throw new System.NotImplementedException();
         }
         

@@ -19,7 +19,7 @@ namespace Taluva.Model.AI
         }
 
         protected override int Heuristic { get; }
-        protected override GameManagment.Coup GetBest(Dictionary<int, GameManagment.Coup> possible)
+        protected override (Turn,int) GetBest(Dictionary<Turn,int> possible)
         {
             throw new System.NotImplementedException();
         }
