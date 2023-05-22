@@ -176,7 +176,6 @@ namespace Wrapper
 
             ChangePhase(_nextPhase);
             _coroutineStarted = false;
-            UiMgr.Instance.InteractiveValidate = true;
             UiMgr.Instance.InteractiveUndo = Instance.CanUndo;
             UiMgr.Instance.InteractiveRedo = Instance.CanRedo;
         }
