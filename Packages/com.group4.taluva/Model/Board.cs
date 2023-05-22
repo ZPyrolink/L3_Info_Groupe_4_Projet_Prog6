@@ -538,11 +538,9 @@ namespace Taluva.Model
 
             bool build = false;
 
-            foreach(List<Vector2Int> village in allVillages)
+            foreach (List<Vector2Int> village in allVillages
+                         .Where(village => WorldMap[village[0]].Owner == actualPlayer.ID))
             {
-                if (WorldMap[village[0]].Owner != actualPlayer.ID)
-                    continue;
-
                 if (CityHasTemple(village))
                     return false;
 

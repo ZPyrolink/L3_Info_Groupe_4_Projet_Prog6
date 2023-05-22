@@ -100,7 +100,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                 0);
         }
 
-        UiMgr.Instance.EnableValidateBtn = true;
+        UiMgr.Instance.InteractiveValidate = GameMgr.Instance.actualPhase != TurnPhase.IAPlays;
     }
 
     public void ValidateTile(bool sendToLogic = true)
@@ -209,7 +209,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         for (int i = tmp.Count; i < _currentPreviews.Length; i++)
             Destroy(_currentPreviews[i]);
 
-        UiMgr.Instance.EnableValidateBtn = true;
+        UiMgr.Instance.InteractiveValidate = GameMgr.Instance.actualPhase != TurnPhase.IAPlays;
     }
 
     public void ValidateBuild(bool sendToLogic = true)
@@ -335,7 +335,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     public void ClearFeedForward()
     {
-        UiMgr.Instance.EnableValidateBtn = false;
+        UiMgr.Instance.InteractiveValidate = false;
         _gos = new();
         foreach (Transform t in feedForwardParent)
             Destroy(t.gameObject);

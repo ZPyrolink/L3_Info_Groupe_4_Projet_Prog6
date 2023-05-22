@@ -153,6 +153,9 @@ namespace Wrapper
         private IEnumerator CTemporateAi()
         {
             _coroutineStarted = true;
+            UiMgr.Instance.InteractiveValidate = false;
+            UiMgr.Instance.InteractiveUndo = Instance.CanUndo;
+            UiMgr.Instance.InteractiveRedo = Instance.CanRedo;
             do
             {
                 AiMove aiMove = _aiMoves.Dequeue();
@@ -173,6 +176,9 @@ namespace Wrapper
 
             ChangePhase(_nextPhase);
             _coroutineStarted = false;
+            UiMgr.Instance.InteractiveValidate = true;
+            UiMgr.Instance.InteractiveUndo = Instance.CanUndo;
+            UiMgr.Instance.InteractiveRedo = Instance.CanRedo;
         }
 
         private class AiMove
