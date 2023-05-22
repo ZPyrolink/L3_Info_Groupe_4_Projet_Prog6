@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Taluva.Model
 {
-    public class Chunk
+    public class Chunk : ICloneable
     {
         public Cell[] Coords { get; }
         public Rotation Rotation { get; set; }
@@ -35,6 +35,11 @@ namespace Taluva.Model
             Coords[2] = c.Coords[2];
             c.Coords[2].ParentChunk = c;
             Level = c.Level;
+        }
+
+        public Object Clone()
+        {
+            return new Chunk(this);
         }
 
         public override string ToString() => $"{Coords[0].ActualBiome}, {Coords[1].ActualBiome}, {Coords[2].ActualBiome}";

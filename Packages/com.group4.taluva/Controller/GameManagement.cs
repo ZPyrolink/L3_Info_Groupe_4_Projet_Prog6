@@ -107,7 +107,7 @@ namespace Taluva.Controller
         {
             this.gameBoard = new Board(original.gameBoard);
             //this.historic = new Historic<Coup>(original.historic); TODO Copy constructor
-            //this.pile = new Pile<Chunk>(original.pile);   TODO copy constructor
+            this.pile = new Pile<Chunk>(original.pile);
         }
         public GameManagment(int nbPlayers, Type[] typeAI)
         {
@@ -893,9 +893,10 @@ namespace Taluva.Controller
 
                 OnChangePhase(actualPhase);
         }
-        public void Phase1IA(PointRotation pr, Rotation r)
+        public void Phase1IA(Chunk c,PointRotation pr, Rotation r)
         {
-            if (ValidateTile(pr, r))
+            AddHistoric(pr.point, r, actualChunk);
+            if (gameBoard.AddChunk(c, ActualPlayer, pr, r))
             {
                 NextPhaseIA();
                 this.maxTurn--;

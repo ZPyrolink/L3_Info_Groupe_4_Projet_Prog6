@@ -205,6 +205,7 @@ PublishScripts/
 !**/[Pp]ackages/com.group4.taluva/
 !**/[Pp]ackages/TestsTaluva/
 !**/[Pp]ackages/TaluvaConsole/
+!**/[Pp]ackages/manifest.json
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/[Pp]ackages/repositories.config
 # NuGet v3's project.json files produces more ignorable files
