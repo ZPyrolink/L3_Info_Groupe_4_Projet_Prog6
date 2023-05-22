@@ -227,6 +227,9 @@ namespace UI
             UpdateCurrentPlayer();
             UpdatePlayersBuild();
             UpdateCurrentPlayerBuild();
+
+            undoButton.interactable = GameMgr.Instance.CanUndo;
+            redoButton.interactable = GameMgr.Instance.CanRedo;
         }
 
         public void Undo()
