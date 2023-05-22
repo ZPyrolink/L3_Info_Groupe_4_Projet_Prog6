@@ -184,6 +184,24 @@ namespace UI
             }).Invoke(true);
         }
 
+        public void MoveSuggestion()
+        {
+            AIRandom ai = new(GameMgr.Instance.ActualPlayer.ID, GameMgr.Instance);
+
+            switch(GameMgr.Instance.actualPhase)
+            {
+                case TurnPhase.SelectCells:
+                    PointRotation p = ai.PlayChunk();
+                    TilesMgr.Instance.PreviewTile(p);
+                    break;
+                case TurnPhase.PlaceBuilding:
+                    (Building b, Vector2Int pos) = ai.PlayBuild();
+                    TilesMgr.Instance.PreviewBuild(pos, b);
+                    break;
+            }
+
+        }
+
         public void Phase1()
         {
             UpdateGui();
