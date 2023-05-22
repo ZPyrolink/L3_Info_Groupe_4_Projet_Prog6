@@ -22,6 +22,19 @@ namespace Taluva.Model
 
             Content = new(list.OrderBy(_ => random.Next()));
         }
+        public Pile(Pile<T> p)
+        {
+            foreach (T tmp in _stack)
+            {
+                p._stack.Push(tmp);
+            }
+        }
+
+        public Pile<T> clone()
+        {
+            return new Pile<T>(this);
+        }
+        
 
         public Pile(List<T> list)
         {
