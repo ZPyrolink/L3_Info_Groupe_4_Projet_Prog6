@@ -92,7 +92,7 @@ namespace Taluva.Model.AI
         private void ComputeBestMove()
         {
             GameManagment AI_gm = new GameManagment(Gm);
-            AITurn = TreeExplore(AI_gm,new Chunk[]{AI_gm.ActualChunk},5).Item1;
+            AITurn = TreeExplore(AI_gm,new Chunk[]{AI_gm.ActualChunk},1).Item1;
         }
 
         public override PointRotation PlayChunk()
