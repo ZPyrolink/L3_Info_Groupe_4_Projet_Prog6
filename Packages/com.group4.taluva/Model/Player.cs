@@ -28,7 +28,7 @@ namespace Taluva.Model
             ID = id;
         }
 
-        public Player Clone() => new(this);
+    public virtual Player Clone() => new(this);
 
         public Player(Player original) : this(original.ID)
         {
