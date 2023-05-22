@@ -11,6 +11,7 @@ using UnityEngine;
 using Utils;
 
 using Wrapper;
+using static UnityEditor.PlayerSettings;
 
 public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 {
@@ -262,6 +263,66 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         _currentFf = _gos.Keys.First();
 
         PutBuild(player.ID.GetColor());
+        ValidateBuild(false);
+        Destroy(_currentFf);
+        _currentFf = null;
+    }
+
+    public void PutAiBuild(Vector2Int[] pos, Building b, Player player)
+    {
+        _currentBuild = b;
+        _gos = null;
+
+        _gos = pos.ToDictionary
+        (
+            static p => new GameObject
+            {
+                transform =
+                {
+                    position = V2IToV3(p)
+                }
+            },
+            static p => new PointRotation(p)
+        );
+
+        _currentFf = _gos.Keys.First();
+
+        //J'ai bien les bonnes positions au bon moment. 
+        //Par contre, il faut que je puisse affiché correctement les maisons.
+        //Donc, il faut regarder soit le putBuild soit le ValidateBuild.
+        //Il faut que cela pose une maison pour chaque positions dans le gos.
+
+        if (_currentPreviews is null || _currentPreviews.Length < pos.Length)
+            _currentPreviews = new GameObject[pos.Length];
+
+        for (int i = 0; i < pos.Length; i++)
+        {
+            if (_currentPreviews[i] == null)
+            {
+                _currentPreviews[i] = Instantiate(_currentBuild switch
+                {
+                    Building.Barrack => barrack,
+                    Building.Tower => tower,
+                    Building.Temple => temple
+                }, boardParent);
+
+                _currentPreviews[i].transform.localScale = _buildsScale[_currentBuild];
+                Material[] mats = _currentPreviews[i].GetComponent<MeshRenderer>().materials;
+                foreach (Material mat in mats)
+                {
+                    mat.SetRenderMode(MaterialExtensions.BlendMode.Transparent);
+                    mat.color = player.ID.GetColor().With(a: .75f);
+                }
+            }
+
+            _currentPreviews[i].transform.position = _gos
+                .First(go => go.Value.point == pos[i])
+                .Key.transform.position;
+        }
+
+        for (int i = pos.Length; i < _currentPreviews.Length; i++)
+            Destroy(_currentPreviews[i]);
+
         ValidateBuild(false);
         Destroy(_currentFf);
         _currentFf = null;

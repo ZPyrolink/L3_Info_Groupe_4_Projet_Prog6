@@ -118,7 +118,7 @@ namespace Wrapper
                 if (pr.point.x % 2 != 0)
                     p.z += TilesMgr.zOffset / 2;
                 
-                _aiMoves.Enqueue(new(pr.point, p, (Rotation) Array.IndexOf(pr.rotations, true),
+                _aiMoves.Enqueue(new(new[] { pr.point }, p, (Rotation) Array.IndexOf(pr.rotations, true),
                     Instance.actualChunk));
                 if (!_coroutineStarted)
                     StartCoroutine(CTemporateAi());
@@ -164,11 +164,11 @@ namespace Wrapper
                 {
                     case TurnPhase.SelectCells:
                         UiMgr.Instance.UpdateTiles();
-                        TilesMgr.Instance.PutAiTile(aiMove.BoardPos, aiMove.GamePos, aiMove.Rot, aiMove.Chunk);
+                        TilesMgr.Instance.PutAiTile(aiMove.BoardPos[0], aiMove.GamePos, aiMove.Rot, aiMove.Chunk);
                         Instance.AiBuild();
                         break;
                     case TurnPhase.PlaceBuilding:
-                        TilesMgr.Instance.ReputBuild(aiMove.BoardPos, aiMove.Build, Instance.actualPlayer);
+                        TilesMgr.Instance.PutAiBuild(aiMove.BoardPos, aiMove.Build, Instance.actualPlayer);
                         Instance.ContinueAi();
                         break;
                 }
@@ -184,7 +184,7 @@ namespace Wrapper
         private class AiMove
         {
             public TurnPhase Turn { get; }
-            public Vector2Int BoardPos { get; }
+            public Vector2Int[] BoardPos { get; }
             
             public Vector3 GamePos { get; }
             public Rotation Rot { get; }
@@ -192,7 +192,7 @@ namespace Wrapper
 
             public Building Build { get; }
 
-            public AiMove(Vector2Int boardPos, Vector3 gamePos, Rotation rot, Chunk chunk)
+            public AiMove(Vector2Int[] boardPos, Vector3 gamePos, Rotation rot, Chunk chunk)
             {
                 Turn = TurnPhase.SelectCells;
                 BoardPos = boardPos;
@@ -201,7 +201,7 @@ namespace Wrapper
                 Chunk = chunk;
             }
 
-            public AiMove(Vector2Int boardPos, Building build)
+            public AiMove(Vector2Int[] boardPos, Building build)
             {
                 Turn = TurnPhase.PlaceBuilding;
                 Build = build;
