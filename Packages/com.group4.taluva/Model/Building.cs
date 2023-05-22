@@ -6,20 +6,17 @@
         /// No building on the cell.
         /// </summary>
         None,
-
         /// <summary>
-        /// Temple building on the cell.
+        /// Barrack building on the cell.
         /// </summary>
-        Temple,
-
+        Barrack,
         /// <summary>
         /// Tower building on the cell.
         /// </summary>
         Tower,
-
         /// <summary>
-        /// Barrack building on the cell.
+        /// Temple building on the cell.
         /// </summary>
-        Barrack
+        Temple
     }
 }

@@ -6,8 +6,14 @@ namespace Taluva.Model
 {
     public class Pile<T>
     {
-        public readonly Stack<T> _stack;
-        private readonly List<T> _played;
+        public Stack<T> Content { get; }
+        [Obsolete("Use Content instead")]
+        public Stack<T> _stack => Content;
+        public List<T> Played { get; }
+        [Obsolete("Use Played instead")]
+        public List<T> _played => Played;
+        
+        public T[] GetRemaining() => _stack.ToArray();
 
         /// <summary>
         /// Initializes a new instance of the Pile class with the specified list of items.
@@ -15,14 +21,17 @@ namespace Taluva.Model
         /// <param name="list">The list of items in the pile.</param>
         public Pile(T[] list)
         {
-            Random random = new Random();
-            _stack = new Stack<T>(list.Length);
-            _played = new List<T>();
+            Random random = new();
+            Played = new();
 
-            foreach (T item in list.OrderBy(_ => random.Next()))
-            {
-                _stack.Push(item);
-            }
+            Content = new(list.OrderBy(_ => random.Next()));
+        }
+
+        public Pile(List<T> list)
+        {
+            Content = new(list);
+            Played = new();
+
         }
 
         /// <summary>
@@ -35,15 +44,16 @@ namespace Taluva.Model
             _played.Add(item);
             return item;
         }
-
         /// <summary>
         /// Restores an item back to the pile.
         /// </summary>
         /// <param name="item">The item to be restored.</param>
-        public void Stack(T item)
+        public void Stack(T stack)
         {
-            _stack.Push(item);
-            _played.Remove(item);
+            _stack.Push(stack);
+            _played.RemoveAt(_played.Count - 1);
         }
+
+        public int NbKeeping => _stack.Count;
     }
 }

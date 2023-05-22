@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Linq;
+using System.Text;
+
+using UnityEngine;
 
 namespace Taluva.Model
 {
@@ -10,12 +14,13 @@ namespace Taluva.Model
         /// <summary>
         /// The position of the chunk placement.
         /// </summary>
-        public readonly Vector2Int point;
-
+        public Vector2Int Point { get; }
+        [Obsolete("Use Point instead")] public Vector2Int point => Point;
         /// <summary>
         /// An array indicating the available rotations for the chunk placement.
         /// </summary>
-        public readonly bool[] rotations;
+        public bool[] Rotations { get; }
+        [Obsolete("Use Rotation instead")] public bool[] rotations => Rotations;
 
         /// <summary>
         /// Creates a new instance of the PointRotation class with the specified position.
@@ -23,8 +28,8 @@ namespace Taluva.Model
         /// <param name="point">The position of the chunk placement.</param>
         public PointRotation(Vector2Int point)
         {
-            this.point = point;
-            this.rotations = new bool[6];
+            Point = point;
+            Rotations = new bool[6];
             for (int i = 0; i < rotations.Length; i++)
                 this.rotations[i] = false;
         }
@@ -36,9 +41,8 @@ namespace Taluva.Model
         /// <param name="rot">The array indicating the available rotations.</param>
         public PointRotation(Vector2Int point, bool[] rot) : this(point)
         {
-            rotations = rot;
+            Rotations = rot;
         }
-
         /// <summary>
         /// Creates a new instance of the PointRotation class with the specified position and rotation.
         /// </summary>
@@ -46,37 +50,19 @@ namespace Taluva.Model
         /// <param name="rot">The rotation available for the placement.</param>
         public PointRotation(Vector2Int point, Rotation rot) : this(point)
         {
-            this.rotations[(int)rot] = true;
+            rotations[(int) rot] = true;
         }
 
-        /// <summary>
-        /// Checks if the rotations of this PointRotation are equal to another PointRotation.
-        /// </summary>
-        /// <param name="rotations">The PointRotation to compare with.</param>
-        /// <returns>True if the rotations are equal, false otherwise.</returns>
-        public bool RotationEquals(PointRotation rotations)
-        {
-            for (int i = 0; i < this.rotations.Length; i++)
-            {
-                if (this.rotations[i] != rotations.rotations[i])
-                    return false;
-            }
-            return true;
-        }
-
+        public bool RotationEquals(PointRotation rotations) => !this.rotations
+            // On ne garde que les rotations qui sont différentes
+            .Where((t, i) => t != rotations.rotations[i])
+            // On regardes s'il en existe un
+            .Any();
         /// <summary>
         /// Checks if there are any available rotations.
         /// </summary>
         /// <returns>True if there are available rotations, false otherwise.</returns>
-        public bool HaveRotation()
-        {
-            foreach (bool b in rotations)
-            {
-                if (b)
-                    return true;
-            }
-            return false;
-        }
+        public bool HaveRotation() => rotations.Any(b => b);
 
         /// <summary>
         /// Sets all rotations to true.
@@ -84,7 +70,7 @@ namespace Taluva.Model
         public void SetAllTrue()
         {
             for (int i = 0; i < rotations.Length; i++)
-                this.rotations[i] = true;
+                rotations[i] = true;
         }
 
         /// <summary>
@@ -93,41 +79,31 @@ namespace Taluva.Model
         /// <param name="r">The rotation to add.</param>
         public void AddRotation(Rotation r)
         {
-            rotations[(int)r] = true;
+            rotations[(int) r] = true;
         }
-
         /// <summary>
         /// Returns a string representation of the available rotations.
         /// </summary>
         /// <returns>A string representing the available rotations.</returns>
-        public string RotationString()
+        [Obsolete("Use ToString() instead")]
+        public string RotationString() => ToString();
+
+        public override string ToString()
         {
-            string s = "";
+            StringBuilder sb = new();
             for (int i = 0; i < rotations.Length; i++)
-                if (rotations[i]) {
-                    switch ((Rotation)i) {
-                        case Rotation.N:
-                            s += "N";
-                            break;
-                        case Rotation.S:
-                            s += "S";
-                            break;
-                        case Rotation.NE:
-                            s += "NE";
-                            break;
-                        case Rotation.NW:
-                            s += "NW";
-                            break;
-                        case Rotation.SE:
-                            s += "SE";
-                            break;
-                        case Rotation.SW:
-                            s += "SW";
-                            break;
-                    }
-                    s += " ";
-                }
-            return s;    
+                if (rotations[i])
+                    sb.Append((Rotation) i switch
+                    {
+                        Rotation.N => sb.Append("N"),
+                        Rotation.S => sb.Append("S"),
+                        Rotation.NE => sb.Append("NE"),
+                        Rotation.NW => sb.Append("NW"),
+                        Rotation.SE => sb.Append("SE"),
+                        Rotation.SW => sb.Append("SW")
+                    }).Append(' ');
+
+            return sb.ToString();
         }
     }
 }

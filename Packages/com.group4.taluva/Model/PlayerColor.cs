@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Taluva.Model
 {
+    // ToDo: Move it into Player
     /// <summary>
     /// Represents the available colors for players in the game.
     /// </summary>

@@ -1,5 +1,5 @@
 ﻿using System;
-using UnityEngine;
+using System.Collections.Generic;
 
 namespace Taluva.Model
 {
@@ -11,15 +11,21 @@ namespace Taluva.Model
         /// <summary>
         /// Gets the array of cells in the chunk.
         /// </summary>
-        public Cell[] Coords { get; private set; }
+        public Cell[] Coords { get; }
         /// <summary>
         /// Gets or sets the rotation of the chunk.
         /// </summary>
-        public Rotation rotation;
+        public Rotation Rotation { get; set; }
+        [Obsolete("Use Rotation instead")]
+        public Rotation rotation
+        {
+            get => Rotation;
+            set => Rotation = value;
+        }
         /// <summary>
         /// Gets or sets the level of the chunk.
         /// </summary>
-        public int Level = 1;
+        public int Level { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the Chunk class with the specified level and left/right cells.
@@ -29,15 +35,15 @@ namespace Taluva.Model
         /// <param name="right">The right cell of the chunk.</param>
         public Chunk(int l, Cell left, Cell right)
         {
-            this.Coords = new Cell[3];
-            this.Coords[0] = new(Biomes.Volcano, this);
-            this.Coords[1] = left;
+            Coords = new Cell[3];
+            Coords[0] = new(Biomes.Volcano, this);
+            Coords[1] = left;
             left.ParentChunk = this;
-            this.Coords[2] = right;
+            Coords[2] = right;
             right.ParentChunk = this;
-            this.Level = l;
-
+            Level = l;
         }
+
         
         /// <summary>
         /// Initializes a new instance of the Chunk class from an existing chunk.
@@ -45,33 +51,17 @@ namespace Taluva.Model
         /// <param name="c">The existing chunk to copy.</param>
         public Chunk(Chunk c)
         {
-            this.Coords = new Cell[3];
-            this.Coords[0] = c.Coords[0];
-            this.Coords[1] = c.Coords[1];
-            c.Coords[1].ParentChunk = this;
-            this.Coords[2] = c.Coords[2];
-            c.Coords[2].ParentChunk = this;
-            this.Level = c.Level;
-        }
-        
-
-        /// <summary>
-        /// Rotates the chunk.
-        /// </summary>
-        void RotateChunk()
-        {
-            throw new NotImplementedException();
+            Coords = new Cell[3];
+            Coords[0] = c.Coords[0];
+            Coords[1] = c.Coords[1];
+            c.Coords[1].ParentChunk = c;
+            Coords[2] = c.Coords[2];
+            c.Coords[2].ParentChunk = c;
+            Level = c.Level;
         }
 
-        /// <summary>
-        /// Checks if the chunk can be rotated.
-        /// </summary>
-        /// <returns>True if the chunk can be rotated, false otherwise.</returns>
-        private bool CanRotate()
-        {
-            throw new NotImplementedException();
-        }
-        
-        
+        public override string ToString() => $"{Coords[0].ActualBiome}, {Coords[1].ActualBiome}, {Coords[2].ActualBiome}";
+
+        public static string ListToString(IEnumerable<Chunk> l) => string.Join("\n", l);
     }
 }

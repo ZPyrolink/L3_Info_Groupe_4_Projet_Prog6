@@ -108,7 +108,7 @@ namespace TestsTaluva
             _board.PlaceBuilding(_matrix[new(-1, -1)], Building.Barrack, _player1);
             Assert.AreEqual(Building.Barrack, _matrix[new(-1, -1)].ActualBuildings);
 
-            Chunk _chunk = new(1, new(Biomes.Desert), new(Biomes.Plain));
+            Chunk _chunk = new(1, new(Biomes.Lake), new(Biomes.Forest));
             PointRotation _pointRot = new(new(-3, 0), Rotation.S);
             _board.AddChunk(_chunk, _player2, _pointRot, Rotation.S);
             _board.PlaceBuilding(_matrix[new(-2, -0)], Building.Barrack, _player1);

@@ -1,14 +1,18 @@
-using System;
-
 using UI;
 
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MenuMgr : MonoBehaviour
 {
     public void Continue() => FindObjectOfType<UiMgr>().ToggleMenu();
-    public void Save() => throw new NotImplementedException();
-    public void Restart() => throw new NotImplementedException();
+    public void Save() => SaveMgr.Instance.ToggleMenu();
+    public void Restart() => ResetGame();
+    public void ResetGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
     public void Quit() =>
 #if UNITY_EDITOR
         Debug.Break();
