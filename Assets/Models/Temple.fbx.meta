@@ -3,7 +3,12 @@ guid: 794f51dcf5464864e9689ecde6b5a02e
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Templebase
+    second: {fileID: 2100000, guid: 063e45f706b9e534dbc596789f90aa5a, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

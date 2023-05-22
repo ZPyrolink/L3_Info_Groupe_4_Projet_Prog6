@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using Taluva.Controller;
 using Taluva.Model;
 using Taluva.Model.AI;
+
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
@@ -79,6 +82,9 @@ namespace UI
         [SerializeField]
         private Button redoButton;
 
+        [SerializeField]
+        private List<KeyValueS<Biomes, Material>> materials;
+
         #region Unity events
 
         protected override void Awake()
@@ -148,7 +154,8 @@ namespace UI
                     if (GameMgr.Instance.ActualPlayerIndex == i)
                     {
                         anim.enabled = true;
-                    } else
+                    }
+                    else
                     {
                         anim.enabled = false;
                         anim.transform.localRotation = Quaternion.Euler(-90, 0, 0);
@@ -180,7 +187,7 @@ namespace UI
         {
             (GameMgr.Instance.actualPhase switch
             {
-                TurnPhase.SelectCells => (Action<bool>)TilesMgr.Instance.ValidateTile,
+                TurnPhase.SelectCells => (Action<bool>) TilesMgr.Instance.ValidateTile,
                 TurnPhase.PlaceBuilding => TilesMgr.Instance.ValidateBuild
             }).Invoke(true);
         }
@@ -189,7 +196,7 @@ namespace UI
         {
             AIRandom ai = new(GameMgr.Instance.ActualPlayer.ID, GameMgr.Instance);
 
-            switch(GameMgr.Instance.actualPhase)
+            switch (GameMgr.Instance.actualPhase)
             {
                 case TurnPhase.SelectCells:
                     PointRotation p = ai.PlayChunk();
@@ -201,6 +208,7 @@ namespace UI
                     validateButton.interactable = true;
                     break;
             }
+
             EventSystem.current.SetSelectedGameObject(validateButton.gameObject);
         }
 
@@ -222,10 +230,25 @@ namespace UI
         public void ChangeTileColor(Chunk chunk)
         {
             MeshRenderer mr = currentTile.transform.GetComponentInChildren<MeshRenderer>(true);
+            Material[] mrs = mr.materials;
+            Cell[] coords = chunk.Coords;
 
-            mr.materials[0].color = chunk.Coords[1].ActualBiome.GetColor();
-            mr.materials[2].color = Biomes.Volcano.GetColor();
-            mr.materials[3].color = chunk.Coords[2].ActualBiome.GetColor();
+            void SetMat(int mrIndex, int coordIndex)
+            {
+                Material tmp = materials
+                    .FirstOrDefault(kv => kv.Key == coords[coordIndex].ActualBiome)?.Value;
+
+                if (tmp is null) // ToDo: Remove when all materials are ready
+                    mrs[mrIndex].color = coords[coordIndex].ActualBiome.GetColor();
+                else
+                    mrs[mrIndex] = tmp;
+            }
+            
+            SetMat(0, 1);
+            SetMat(3, 2);
+            mrs[2] = materials.First(kv => kv.Key == Biomes.Volcano).Value;
+
+            mr.materials = mrs;
         }
 
         public void UpdateTiles() => NbTiles = NbTiles;
@@ -259,13 +282,13 @@ namespace UI
             InteractiveUndo = false;
             InteractiveRedo = false;
             TilesMgr.Instance.ClearFeedForward();
-            if(TilesMgr.Instance.CurrentPreviewsNotNull)
+            if (TilesMgr.Instance.CurrentPreviewsNotNull)
                 TilesMgr.Instance.ClearCurrentPreviews();
             GameManagment.Coup coup = GameMgr.Instance.Undo();
 
             (GameMgr.Instance.actualPhase switch
             {
-                TurnPhase.SelectCells => (Action<GameManagment.Coup>)UndoPhase1,
+                TurnPhase.SelectCells => (Action<GameManagment.Coup>) UndoPhase1,
                 TurnPhase.PlaceBuilding => UndoPhase2
             }).Invoke(coup);
 
@@ -276,11 +299,11 @@ namespace UI
 
                 (GameMgr.Instance.actualPhase switch
                 {
-                    TurnPhase.SelectCells => (Action<GameManagment.Coup>)UndoPhase1,
+                    TurnPhase.SelectCells => (Action<GameManagment.Coup>) UndoPhase1,
                     TurnPhase.PlaceBuilding => UndoPhase2
                 }).Invoke(coup);
-
             }
+
             InteractiveUndo = GameMgr.Instance.CanUndo;
             InteractiveRedo = GameMgr.Instance.CanRedo;
         }
@@ -297,7 +320,7 @@ namespace UI
 
             (GameMgr.Instance.actualPhase switch
             {
-                TurnPhase.PlaceBuilding => (Action<GameManagment.Coup>)RedoPhase1,
+                TurnPhase.PlaceBuilding => (Action<GameManagment.Coup>) RedoPhase1,
                 TurnPhase.SelectCells => RedoPhase2,
                 TurnPhase.IAPlays => RedoPhase2
             }).Invoke(coup);
@@ -309,12 +332,11 @@ namespace UI
         private void RedoPhase1(GameManagment.Coup coup)
         {
             // ReSharper disable once PossibleInvalidOperationException
-            TilesMgr.Instance.ReputTile(coup.positions[0], (Rotation)coup.rotation);
+            TilesMgr.Instance.ReputTile(coup.positions[0], (Rotation) coup.rotation);
             if (GameMgr.Instance.actualPhase == TurnPhase.PlaceBuilding)
                 TilesMgr.Instance.SetFeedForwards2(Building.Barrack);
             else
                 CurrentTile.SetActive(true);
-
         }
 
         private void RedoPhase2(GameManagment.Coup coup)
@@ -322,9 +344,10 @@ namespace UI
             if (GameMgr.Instance.players[coup.playerIndex].Eliminated)
             {
                 RedoPhase1(coup);
-            } else
+            }
+            else
             {
-                for(int i = 0; i < coup.positions.Length; i++)
+                for (int i = 0; i < coup.positions.Length; i++)
                 {
                     TilesMgr.Instance.ReputBuild(coup.positions[i], coup.building[i], GameMgr.Instance.PreviousPlayer);
                 }
@@ -368,7 +391,7 @@ namespace UI
                 anim.transform.localRotation = Quaternion.Euler(-90, -90, 0);
             }
 
-            TilesMgr.Instance.SetFeedForwards2((Building)i + 1);
+            TilesMgr.Instance.SetFeedForwards2((Building) i + 1);
 
             child = builds.transform.GetChild(i).GetComponent<RectTransform>();
             child.anchoredPosition = child.anchoredPosition.With(y: 20);
