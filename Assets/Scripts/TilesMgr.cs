@@ -164,19 +164,33 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     {
         UiMgr.Instance.Phase1();
 
-        _gos = null;
-
-        _currentFf = new();
-        _gos = new()
+        if (!preview)
         {
-            [_currentFf] = new(pos, rot)
-        };
+            _gos = null;
+
+            _currentFf = new();
+            _gos = new()
+            {
+                [_currentFf] = new(pos, rot)
+            };
+        } else
+        {
+            for(int i = 0; i < feedForwardParent.childCount; ++i)
+            {
+                if (feedForwardParent.GetChild(i).transform.position == p)
+                    _currentFf = feedForwardParent.GetChild(i).gameObject;
+            }
+        }
 
         UiMgr.Instance.ChangeTileColor(chunk);
         PutTile(p);
-        ValidateTile(preview);
-        Destroy(_currentFf);
-        _currentFf = null;
+        if (!preview)
+        {
+            ValidateTile(false);
+            Destroy(_currentFf);
+            _currentFf = null;
+        }
+        
     }
 
     public void ClearCurrentPreviews()
@@ -203,6 +217,12 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         List<Vector2Int> tmp = new() { currentPos };
         if (_currentBuild == Building.Barrack)
             tmp = GameMgr.Instance.FindBiomesAroundVillage(currentPos);
+
+        if (!(_currentPreviews is null))
+            foreach (GameObject currentPreview in _currentPreviews)
+                Destroy(currentPreview);
+
+        _currentPreviews = null;
 
         if (_currentPreviews is null || _currentPreviews.Length < tmp.Count)
             _currentPreviews = new GameObject[tmp.Count];
@@ -300,21 +320,33 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     public void PutAiBuild(Vector2Int[] pos, Building b, Player player, bool preview = false)
     {
         _currentBuild = b;
-        _gos = null;
 
-        _gos = pos.ToDictionary
-        (
-            static p => new GameObject
-            {
-                transform =
+        if (!preview)
+        {
+            _gos = null;
+
+            _gos = pos.ToDictionary
+            (
+                static p => new GameObject
                 {
+                    transform =
+                    {
                     position = V2IToV3(p)
-                }
-            },
-            static p => new PointRotation(p)
-        );
+                    }
+                },
+                static p => new PointRotation(p)
+            );
 
-        _currentFf = _gos.Keys.First();
+            _currentFf = _gos.Keys.First();
+        } else
+        {
+            for (int i = 0; i < feedForwardParent.childCount; ++i)
+            {
+                if (feedForwardParent.GetChild(i).transform.position == V2IToV3(pos[0]))
+                    _currentFf = feedForwardParent.GetChild(i).gameObject;
+            }
+        }
+        
 
         if (_currentPreviews is null || _currentPreviews.Length < pos.Length)
             _currentPreviews = new GameObject[pos.Length];
@@ -347,10 +379,12 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         for (int i = pos.Length; i < _currentPreviews.Length; i++)
             Destroy(_currentPreviews[i]);
 
-        ValidateBuild(preview);
-        Destroy(_currentFf);
-        _currentFf = null;
-
+        if (!preview)
+        {
+            ValidateBuild(false);
+            Destroy(_currentFf);
+            _currentFf = null;
+        }
     }
 
     private void RotateTile()
