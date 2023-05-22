@@ -1257,6 +1257,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nbPlayers: 4
+  nbAis: 0
+  path: 
+  load: 0
 --- !u!1 &342422411
 GameObject:
   m_ObjectHideFlags: 0
@@ -1518,6 +1521,7 @@ MonoBehaviour:
   currentTile: {fileID: 567591721}
   builds: {fileID: 514725167}
   menuCanva: {fileID: 1694325169}
+  victoryCanva: {fileID: 2053269521}
   nextPhase: 13
   menu: 27
   validateButton: {fileID: 1931092067}
@@ -2509,6 +2513,7 @@ GameObject:
   m_Component:
   - component: {fileID: 634683321}
   - component: {fileID: 634683320}
+  - component: {fileID: 634683322}
   m_Layer: 0
   m_Name: UI Camera
   m_TagString: Untagged
@@ -2574,6 +2579,18 @@ Transform:
   m_Father: {fileID: 1564506406}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 39, y: 0, z: 0}
+--- !u!114 &634683322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 634683319}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &642755114
 GameObject:
   m_ObjectHideFlags: 0
@@ -3355,7 +3372,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 963194229}
         m_TargetAssemblyTypeName: CameraMgr, Assembly-CSharp
-        m_MethodName: Rotate
+        m_MethodName: StartCRotate
         m_Mode: 4
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4083,6 +4100,7 @@ GameObject:
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
   - component: {fileID: 963194229}
+  - component: {fileID: 963194230}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -4173,6 +4191,19 @@ MonoBehaviour:
   screenDetectionOffset: 5.5
   zoomIn: 270
   zoomOut: 269
+  rotationSpeed: 1
+--- !u!114 &963194230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &973819461
 GameObject:
   m_ObjectHideFlags: 0
@@ -5096,7 +5127,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 963194229}
         m_TargetAssemblyTypeName: CameraMgr, Assembly-CSharp
-        m_MethodName: Rotate
+        m_MethodName: StartCRotate
         m_Mode: 4
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7979,6 +8010,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2107440044}
   - component: {fileID: 2107440043}
+  - component: {fileID: 2107440045}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -8063,6 +8095,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 90, y: -30, z: 0}
+--- !u!114 &2107440045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107440042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2131746607
 GameObject:
   m_ObjectHideFlags: 0

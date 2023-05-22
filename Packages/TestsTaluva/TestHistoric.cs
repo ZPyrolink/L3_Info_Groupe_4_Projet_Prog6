@@ -5,6 +5,7 @@ using Taluva.Controller;
 using Taluva.Model;
 using UnityEngine;
 using Taluva.Model.AI;
+using System.Linq;
 
 namespace TestsTaluva
 {
@@ -70,7 +71,7 @@ namespace TestsTaluva
 
             _gm.Undo();
             Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.None);
-            Assert.AreEqual(20, _gm.actualPlayer.nbBarrack);
+            Assert.AreEqual(20, _gm.actualPlayer.NbBarrack);
 
             _gm.actualChunk = _gm.pile.Draw();
             _gm.ValidateTile(new(new(0, 1), new[] { false, false, false, true, false, false }), Rotation.S);
@@ -105,7 +106,7 @@ namespace TestsTaluva
             _gm.NextPlayer();
 
             Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.Barrack);
-            Assert.AreEqual(19, _gm.actualPlayer.nbBarrack);
+            Assert.AreEqual(19, _gm.actualPlayer.NbBarrack);
 
             _gm.actualChunk = _gm.pile.Draw();
             _gm.ValidateTile(new(new(0, 1), new[] { false, false, false, true, false, false }), Rotation.S);
@@ -117,7 +118,7 @@ namespace TestsTaluva
             _gm.Redo();
             Assert.IsFalse(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.Barrack);
             Assert.AreEqual(45, _gm.pile._stack.Count);
-            Assert.AreEqual(18, _gm.actualPlayer.nbBarrack);
+            Assert.AreEqual(18, _gm.actualPlayer.NbBarrack);
         }
 
         [Test]
@@ -128,7 +129,8 @@ namespace TestsTaluva
 
             _gm.Save(path);
 
-            GameManagment gm = new(path);
+            GameManagment gm = new(2, Enumerable.Repeat(typeof(AIRandom), 0).ToArray());
+            gm.LoadGame(path);
             Assert.IsFalse(gm.IsVoid(new(0, 0)));
             Assert.IsFalse(gm.IsVoid(new(-1, 0)));
             Assert.IsFalse(gm.IsVoid(new(-1, -1)));
@@ -150,14 +152,15 @@ namespace TestsTaluva
         public void TestSave1Building()
         {
             _gm.ValidateTile(new(new(0, 0), new[] { true, false, false, false, false, false }), Rotation.N);
-            _gm.ValidateBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
+            _gm.Phase2(new(-1, 0), Building.Barrack);
 
             string path = "save1";
             _gm.Save(path);
-            GameManagment gm = new(path);
+            GameManagment gm = new(2);
+            gm.LoadGame(path);
 
             Assert.AreEqual(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings, gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings);
-            Assert.AreEqual(_gm.actualPlayer.nbBarrack, gm.actualPlayer.nbBarrack);
+            Assert.AreEqual(_gm.actualPlayer.NbBarrack, gm.actualPlayer.NbBarrack);
         }
 
 

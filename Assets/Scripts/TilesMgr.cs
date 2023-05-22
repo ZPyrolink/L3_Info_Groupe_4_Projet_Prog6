@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Taluva.Model;
-
+using Taluva.Model.AI;
 using UI;
 
 using UnityEngine;
@@ -14,7 +14,7 @@ using Wrapper;
 
 public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 {
-    private const float xOffset = 1.5f, yOffset = .41f, zOffset = 1.73205f;
+    public const float xOffset = 1.5f, yOffset = .41f, zOffset = 1.73205f;
 
     [SerializeField]
     private Transform boardParent;
@@ -140,37 +140,44 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         Destroy(_currentFf);
         _currentFf = null;
     }
-    
-    public void PutAiTile(Vector2Int pos, Rotation rot)
+
+    public void PutAiTile(Vector2Int pos, Vector3 p, Rotation rot, Chunk chunk)
     {
         UiMgr.Instance.Phase1();
         
         _gos = null;
-        Vector3 p = new(pos.x, 0, pos.y);
-        if (!GameMgr.Instance.IsVoid(pos))
-            p.y = GameMgr.Instance.LevelAt(pos) * yOffset;
-        p.Scale(new(xOffset, 1, zOffset));
-
-        if (pos.x % 2 != 0)
-            p.z += zOffset / 2;
 
         _currentFf = new();
         _gos = new()
         {
             [_currentFf] = new(pos, rot)
         };
+        
+        UiMgr.Instance.ChangeTileColor(chunk);
         PutTile(p);
         ValidateTile(false);
         Destroy(_currentFf);
         _currentFf = null;
     }
 
+    public void ClearCurrentPreviews()
+    {
+        foreach(GameObject currentPreview in _currentPreviews)
+            Destroy(currentPreview);
+        _currentPreviews = null;
+    }
+
+    public bool CurrentPreviewsNotNull => _currentPreviews != null;
+
     private void PutBuild(Vector3 _) => PutBuild(GameMgr.Instance.actualPlayer.ID.GetColor());
 
     private void PutBuild(Color color)
     {
         Vector2Int currentPos = _gos[_currentFf].point;
-        List<Vector2Int> tmp = GameMgr.Instance.FindBiomesAroundVillage(currentPos);
+        List<Vector2Int> tmp = new() { currentPos };
+        if (_currentBuild == Building.Barrack)
+            tmp = GameMgr.Instance.FindBiomesAroundVillage(currentPos);
+
         if (_currentPreviews is null || _currentPreviews.Length < tmp.Count)
             _currentPreviews = new GameObject[tmp.Count];
 
@@ -274,15 +281,18 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     public void SetFeedForwards1()
     {
         ClearFeedForward();
-        foreach (PointRotation pr in GameMgr.Instance.ChunkSlots())
+        if (!(GameMgr.Instance.actualPlayer is AI))
         {
-            Vector3 pos = new(pr.point.x, 0, pr.point.y);
-            if (!GameMgr.Instance.IsVoid(pr.point))
-                pos.y = GameMgr.Instance.LevelAt(pr.point) * yOffset;
-            pos.Scale(new(xOffset, 1, zOffset));
-            if (pr.point.x % 2 != 0)
-                pos.z += zOffset / 2;
-            _gos[SetFeedForward(pos)] = pr;
+            foreach (PointRotation pr in GameMgr.Instance.ChunkSlots())
+            {
+                Vector3 pos = new(pr.point.x, 0, pr.point.y);
+                if (!GameMgr.Instance.IsVoid(pr.point))
+                    pos.y = GameMgr.Instance.LevelAt(pr.point) * yOffset;
+                pos.Scale(new(xOffset, 1, zOffset));
+                if (pr.point.x % 2 != 0)
+                    pos.z += zOffset / 2;
+                _gos[SetFeedForward(pos)] = pr;
+            }
         }
     }
 

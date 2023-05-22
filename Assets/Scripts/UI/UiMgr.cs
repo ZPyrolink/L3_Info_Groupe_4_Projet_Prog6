@@ -2,7 +2,7 @@ using System;
 
 using Taluva.Controller;
 using Taluva.Model;
-
+using Taluva.Model.AI;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -22,7 +22,7 @@ namespace UI
 
         private int NbTiles
         {
-            get => GameMgr.Instance.pile.NbKeeping + 1;
+            get => GameMgr.Instance.maxTurn;
             set => uiNbTiles.text = NB_TILES_PLACEHOLDER.Replace("%nb%", value.ToString());
         }
 
@@ -47,10 +47,15 @@ namespace UI
         private GameObject menuCanva;
 
         [SerializeField]
+        private GameObject victoryCanva;
+
+        [SerializeField]
         private KeyCode nextPhase = KeyCode.Return, menu = KeyCode.Escape;
 
         [SerializeField]
         private Button validateButton;
+
+        private bool inMenu = false;
 
         public bool EnableValidateBtn
         {
@@ -62,7 +67,6 @@ namespace UI
 
         [SerializeField]
         private Button redoButton;
-
 
         #region Unity events
 
@@ -80,8 +84,13 @@ namespace UI
 
         private void Update()
         {
-            if (Input.GetKeyDown(nextPhase))
-                Next();
+            if (!inMenu)
+            {
+                undoButton.interactable = GameMgr.Instance.CanUndo;
+                redoButton.interactable = GameMgr.Instance.CanRedo;
+                if (Input.GetKeyDown(nextPhase))
+                    Next();
+            }
 
             if (Input.GetKeyDown(menu))
                 ToggleMenu();
@@ -109,6 +118,13 @@ namespace UI
             }
         }
 
+        public void UnloadSetUp()
+        {
+            //Enlever les joueurs affiché qui n'existe pas (utilisé pour le load)
+            for (int i = GameMgr.Instance.NbPlayers; i < 4; i++)
+                Destroy(this.gameObject.transform.GetChild(i + 5).gameObject);
+        }
+
         public void UpdateCurrentPlayer()
         {
             for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
@@ -123,8 +139,7 @@ namespace UI
                     if (GameMgr.Instance.ActualPlayerIndex == i)
                     {
                         anim.enabled = true;
-                    }
-                    else
+                    } else
                     {
                         anim.enabled = false;
                         anim.transform.localRotation = Quaternion.Euler(-90, 0, 0);
@@ -137,54 +152,57 @@ namespace UI
             for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
             {
                 _guis[i].transform.GetChild(2).GetComponentInChildren<Text>().text =
-                    GameMgr.Instance.players[i].nbBarrack.ToString();
+                    GameMgr.Instance.players[i].NbBarrack.ToString();
                 _guis[i].transform.GetChild(3).GetComponentInChildren<Text>().text =
-                    GameMgr.Instance.players[i].nbTowers.ToString();
+                    GameMgr.Instance.players[i].NbTowers.ToString();
                 _guis[i].transform.GetChild(4).GetComponentInChildren<Text>().text =
-                    GameMgr.Instance.players[i].nbTemple.ToString();
+                    GameMgr.Instance.players[i].NbTemple.ToString();
             }
         }
 
         public void UpdateCurrentPlayerBuild()
         {
-            currentPlayerBuildCount[0].text = GameMgr.Instance.actualPlayer.nbBarrack.ToString();
-            currentPlayerBuildCount[1].text = GameMgr.Instance.actualPlayer.nbTowers.ToString();
-            currentPlayerBuildCount[2].text = GameMgr.Instance.actualPlayer.nbTemple.ToString();
+            currentPlayerBuildCount[0].text = GameMgr.Instance.actualPlayer.NbBarrack.ToString();
+            currentPlayerBuildCount[1].text = GameMgr.Instance.actualPlayer.NbTowers.ToString();
+            currentPlayerBuildCount[2].text = GameMgr.Instance.actualPlayer.NbTemple.ToString();
         }
 
         public void Next()
         {
             (GameMgr.Instance.actualPhase switch
             {
-                TurnPhase.SelectCells => (Action<bool>) TilesMgr.Instance.ValidateTile,
+                TurnPhase.SelectCells => (Action<bool>)TilesMgr.Instance.ValidateTile,
                 TurnPhase.PlaceBuilding => TilesMgr.Instance.ValidateBuild
             }).Invoke(true);
         }
 
         public void Phase1()
         {
-            undoButton.interactable = GameMgr.Instance.CanUndo;
-            redoButton.interactable = GameMgr.Instance.CanRedo;
             UpdateGui();
-
             TilesMgr.Instance.SetFeedForwards1();
 
             CurrentTile.SetActive(true);
 
-            MeshRenderer mr = currentTile.transform.GetComponentInChildren<MeshRenderer>();
-            mr.materials[0].color = GameMgr.Instance.actualChunk.Coords[1].ActualBiome.GetColor();
-            mr.materials[2].color = Biomes.Volcano.GetColor();
-            mr.materials[3].color = GameMgr.Instance.actualChunk.Coords[2].ActualBiome.GetColor();
+            ChangeTileColor(GameMgr.Instance.actualChunk);
 
             currentTile.SetActive(true);
             currentTile.transform.GetChild(0).gameObject.SetActive(true);
             builds.SetActive(false);
         }
 
+        public void ChangeTileColor(Chunk chunk)
+        {
+            MeshRenderer mr = currentTile.transform.GetComponentInChildren<MeshRenderer>(true);
+
+            mr.materials[0].color = chunk.Coords[1].ActualBiome.GetColor();
+            mr.materials[2].color = Biomes.Volcano.GetColor();
+            mr.materials[3].color = chunk.Coords[2].ActualBiome.GetColor();
+        }
+
+        public void UpdateTiles() => NbTiles = NbTiles;
+
         public void Phase2()
         {
-            undoButton.interactable = GameMgr.Instance.CanUndo;
-            redoButton.interactable = GameMgr.Instance.CanRedo;
             UpdateGui();
             currentTile.SetActive(false);
             builds.SetActive(true);
@@ -192,7 +210,7 @@ namespace UI
             foreach (MeshRenderer mr in builds.GetComponentsInChildren<MeshRenderer>())
                 mr.material.color = GameMgr.Instance.actualPlayer.ID.GetColor();
 
-            NbTiles--;
+            UpdateTiles();
             UpBuild(0);
         }
 
@@ -205,13 +223,29 @@ namespace UI
 
         public void Undo()
         {
+            TilesMgr.Instance.ClearFeedForward();
+            if(TilesMgr.Instance.CurrentPreviewsNotNull)
+                TilesMgr.Instance.ClearCurrentPreviews();
             GameManagment.Coup coup = GameMgr.Instance.Undo();
 
             (GameMgr.Instance.actualPhase switch
             {
-                TurnPhase.SelectCells => (Action<GameManagment.Coup>) UndoPhase1,
+                TurnPhase.SelectCells => (Action<GameManagment.Coup>)UndoPhase1,
                 TurnPhase.PlaceBuilding => UndoPhase2
             }).Invoke(coup);
+
+
+            while (GameMgr.Instance.actualPlayer is AI)
+            {
+                coup = GameMgr.Instance.Undo();
+
+                (GameMgr.Instance.actualPhase switch
+                {
+                    TurnPhase.SelectCells => (Action<GameManagment.Coup>)UndoPhase1,
+                    TurnPhase.PlaceBuilding => UndoPhase2
+                }).Invoke(coup);
+
+            }
         }
 
         private void UndoPhase1(GameManagment.Coup c) => TilesMgr.Instance.RemoveTile(c.positions[0]);
@@ -224,32 +258,34 @@ namespace UI
 
             (GameMgr.Instance.actualPhase switch
             {
-                TurnPhase.PlaceBuilding => (Action<GameManagment.Coup>) RedoPhase1,
-                TurnPhase.SelectCells => RedoPhase2
+                TurnPhase.PlaceBuilding => (Action<GameManagment.Coup>)RedoPhase1,
+                TurnPhase.SelectCells => RedoPhase2,
+                TurnPhase.IAPlays => RedoPhase2
             }).Invoke(coup);
         }
 
         private void RedoPhase1(GameManagment.Coup coup)
         {
             // ReSharper disable once PossibleInvalidOperationException
-            TilesMgr.Instance.ReputTile(coup.positions[0], (Rotation) coup.rotation);
+            TilesMgr.Instance.ReputTile(coup.positions[0], (Rotation)coup.rotation);
             if (GameMgr.Instance.actualPhase == TurnPhase.PlaceBuilding)
                 TilesMgr.Instance.SetFeedForwards2(Building.Barrack);
             else
                 CurrentTile.SetActive(true);
 
-            Phase1();
         }
 
         private void RedoPhase2(GameManagment.Coup coup)
         {
-            if (coup.player.Eliminated)
+            if (GameMgr.Instance.players[coup.playerIndex].Eliminated)
             {
                 RedoPhase1(coup);
-            }
-            else
+            } else
             {
-                TilesMgr.Instance.ReputBuild(coup.positions[0], coup.building[0], GameMgr.Instance.PreviousPlayer);
+                for(int i = 0; i < coup.positions.Length; i++)
+                {
+                    TilesMgr.Instance.ReputBuild(coup.positions[i], coup.building[i], GameMgr.Instance.PreviousPlayer);
+                }
             }
 
             TilesMgr.Instance.SetFeedForwards1();
@@ -258,8 +294,21 @@ namespace UI
         public void ToggleMenu()
         {
             menuCanva.SetActive(!menuCanva.activeSelf);
-            CameraMgr.Instance.enabled = !menuCanva.activeSelf;
-            UiMgr.Instance.enabled = !menuCanva.activeSelf;
+            SaveMgr.Instance.gameObject.SetActive(false);
+            EnableScript();
+        }
+
+        public void ToggleVictory()
+        {
+            EnableScript();
+            victoryCanva.SetActive(true);
+        }
+
+        public void EnableScript()
+        {
+            CameraMgr.Instance.enabled = !CameraMgr.Instance.enabled;
+            inMenu = !inMenu;
+            TilesMgr.Instance.enabled = !TilesMgr.Instance.enabled;
         }
 
         public void UpBuild(int i)
@@ -277,7 +326,7 @@ namespace UI
                 anim.transform.localRotation = Quaternion.Euler(-90, -90, 0);
             }
 
-            TilesMgr.Instance.SetFeedForwards2((Building) i + 1);
+            TilesMgr.Instance.SetFeedForwards2((Building)i + 1);
 
             child = builds.transform.GetChild(i).GetComponent<RectTransform>();
             child.anchoredPosition = child.anchoredPosition.With(y: 20);

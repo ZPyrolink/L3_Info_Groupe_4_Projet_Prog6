@@ -1,57 +1,44 @@
 using System;
 
-using Taluva.Model;
-using Taluva.Model.AI;
 using UnityEngine;
 
-public class Player
+namespace Taluva.Model
 {
-    public Chunk lastChunk { get; set; }
-    public bool b_played;
-    public PlayerColor ID { get; private set; }
-    public int nbTowers = 2;
-    public int nbTemple = 3;
-    public int nbBarrack = 20;
-    public bool playerIA = false;
-    public bool Eliminated { get; set; }
-
-    public Player(PlayerColor id)
+    public class Player
     {
-        this.ID = id;
-    }
+        public Chunk LastChunk { get; set; }
 
-    public void SetAi()
-    {
-        playerIA = true;
-    }
+        [Obsolete("Use LastChunk instead")]
+        public Chunk lastChunk
+        {
+            get => LastChunk;
+            set => LastChunk = value;
+        }
 
-    public Player Clone()
-    {
-        return new Player(this);
-    }
+        public PlayerColor ID { get; private set; }
+        public Color IdColor => ID.GetColor();
+        public int NbTowers = 2;
+        public int NbTemple = 3;
+        public int NbBarrack = 20;
 
-    public Player(Player original) : this(original.ID)
-    {
-        Player clone = new Player(this.ID);
-        clone.lastChunk = this.lastChunk;
-        clone.b_played = this.b_played;
-        clone.nbTowers = this.nbTowers;
-        clone.nbTemple = this.nbTemple;
-        clone.nbBarrack = this.nbBarrack;
-        clone.playerIA = this.playerIA;
-    }
+        public bool Eliminated { get; set; }
 
+        public Player(PlayerColor id)
+        {
+            ID = id;
+        }
 
-    //Player placeChunk
-    public void PlaceChunk(Board gameBoard, PointRotation p, Chunk chunk , Rotation r )
-    {
-        gameBoard.AddChunk(chunk, this, p, r);
-        
-    }
-    public void PlaceBuilding(Board gameBoard, Cell c, Building b)
-    {
-        gameBoard.PlaceBuilding(c, b, this);
-    }
+        public Player Clone() => new(this);
 
-    public void Eliminate() => Eliminated = true;
+        public Player(Player original) : this(original.ID)
+        {
+            Player clone = new(ID);
+            clone.LastChunk = LastChunk;
+            clone.NbTowers = NbTowers;
+            clone.NbTemple = NbTemple;
+            clone.NbBarrack = NbBarrack;
+        }
+
+        public void Eliminate() => Eliminated = true;
+    }
 }

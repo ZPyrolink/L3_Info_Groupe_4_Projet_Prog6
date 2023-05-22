@@ -1,7 +1,7 @@
-using System;
-using System.Collections.Generic;
+using System.Collections;
 
 using UnityEngine;
+
 using Utils;
 
 public class CameraMgr : MonoBehaviourMgr<CameraMgr>
@@ -30,7 +30,12 @@ public class CameraMgr : MonoBehaviourMgr<CameraMgr>
     private Quaternion _defaultRotation;
 
     private int _currentRotation;
-    
+
+    [SerializeField]
+    private float rotationSpeed = 1;
+
+    private bool _rotation;
+
     // Start is called before the first frame update
     private void Start()
     {
@@ -122,7 +127,7 @@ public class CameraMgr : MonoBehaviourMgr<CameraMgr>
     // }
 
     private void Move(Vector3 direction) => _cam.transform.Translate(direction * moveFactor);
-    
+
     public void Rotate(float angle)
     {
         Transform camTr = _cam.transform;
@@ -133,11 +138,33 @@ public class CameraMgr : MonoBehaviourMgr<CameraMgr>
         _currentRotation %= rotationNb;
     }
 
+    public void StartCRotate(float angle)
+    {
+        if (_rotation)
+            return;
+        
+        StartCoroutine(CRotate(angle));
+        _rotation = true;
+    }
+
+    public IEnumerator CRotate(float angle)
+    {
+        float speed = rotationSpeed * Mathf.Sign(angle);
+
+        for (float f = 0; speed > 0 ? f < angle : f > angle; f += speed)
+        {
+            Rotate(speed);
+            yield return 0;
+        }
+
+        _rotation = false;
+    }
+
     public void ResetPosition()
     {
         _cam.transform.position = _defaultPosition;
         _cam.transform.rotation = _defaultRotation;
-        
+
         for (int i = 0; i < _currentRotation; i++)
             Rotate(360f / rotationNb);
     }
