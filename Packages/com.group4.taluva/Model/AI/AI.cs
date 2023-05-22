@@ -6,19 +6,16 @@ namespace Taluva.Model.AI
     public abstract class AI : Player
     {
         protected readonly GameManagment Gm;
-        protected readonly Pile<Chunk> Pile;
         public Difficulty Difficulty;
 
-        public AI(PlayerColor id, GameManagment gm, Pile<Chunk> pile) : base(id)
+        public AI(PlayerColor id, GameManagment gm) : base(id)
         {
             this.Gm = gm;
-            this.Pile = pile;
         }
 
         public AI(AI original) :base(original.ID)
         {
             this.Gm = original.Gm;
-            this.Pile = original.Pile;
             this.LastChunk = original.LastChunk;
             // this.BPlayed = original.BPlayed;
             this.NbTowers = original.NbTowers;

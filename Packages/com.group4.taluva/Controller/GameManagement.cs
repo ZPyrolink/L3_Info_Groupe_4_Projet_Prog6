@@ -103,6 +103,12 @@ namespace Taluva.Controller
 
         #region Ctors
 
+        public GameManagment(GameManagment original)
+        {
+            this.gameBoard = new Board(original.gameBoard);
+            //this.historic = new Historic<Coup>(original.historic); TODO Copy constructor
+            //this.pile = new Pile<Chunk>(original.pile);   TODO copy constructor
+        }
         public GameManagment(int nbPlayers, Type[] typeAI)
         {
             historic = new();
@@ -129,7 +135,7 @@ namespace Taluva.Controller
                 if (typeAI[i] == typeof(AIRandom))
                     ptr = new AIRandom(pc[index], this);
                 else if (typeAI[i] == typeof(AIMonteCarlo))
-                    ptr = new AIMonteCarlo(pc[index], this, pile);
+                    ptr = new AIMonteCarlo(pc[index], this);
             }
         }
 
@@ -615,7 +621,8 @@ namespace Taluva.Controller
             PrecedentPhase();
             return c;
         }
-
+        
+        
         public Coup Redo()
         {
             if (!historic.CanRedo)
@@ -842,6 +849,70 @@ namespace Taluva.Controller
 
             checkIa = true;
         }
+        
+        public bool InitPlayIA()
+        {
+            if (CheckWinner() != null)
+            {
+                return false;
+            }
+
+            ActualPlayerIndex++;
+            if (ActualPlayerIndex + 1 > NbPlayers)
+            {
+                ActualPlayerIndex = 0;
+            }
+
+            if (actualPlayer.Eliminated)
+            {
+                ActualPlayerIndex++;
+                if (ActualPlayerIndex + 1 > NbPlayers)
+                {
+                    ActualPlayerIndex = 0;
+                }
+            }
+
+            this.actualChunk = pile.Draw();
+
+            NextPhaseIA();
+            return true;
+        }
+        
+        public void NextPhaseIA()
+        {
+            int nextPhaseValue = ((int)actualPhase + 1) % (Enum.GetNames(typeof(TurnPhase)).Length - 1);
+                actualPhase = (TurnPhase)nextPhaseValue;
+
+                if (actualPhase == TurnPhase.PlaceBuilding)
+                {
+                    PlayerEliminated();
+
+                    if (actualPlayer.Eliminated)
+                        InitPlay();
+                }
+
+                OnChangePhase(actualPhase);
+        }
+        public void Phase1IA(PointRotation pr, Rotation r)
+        {
+            if (ValidateTile(pr, r))
+            {
+                NextPhaseIA();
+                this.maxTurn--;
+            }
+        }
+        public void Phase2IA(PointRotation pr, Building b)
+        {
+            Cell c = gameBoard.WorldMap[pr.point];
+            if (ValidateBuilding(c, b))
+            {
+                NextPhaseIA();
+                InitPlay();
+            }
+        }
+        
+        
+        
 
         public void PlayerEliminated()
         {

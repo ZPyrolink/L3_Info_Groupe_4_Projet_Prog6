@@ -7,7 +7,7 @@ namespace Taluva.Model.AI
 {
     public class AIRandom : AI
     {
-        public AIRandom(PlayerColor id,GameManagment gm) : base(id,gm,null)
+        public AIRandom(PlayerColor id,GameManagment gm) : base(id,gm)
         {
             
         }
@@ -43,7 +43,7 @@ namespace Taluva.Model.AI
 
         public override (Building buil, Vector2Int pos) PlayBuild()
         {
-            int rand = Random.Range(0,1000);
+            int rand;
             Vector2Int[] temples = Gm.gameBoard.GetTempleSlots(this);
             if(temples.Length>0)
             {
