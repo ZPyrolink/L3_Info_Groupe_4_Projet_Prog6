@@ -845,6 +845,18 @@ namespace Taluva.Controller
                 OnPlayerElimination(ActualPlayer);
             }
         }
+        //Find where the cell is placed inside his parent chunk
+        public int CellPositionInChunk(Vector2Int p)
+        {
+            if (!gameBoard.WorldMap.IsVoid(p))
+            {
+                Cell c = gameBoard.WorldMap[p];
+                Chunk chunk = c.ParentChunk;
+                if (chunk.Coords[1] == c) return 0; //left
+                if (chunk.Coords[2] == c) return 1; //right
+            }
+            return 2;
+        }
 
         public void Phase1(PointRotation pr, Rotation r, bool ia = false)
         {
