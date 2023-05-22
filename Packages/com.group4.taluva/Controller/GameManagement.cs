@@ -928,17 +928,12 @@ namespace Taluva.Controller
         public int CellPositionInChunk(Vector2Int p)
         {
             if (gameBoard.WorldMap.IsVoid(p))
-                return 0;
+                return -1;
 
             Cell c = gameBoard.WorldMap[p];
             Chunk chunk = c.ParentChunk;
-            
-            if (chunk.Coords[1] == c) 
-                return 1; //left
-            if (chunk.Coords[2] == c)
-                return 2; //right
 
-            return -1;
+            return Array.IndexOf(chunk.Coords, c);
         }
 
         public void Phase1(PointRotation pr, Rotation r, bool ia = false)
