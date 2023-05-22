@@ -774,6 +774,16 @@ namespace Taluva.Controller
             }
         }
 
+        //Find where the cell is placed inside his parent chunk
+        public int CellPositionInChunk(Vector2Int p)
+        {
+            Cell c = gameBoard.WorldMap[p];
+            Chunk chunk = c.ParentCunk;
+            if (chunk.Coords[1] == c) return 0; //left
+            if (chunk.Coords[2] == c) return 1; //right
+            else return 2;
+        }
+
         public void Phase1(PointRotation pr, Rotation r)
         {
             if (ValidateTile(pr, r))
@@ -782,7 +792,6 @@ namespace Taluva.Controller
                 this.maxTurn--;
             }
         }
-
         //Place building
         public void Phase2(Vector2Int pr, Building b)
         {

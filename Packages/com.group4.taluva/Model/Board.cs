@@ -24,7 +24,7 @@ namespace Taluva.Model
 
         /// <summary>
         /// Remove the chunk from the map.
-        /// Be careful! This only remove the chunk and don't add the possible under cells
+        /// Be careful! This only removes the chunk and doesn't add the possible under cells
         /// </summary>
         /// <param name="c">The chunk to remove</param>
         public void RemoveChunk(Vector2Int[] positions)
