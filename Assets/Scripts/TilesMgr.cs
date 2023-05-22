@@ -287,11 +287,6 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
         _currentFf = _gos.Keys.First();
 
-        //J'ai bien les bonnes positions au bon moment. 
-        //Par contre, il faut que je puisse affiché correctement les maisons.
-        //Donc, il faut regarder soit le putBuild soit le ValidateBuild.
-        //Il faut que cela pose une maison pour chaque positions dans le gos.
-
         if (_currentPreviews is null || _currentPreviews.Length < pos.Length)
             _currentPreviews = new GameObject[pos.Length];
 
