@@ -56,12 +56,12 @@ namespace Taluva.Model.AI
 
         public override (Building buil, Vector2Int pos) PlayBuild()
         {
-            int rand = Random.Range(0,1000);
+            int rand;
             Vector2Int[] temples = gm.gameBoard.GetTempleSlots(this);
             if(temples.Length>0)
             {
                 rand = Random.Range(0, temples.Length);
-                return (Building.Barrack,temples[rand]);
+                return (Building.Temple,temples[rand]);
             } 
             Vector2Int[] towers = gm.gameBoard.GetTowerSlots(this);
             if(towers.Length>0)

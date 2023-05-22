@@ -798,6 +798,7 @@ namespace Taluva.Controller
             NextPhaseIA();
             return true;
         }
+        
         public void NextPhaseIA()
         {
             int nextPhaseValue = ((int)actualPhase + 1) % (Enum.GetNames(typeof(TurnPhase)).Length - 1);
