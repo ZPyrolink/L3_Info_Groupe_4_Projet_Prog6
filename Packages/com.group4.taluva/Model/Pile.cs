@@ -24,6 +24,7 @@ namespace Taluva.Model
         }
 
         
+
         public Pile(List<T> list)
         {
             Content = new(list);
