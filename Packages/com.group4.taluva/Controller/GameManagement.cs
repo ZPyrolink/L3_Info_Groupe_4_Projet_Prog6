@@ -980,7 +980,9 @@ namespace Taluva.Controller
             PlayerEliminated();
             if (!ActualPlayer.Eliminated)
             {
-                List<Vector2Int> build = FindBiomesAroundVillage(p.Point);
+                List<Vector2Int> build = new(){pos};
+                if(b == Building.Barrack) 
+                    build = FindBiomesAroundVillage(p.Point);
                 OnAIBuildingPlacement(b, build.ToArray());
                 ValidateBuilding(c, b);
             }

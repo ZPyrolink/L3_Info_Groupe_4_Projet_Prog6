@@ -73,7 +73,7 @@ namespace Taluva.Model.AI
                         {
                             AI_gm.Phase2IA(new PointRotation(pos), Building.Barrack);
                             AI_gm.InitPlay(true,true,true);
-                            possiblePlay.Add(new Turn(p,(Rotation)i,pos,Building.Barrack), TreeExplore(AI_gm,chunks,--depth).Item2);
+                            possiblePlay.Add(new Turn(p,(Rotation)i,pos,Building.Barrack), TreeExplore(AI_gm,chunks,--depth ).Item2);
                             AI_gm.Undo(true);
                         }
                         Vector2Int[] possibleTower = AI_gm.gameBoard.GetTowerSlots(AI_gm.actualPlayer);
@@ -81,7 +81,7 @@ namespace Taluva.Model.AI
                         {
                             AI_gm.Phase2IA(new PointRotation(pos), Building.Tower);
                             AI_gm.InitPlay(true,true,true);
-                            possiblePlay.Add(new Turn(p,(Rotation)i,pos,Building.Tower), TreeExplore(AI_gm,chunks,--depth).Item2);
+                            possiblePlay.Add(new Turn(p,(Rotation)i,pos,Building.Tower), TreeExplore(AI_gm,chunks,--depth ).Item2);
                             AI_gm.Undo(true);
                         }
                         

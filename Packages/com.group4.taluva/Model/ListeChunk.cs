@@ -50,23 +50,26 @@ namespace Taluva.Model
         {
             Stack<Chunk> stack = new();
             int nb = pileChunk.NbKeeping;
-            for(int i = 0; i < nb; i++)
+    
+            for (int i = 0; i < nb; i++)
             {
-                Chunk chunk = pileChunk._stack.Pop();
+                Chunk chunk = pileChunk.Draw(); // Utiliser la méthode Draw() pour retirer un élément de la pile
                 chunk.Coords[1].ActualBuildings = Building.None;
                 chunk.Coords[2].ActualBuildings = Building.None;
                 chunk.Level = 1;
 
                 stack.Push(chunk);
             }
-            pileChunk._stack.Clear();
-
-            for(int i = 0; i < nb; i++)
+    
+            pileChunk._stack.Clear(); // Vider la pile à l'aide de la méthode Clear()
+    
+            for (int i = 0; i < nb; i++)
             {
                 Chunk chunk = stack.Pop();
-                pileChunk._stack.Push(chunk);
+                pileChunk._stack.Push(chunk); // Ajouter les éléments à la pile corrigée
             }
         }
+
 
         [Obsolete("Use Chunk.ToString() instead")]
         public static void PrintChunkToString(Chunk c) => Console.WriteLine(c);

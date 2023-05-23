@@ -89,36 +89,45 @@ namespace Wrapper
 
             Instance.NotifyEndGame = (player, end) => 
             { 
-                VictoryMgr.Instance.SetWinnerText(player.ID.ToString());
-                UiMgr.Instance.ToggleVictory();
+                if (VictoryMgr.Instance != null)
+                {
+                    VictoryMgr.Instance.SetWinnerText(player.ID.ToString());
+                    UiMgr.Instance.ToggleVictory();
+                }
             };
 
             Instance.NotifyPlayerEliminated = player =>
             {
-                //Debug.Log(player);
+                // Debug.Log(player);
             };
-            
+    
             Instance.NotifyReputTile = (pos, r) => 
             { 
-                TilesMgr.Instance.ReputTile(pos, r); 
+                if (TilesMgr.Instance != null)
+                {
+                    TilesMgr.Instance.ReputTile(pos, r); 
+                }
             };
 
             Instance.NotifyReputBuild = (pos, b) =>
             {
-                TilesMgr.Instance.ReputBuild(pos, b, Instance.actualPlayer);
+                if (TilesMgr.Instance != null)
+                {
+                    TilesMgr.Instance.ReputBuild(pos, b, Instance.actualPlayer);
+                }
             };
 
             Instance.NotifyAIChunkPlacement = pr =>
             {
-                Vector3 p = new(pr.point.x, 0, pr.point.y);
+                Vector3 p = new Vector3(pr.point.x, 0, pr.point.y);
                 if (!Instance.IsVoid(pr.point))
                     p.y = Instance.LevelAt(pr.point) * TilesMgr.yOffset;
-                p.Scale(new(TilesMgr.xOffset, 1, TilesMgr.zOffset));
+                p.Scale(new Vector3(TilesMgr.xOffset, 1, TilesMgr.zOffset));
 
                 if (pr.point.x % 2 != 0)
                     p.z += TilesMgr.zOffset / 2;
-                
-                _aiMoves.Enqueue(new(new[] { pr.point }, p, (Rotation) Array.IndexOf(pr.rotations, true),
+        
+                _aiMoves.Enqueue(new AiMove(new[] { pr.point }, p, (Rotation)Array.IndexOf(pr.rotations, true),
                     Instance.actualChunk));
                 if (!_coroutineStarted)
                     StartCoroutine(CTemporateAi());
@@ -126,12 +135,11 @@ namespace Wrapper
 
             Instance.NotifyAIBuildingPlacement = (building, pos) =>
             {
-                _aiMoves.Enqueue(new(pos, building));
+                _aiMoves.Enqueue(new AiMove(pos, building));
                 if (!_coroutineStarted)
                     StartCoroutine(CTemporateAi());
             };
         }
-        
         private void ChangePhase(TurnPhase phase)
         {
             if (_AiWorking)
