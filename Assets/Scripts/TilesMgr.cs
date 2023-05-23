@@ -37,7 +37,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     private readonly Dictionary<Building, Vector3> _buildsScale = new()
     {
         [Building.Barrack] = new(100, 100, 100),
-        [Building.Tower] = new(120, 120, 29),
+        [Building.Tower] = new(70, 70, 100),
         [Building.Temple] = new(100, 100, 100)
     };
 
