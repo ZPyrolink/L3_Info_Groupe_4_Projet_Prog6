@@ -105,7 +105,8 @@ namespace Taluva.Model.AI
         private void ComputeBestMove()
         {
             GameManagment AI_gm = new GameManagment(Gm);
-            List<Chunk> possibleChunk = AI_gm.GetPossibleChunks();
+            List<Chunk> possibleChunk = AI_gm.Pile.Content.ToList();
+            possibleChunk.Add((AI_gm.ActualChunk));
             AITurn = TreeExplore(AI_gm,possibleChunk,1,AI_gm.ActualPlayer).Item1;
         }
 

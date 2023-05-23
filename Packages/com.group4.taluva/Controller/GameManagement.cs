@@ -112,7 +112,7 @@ namespace Taluva.Controller
             this.Players = new Player[NbPlayers];
             this.ActualPlayerIndex = original.ActualPlayerIndex;
             this.maxTurn = original.MaxTurn;
-            this.ActualChunk = original.ActualChunk;
+            this.ActualChunk = new Chunk(original.ActualChunk);
             for (int i = 0; i < NbPlayers; i++)
             {
                 Players[i] = original.Players[i].Clone();
@@ -543,7 +543,6 @@ namespace Taluva.Controller
         public List<Chunk> GetPossibleChunks()
         {
             List<Chunk> possible =  Pile.Content.ToList();
-            possible.Add(ActualChunk);
             return possible;
         }
         public void PrecedentPhase(bool AIMode = false)
@@ -559,7 +558,7 @@ namespace Taluva.Controller
             else
             {
                 actualPhase = TurnPhase.NextPlayer; //Change Player ?
-                if(AIMode)
+                if(!AIMode)
                     OnChangePhase(actualPhase);
             }
         }
@@ -593,7 +592,7 @@ namespace Taluva.Controller
             else
             {
                 actualPhase = TurnPhase.NextPlayer;
-                if(AIMode)
+                if(!AIMode)
                     OnChangePhase(actualPhase);
             }
         }
@@ -657,7 +656,7 @@ namespace Taluva.Controller
                     pile.Stack(actualChunk);
                 }
             }
-            PrecedentPhase();
+            PrecedentPhase(AIMode);
             return c;
         }
         

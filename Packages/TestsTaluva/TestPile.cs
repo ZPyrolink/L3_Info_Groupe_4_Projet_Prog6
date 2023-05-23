@@ -51,6 +51,13 @@ namespace TestsTaluva
             Assert.IsFalse(ReferenceEquals(originalPile.Content, clonePile.Content));
             Assert.IsTrue(originalPile.Played.SequenceEqual(clonePile.Played));
             Assert.IsFalse(ReferenceEquals(originalPile.Played, clonePile.Played));
+            for (int i = 0; i < originalPile.Content.Count; i++)
+            {
+                CloneableInteger originalC = originalPile.Content.Pop();
+                CloneableInteger cloneC = clonePile.Content.Pop();
+                Assert.IsFalse(ReferenceEquals(originalC,cloneC ));
+                Assert.AreEqual(originalC.Value,cloneC.Value);
+            }
         }
     }
 }
