@@ -55,16 +55,17 @@ namespace Taluva.Model.AI
                     foreach (Chunk c in possibleDraw)
                     {
                         AI_gm.Phase1IA(c,p, (Rotation)i);
-                        AI_gm.Pile.Stack(AI_gm.ActualChunk);
                         List<Chunk> chunks = AI_gm.Pile.Content.ToList();
+                        chunks.Add(AI_gm.ActualChunk);
                         AI_gm.Pile.Content.Clear();
                         foreach (var chunk in chunks)
                         {
-                            if(chunk == c)
+                            if(chunk != c)
                                 AI_gm.Pile.Content.Push(chunk);
                         }
 
                         AI_gm.Pile.Played.Remove(AI_gm.ActualChunk);
+                        AI_gm.Pile.Played.Add(c);
                         
                         
                         Vector2Int[] possibleBarracks = AI_gm.gameBoard.GetBarrackSlots(AI_gm.actualPlayer);
