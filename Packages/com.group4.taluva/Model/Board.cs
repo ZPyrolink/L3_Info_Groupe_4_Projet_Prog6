@@ -393,7 +393,7 @@ namespace Taluva.Model
         /// <param name="b">Building to placed</param>
         /// <param name="player">Actual player</param>
         /// <returns>Return if the building has been placed</returns>
-        public bool PlaceBuilding(Cell c, Building b, Player player)
+        public bool PlaceBuilding(Cell c, Building b, Player player, bool decrement = true)
         {
             if (c == null || player == null)
                 return false;
@@ -424,16 +424,19 @@ namespace Taluva.Model
                     foreach (Vector2Int v in tmp2)
                     {
                         SetC(WorldMap[v]);
-                        player.NbBarrack -= WorldMap[v].ParentChunk.Level;
+                        if(decrement)
+                            player.NbBarrack -= WorldMap[v].ParentChunk.Level;
                     }
                     break;
                 case Building.Temple when GetTempleSlots(player).Contains(coord):
                     SetC(c);
-                    player.NbTemple--;
+                    if(decrement)
+                        player.NbTemple--;
                     break;
                 case Building.Tower when GetTowerSlots(player).Contains(coord):
                     SetC(c);
-                    player.NbTowers--;
+                    if(decrement)
+                        player.NbTowers--;
                     break;
                 default:
                     return false;

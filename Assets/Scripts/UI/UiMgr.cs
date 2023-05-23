@@ -14,6 +14,7 @@ using UnityEngine.UI;
 using Utils;
 
 using Wrapper;
+using static Taluva.Controller.GameManagment;
 
 namespace UI
 {
@@ -308,7 +309,22 @@ namespace UI
             InteractiveRedo = GameMgr.Instance.CanRedo;
         }
 
-        private void UndoPhase1(GameManagment.Coup c) => TilesMgr.Instance.RemoveTile(c.positions[0]);
+        private void UndoPhase1(GameManagment.Coup c)
+        {
+            TilesMgr.Instance.RemoveTile(c.positions[0]);
+            for(int i = 0; i < c.building.Length; i++)
+            {
+                if (c.building[i] != Building.None)
+                {
+                    Player player = GameMgr.Instance.Players[0];
+                    for(int j = 0; j < GameMgr.Instance.NbPlayers; j++)
+                        if (GameMgr.Instance.Players[j].ID == c.cells[i].Owner)
+                            player = GameMgr.Instance.Players[j];
+                    TilesMgr.Instance.ReputBuild(c.positions[i], c.building[i], player);
+                }
+                    
+            }
+        }
 
         private void UndoPhase2(GameManagment.Coup c) => TilesMgr.Instance.RemoveBuild(c.positions);
 
@@ -316,6 +332,11 @@ namespace UI
         {
             InteractiveUndo = false;
             InteractiveRedo = false;
+
+            GameManagment.Coup c = GameMgr.Instance.historic[GameMgr.Instance.historic.Index + 1];
+            if (c.chunk != null && !GameMgr.Instance.IsVoid(c.positions[0]))
+                TilesMgr.Instance.ClearInformations(c.positions[0],(Rotation) c.rotation);
+
             GameManagment.Coup coup = GameMgr.Instance.Redo();
 
             (GameMgr.Instance.actualPhase switch
