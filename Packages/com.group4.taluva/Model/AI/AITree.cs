@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Taluva.Model.AI
 {
-    public abstract class AITree : AI
+    public class AITree : AI
     {
         public AITree(PlayerColor id, GameManagment gm) : base(id, gm){}
 
@@ -41,7 +41,7 @@ namespace Taluva.Model.AI
 
         private (Turn,int) TreeExplore(GameManagment AI_gm,Chunk[] possibleDraw,int depth)
         {
-            if (depth == 0 || AI_gm.CheckWinner() == null)
+            if (depth == 0 || AI_gm.CheckWinner() != null)
                 return (null,Heuristic);
             PointRotation[] possibleChunk = AI_gm.gameBoard.GetChunkSlots();
             Dictionary<Turn, int> possiblePlay = new Dictionary<Turn, int>();
@@ -92,7 +92,12 @@ namespace Taluva.Model.AI
         private void ComputeBestMove()
         {
             GameManagment AI_gm = new GameManagment(Gm);
-            AITurn = TreeExplore(AI_gm,new Chunk[]{AI_gm.ActualChunk},1).Item1;
+            AITurn = TreeExplore(AI_gm,new []{AI_gm.ActualChunk},1).Item1;
+        }
+
+        public override Player Clone()
+        {
+            return new AITree(this);
         }
 
         public override PointRotation PlayChunk()
@@ -110,7 +115,7 @@ namespace Taluva.Model.AI
         {
             get
             {
-                return this.NbBarrack * 5 + this.NbTowers * 100 + this.NbTemple * 1000;
+                return (20-this.NbBarrack) * 2 + (2-this.NbTowers) * 100 + (3-this.NbTemple);
             }
         }
 

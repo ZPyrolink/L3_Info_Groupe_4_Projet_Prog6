@@ -34,11 +34,7 @@ namespace Taluva.Model
 
         public Pile(Pile<T> p)
         {
-            Content = new Stack<T>();
-            foreach (T tmp in p._stack)
-            {
-                Content.Push((T)tmp.Clone());
-            }
+            Content = new Stack<T>(p.Content);
             Played = new List<T>(p.Played);
         }
 
