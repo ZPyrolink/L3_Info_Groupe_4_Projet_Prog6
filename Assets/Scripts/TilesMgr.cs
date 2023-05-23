@@ -89,8 +89,8 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             Material[] mats = _currentPreviews[0].GetComponent<MeshRenderer>().materials;
             foreach (Material mat in mats.Where((_, i) => i != 1))
             {
-                mat.SetRenderMode(MaterialExtensions.BlendMode.Transparent);
-                mat.color = mat.color.With(a: .75f);
+                mat.SetSurfaceType(MaterialExtensions.SurfaceType.Transparent);
+                mat.SetInt(Shader.PropertyToID("_Preview"), 1);
             }
         }
 
@@ -129,8 +129,8 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         Material[] mats = _currentPreviews[0].GetComponent<MeshRenderer>().materials;
         foreach (Material mat in mats.Where((_, i) => i != 1))
         {
-            mat.SetRenderMode(MaterialExtensions.BlendMode.Opaque);
-            mat.color = mat.color.With(a: 1);
+            mat.SetSurfaceType(MaterialExtensions.SurfaceType.Opaque);
+            mat.SetInt(Shader.PropertyToID("_Preview"), 0);
         }
 
         Rotation rot = RotationExt.Of(Mathf.Round(_currentPreviews[0].transform.rotation.eulerAngles.y));
@@ -278,7 +278,6 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                 Material[] mats = _currentPreviews[i].GetComponent<MeshRenderer>().materials;
                 foreach (Material mat in mats)
                 {
-                    mat.SetRenderMode(MaterialExtensions.BlendMode.Transparent);
                     mat.SetFloat(Shader.PropertyToID("_Level"), GameMgr.Instance.LevelAt(tmp[i]));
                     mat.color = color.With(a: .75f);
                 }
@@ -304,7 +303,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             Material[] mats = currentPreview.GetComponent<MeshRenderer>().materials;
             foreach (Material mat in mats.Where((_, i) => i != 1))
             {
-                mat.SetRenderMode(MaterialExtensions.BlendMode.Opaque);
+                mat.SetSurfaceType(MaterialExtensions.SurfaceType.Opaque);
                 mat.color = mat.color.With(a: 1);
             }
         }
@@ -405,7 +404,6 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                 Material[] mats = _currentPreviews[i].GetComponent<MeshRenderer>().materials;
                 foreach (Material mat in mats)
                 {
-                    mat.SetRenderMode(MaterialExtensions.BlendMode.Transparent);
                     mat.color = player.ID.GetColor().With(a: .75f);
                 }
             }

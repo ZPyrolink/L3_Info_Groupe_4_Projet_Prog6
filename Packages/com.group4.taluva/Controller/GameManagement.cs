@@ -112,9 +112,10 @@ namespace Taluva.Controller
             this.Players = new Player[NbPlayers];
             this.ActualPlayerIndex = original.ActualPlayerIndex;
             this.maxTurn = original.MaxTurn;
+            this.ActualChunk = original.ActualChunk;
             for (int i = 0; i < NbPlayers; i++)
             {
-                Players[i] = new Player(original.Players[i]);
+                Players[i] = original.Players[i].Clone();
             }
         }
         public GameManagment(int nbPlayers, Type[] typeAI)
@@ -142,6 +143,8 @@ namespace Taluva.Controller
 
                 if (typeAI[i] == typeof(AIRandom))
                     ptr = new AIRandom(pc[index], this);
+                else if (typeAI[i] == typeof(AITree))
+                    ptr = new AITree(pc[index], this);
                 else if (typeAI[i] == typeof(AIMonteCarlo))
                     ptr = new AIMonteCarlo(pc[index], this);
             }
@@ -915,16 +918,16 @@ namespace Taluva.Controller
                     PlayerEliminated();
 
                     if (actualPlayer.Eliminated)
-                        InitPlay();
+                        InitPlayIA();
                 }
 
                 OnChangePhase(actualPhase);
         }
         public void Phase1IA(Chunk c,PointRotation pr, Rotation r)
         {
-            AddHistoric(pr.point, r, actualChunk);
             if (gameBoard.AddChunk(c, ActualPlayer, pr, r))
             {
+                AddHistoric(pr.point, r, c);
                 NextPhaseIA();
                 this.maxTurn--;
             }

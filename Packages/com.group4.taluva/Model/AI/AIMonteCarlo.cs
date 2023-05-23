@@ -30,7 +30,7 @@ namespace Taluva.Model.AI
                 GameManagment virtualGM = new GameManagment(Gm);
                 for (int i = 0; i < 500; i++)
                 {
-                    while (true) //TODO condition go on till the games end.
+                    while (false) //TODO condition go on till the games end.
                     {
                         //AIPlayChunk(PlayRandomChunk(gm.gameBoard));
                         //AIPlayBuilding(PlayRandomBuild(gm.gameBoard));
