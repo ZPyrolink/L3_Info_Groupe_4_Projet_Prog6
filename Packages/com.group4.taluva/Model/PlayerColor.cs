@@ -8,8 +8,8 @@ namespace Taluva.Model
     public enum PlayerColor : uint
     {
         Red = 0xFFD20F28,
-        Green = 0xFF6C935E,
-        Blue = 0xFF4855B7,
+        Green = 0xFF00FF00,
+        Blue = 0xFF2E00FF,
         Yellow = 0xFFFFD700,
     }
 
