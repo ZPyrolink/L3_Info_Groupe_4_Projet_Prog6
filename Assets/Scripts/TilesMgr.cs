@@ -41,6 +41,13 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         [Building.Temple] = new(100, 100, 100)
     };
 
+    public static Dictionary<Building, int> BuildOwnerMatIndex { get; } = new()
+    {
+        [Building.Barrack] = 1,
+        [Building.Tower] = 1,
+        [Building.Temple] = 4
+    };
+
     private Dictionary<GameObject, PointRotation> _gos;
 
     [SerializeField]
@@ -304,12 +311,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                 foreach (Material mat in mats)
                     mat.SetInt(Shader.PropertyToID("_Preview"), 1);
 
-                mats[_currentBuild switch
-                {
-                    Building.Barrack => 1,
-                    Building.Tower => 0,
-                    Building.Temple => 4
-                }].color = color;
+                mats[BuildOwnerMatIndex[_currentBuild]].color = color;
 
                 mr.materials = mats;
             }

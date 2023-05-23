@@ -127,6 +127,7 @@ namespace UI
                 foreach ((MeshRenderer mr, Building b) in _guis[i].GetComponentsInChildren<MeshRenderer>()
                              .Select(static (mr, i) => (mr, (Building) i + 1)))
                 {
+                    // mr.materials[TilesMgr.BuildOwnerMatIndex[b]].color = GameMgr.Instance.ActualPlayer.IdColor;
                     mr.materials[b switch
                     {
                         Building.Barrack => 1,
@@ -250,18 +251,7 @@ namespace UI
             foreach ((MeshRenderer mr, Building b) in builds.transform.Cast<Transform>()
                          .Select((t, i) => (t.GetComponentInChildren<MeshRenderer>(), (Building) i + 1)))
             {
-                switch (b)
-                {
-                    case Building.Barrack:
-                        mr.materials[1].color = GameMgr.Instance.actualPlayer.ID.GetColor();
-                        break;
-                    case Building.Tower:
-                        mr.material.color = GameMgr.Instance.actualPlayer.ID.GetColor();
-                        break;
-                    case Building.Temple:
-                        mr.materials[4].color = GameMgr.Instance.actualPlayer.ID.GetColor();
-                        break;
-                }
+                mr.materials[TilesMgr.BuildOwnerMatIndex[b]].color = GameMgr.Instance.ActualPlayer.IdColor;
             }
 
             UpdateTiles();
