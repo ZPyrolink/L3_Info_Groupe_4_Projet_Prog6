@@ -30,5 +30,6 @@ namespace TestsTaluva
             // Verify that they are not the same object
             Assert.IsFalse(ReferenceEquals(original, copy));
         }
+        
     }
 }
