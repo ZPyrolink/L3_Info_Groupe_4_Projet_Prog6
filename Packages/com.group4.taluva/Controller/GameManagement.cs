@@ -539,6 +539,13 @@ namespace Taluva.Controller
             historic.Add(new(positions, null, ActualPlayerIndex, newCells, buildings));
         }
 
+
+        public List<Chunk> GetPossibleChunks()
+        {
+            List<Chunk> possible =  Pile.Content.ToList();
+            possible.Add(ActualChunk);
+            return possible;
+        }
         public void PrecedentPhase(bool AIMode = false)
         {
             if (actualPhase != TurnPhase.IAPlays)
