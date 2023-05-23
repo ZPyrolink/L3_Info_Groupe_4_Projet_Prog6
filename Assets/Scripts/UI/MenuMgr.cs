@@ -13,6 +13,8 @@ public class MenuMgr : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
+    public void Settings() => SettingsMgr.Instance.ToggleMenu();
+
     public void Quit() =>
 #if UNITY_EDITOR
         Debug.Break();
