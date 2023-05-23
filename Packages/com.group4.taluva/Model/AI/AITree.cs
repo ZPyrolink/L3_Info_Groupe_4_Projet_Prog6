@@ -72,7 +72,7 @@ namespace Taluva.Model.AI
                         foreach (Vector2Int pos in possibleBarracks)
                         {
                             AI_gm.Phase2IA(new PointRotation(pos), Building.Barrack);
-                            AI_gm.InitPlayIA();
+                            AI_gm.InitPlay(true,true,true);
                             possiblePlay.Add(new Turn(p,(Rotation)i,pos,Building.Barrack), TreeExplore(AI_gm,chunks,--depth).Item2);
                             AI_gm.Undo(true);
                         }
@@ -80,7 +80,7 @@ namespace Taluva.Model.AI
                         foreach (Vector2Int pos in possibleTower)
                         {
                             AI_gm.Phase2IA(new PointRotation(pos), Building.Tower);
-                            AI_gm.InitPlayIA();
+                            AI_gm.InitPlay(true,true,true);
                             possiblePlay.Add(new Turn(p,(Rotation)i,pos,Building.Tower), TreeExplore(AI_gm,chunks,--depth).Item2);
                             AI_gm.Undo(true);
                         }
@@ -89,7 +89,7 @@ namespace Taluva.Model.AI
                         foreach (Vector2Int pos in possibleTemple)
                         {
                             AI_gm.Phase2IA(new PointRotation(pos), Building.Temple);
-                            AI_gm.InitPlayIA();
+                            AI_gm.InitPlay(true,true,true);
                             possiblePlay.Add(new Turn(p,(Rotation)i,pos,Building.Temple), TreeExplore(AI_gm,chunks,--depth).Item2);
                             AI_gm.Undo(true);
                         }
