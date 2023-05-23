@@ -22,11 +22,9 @@ namespace Taluva.Model.AI
         }
         
 
-        protected override int Heuristic
+        protected override int Heuristic(GameManagment AI_gm, Player previousPlayer)
         {
-            get
-            {
-                int val = 0;
+        int val = 0;
                 GameManagment virtualGM = new GameManagment(Gm);
                 for (int i = 0; i < 500; i++)
                 {
@@ -42,7 +40,6 @@ namespace Taluva.Model.AI
                     }
                 }
                 return val;
-            }
         }
 
         protected override (Turn,int) GetBest(Dictionary<Turn,int> possible)
