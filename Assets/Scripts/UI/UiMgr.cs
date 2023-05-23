@@ -84,9 +84,6 @@ namespace UI
         [SerializeField]
         private Button redoButton;
 
-        [SerializeField]
-        private List<KeyValueS<Biomes, Material>> materials;
-
         #region Unity events
 
         protected override void Awake()
@@ -229,29 +226,9 @@ namespace UI
             builds.SetActive(false);
         }
 
-        public void ChangeTileColor(Chunk chunk)
-        {
-            MeshRenderer mr = currentTile.transform.GetComponentInChildren<MeshRenderer>(true);
-            Material[] mrs = mr.materials;
-            Cell[] coords = chunk.Coords;
-
-            void SetMat(int mrIndex, int coordIndex)
-            {
-                Material tmp = materials
-                    .FirstOrDefault(kv => kv.Key == coords[coordIndex].ActualBiome)?.Value;
-
-                if (tmp is null) // ToDo: Remove when all materials are ready
-                    mrs[mrIndex].color = coords[coordIndex].ActualBiome.GetColor();
-                else
-                    mrs[mrIndex] = tmp;
-            }
-
-            SetMat(0, 1);
-            SetMat(3, 2);
-            mrs[2] = materials.First(kv => kv.Key == Biomes.Volcano).Value;
-
-            mr.materials = mrs;
-        }
+        public void ChangeTileColor(Chunk chunk) => TilesMgr.ChangeTileColor(chunk,
+            currentTile.transform.GetComponentInChildren<MeshRenderer>(true),
+            TilesMgr.Instance.Materials);
 
         public void UpdateTiles() => NbTiles = NbTiles;
 
