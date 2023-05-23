@@ -347,10 +347,10 @@ namespace Taluva.Controller
                                 Players[i] = new AIRandom(id, this);
                                 break;
                             case Difficulty.Normal:
-                                throw new NotImplementedException();
+                                Players[i] = new AITree(id, this);
                                 break;
                             case Difficulty.SkillIssue:
-                                throw new NotImplementedException();
+                                Players[i] = new AIMonteCarlo(id, this);
                                 break;
                         }
                     }
