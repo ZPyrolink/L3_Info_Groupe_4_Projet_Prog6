@@ -14,6 +14,7 @@ using UnityEngine.UI;
 using Utils;
 
 using Wrapper;
+
 using static Taluva.Controller.GameManagment;
 
 namespace UI
@@ -244,7 +245,7 @@ namespace UI
                 else
                     mrs[mrIndex] = tmp;
             }
-            
+
             SetMat(0, 1);
             SetMat(3, 2);
             mrs[2] = materials.First(kv => kv.Key == Biomes.Volcano).Value;
@@ -261,8 +262,22 @@ namespace UI
             currentTile.SetActive(false);
             builds.SetActive(true);
 
-            foreach (MeshRenderer mr in builds.GetComponentsInChildren<MeshRenderer>())
-                mr.material.color = GameMgr.Instance.actualPlayer.ID.GetColor();
+            foreach ((MeshRenderer mr, Building b) in builds.transform.Cast<Transform>()
+                         .Select((t, i) => (t.GetComponentInChildren<MeshRenderer>(), (Building) i + 1)))
+            {
+                switch (b)
+                {
+                    case Building.Barrack:
+                        mr.materials[1].color = GameMgr.Instance.actualPlayer.ID.GetColor();
+                        break;
+                    case Building.Tower:
+                        mr.material.color = GameMgr.Instance.actualPlayer.ID.GetColor();
+                        break;
+                    case Building.Temple:
+                        mr.materials[4].color = GameMgr.Instance.actualPlayer.ID.GetColor();
+                        break;
+                }
+            }
 
             UpdateTiles();
             UpBuild(0);
@@ -312,17 +327,16 @@ namespace UI
         private void UndoPhase1(GameManagment.Coup c)
         {
             TilesMgr.Instance.RemoveTile(c.positions[0]);
-            for(int i = 0; i < c.building.Length; i++)
+            for (int i = 0; i < c.building.Length; i++)
             {
                 if (c.building[i] != Building.None)
                 {
                     Player player = GameMgr.Instance.Players[0];
-                    for(int j = 0; j < GameMgr.Instance.NbPlayers; j++)
+                    for (int j = 0; j < GameMgr.Instance.NbPlayers; j++)
                         if (GameMgr.Instance.Players[j].ID == c.cells[i].Owner)
                             player = GameMgr.Instance.Players[j];
                     TilesMgr.Instance.ReputBuild(c.positions[i], c.building[i], player);
                 }
-                    
             }
         }
 
@@ -335,7 +349,7 @@ namespace UI
 
             GameManagment.Coup c = GameMgr.Instance.historic[GameMgr.Instance.historic.Index + 1];
             if (c.chunk != null && !GameMgr.Instance.IsVoid(c.positions[0]))
-                TilesMgr.Instance.ClearInformations(c.positions[0],(Rotation) c.rotation);
+                TilesMgr.Instance.ClearInformations(c.positions[0], (Rotation) c.rotation);
 
             GameManagment.Coup coup = GameMgr.Instance.Redo();
 
