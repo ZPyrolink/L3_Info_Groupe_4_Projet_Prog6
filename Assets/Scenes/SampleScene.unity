@@ -1475,7 +1475,7 @@ MonoBehaviour:
   feedForwardParent: {fileID: 897227192}
   barrack: {fileID: 919132149155446097, guid: 16751b1d9cb52f94b8c79d4879e31bab, type: 3}
   tower: {fileID: 919132149155446097, guid: 1bfe7bae8d80166468e94a363daf2bc5, type: 3}
-  temple: {fileID: 919132149155446097, guid: 794f51dcf5464864e9689ecde6b5a02e, type: 3}
+  temple: {fileID: 919132149155446097, guid: 656e3ad17e7b78b49a62bb20d060c472, type: 3}
   materials:
   - key: 6
     value: {fileID: 2100000, guid: 503ca26dd783cc145878fd1a5b057a58, type: 2}
@@ -1536,7 +1536,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c35b9f2cdfb844fca00fe491b032dbca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nbPlayers: 4
+  nbPlayers: 2
   ais: 
   path: 
   load: 0

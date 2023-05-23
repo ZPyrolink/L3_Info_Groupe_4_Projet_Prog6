@@ -38,7 +38,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     {
         [Building.Barrack] = new(100, 100, 100),
         [Building.Tower] = new(120, 120, 29),
-        [Building.Temple] = new(38, 27, 23)
+        [Building.Temple] = new(100, 100, 100)
     };
 
     private Dictionary<GameObject, PointRotation> _gos;
@@ -294,12 +294,24 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                 }, boardParent);
 
                 _currentPreviews[i].transform.localScale = _buildsScale[_currentBuild];
-                Material[] mats = _currentPreviews[i].GetComponent<MeshRenderer>().materials;
+                MeshRenderer mr = _currentPreviews[i].GetComponent<MeshRenderer>();
+                Material[] mats = mr.materials;
+
+                if (_currentBuild == Building.Barrack)
+                    foreach (Material mat in mats)
+                        mat.SetFloat(Shader.PropertyToID("_Level"), GameMgr.Instance.LevelAt(tmp[i]));
+
                 foreach (Material mat in mats)
+                    mat.SetInt(Shader.PropertyToID("_Preview"), 1);
+
+                mats[_currentBuild switch
                 {
-                    mat.SetFloat(Shader.PropertyToID("_Level"), GameMgr.Instance.LevelAt(tmp[i]));
-                    mat.color = color.With(a: .75f);
-                }
+                    Building.Barrack => 1,
+                    Building.Tower => 0,
+                    Building.Temple => 4
+                }].color = color;
+
+                mr.materials = mats;
             }
 
             _currentPreviews[i].transform.position = _gos
@@ -319,11 +331,11 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     {
         foreach (GameObject currentPreview in _currentPreviews)
         {
-            Material[] mats = currentPreview.GetComponent<MeshRenderer>().materials;
-            foreach (Material mat in mats.Where((_, i) => i != 1))
-            {
-                mat.color = mat.color.With(a: 1);
-            }
+            MeshRenderer mr = currentPreview.GetComponent<MeshRenderer>();
+            Material[] mrs = mr.materials;
+            foreach (Material mat in mrs)
+                mat.SetInt(Shader.PropertyToID("_Preview"), 0);
+            mr.materials = mrs;
         }
 
         _currentPreviews = null;

@@ -124,11 +124,19 @@ namespace UI
                 rt.anchorMax = Vector2.one;
                 rt.anchoredPosition = new(-10, -10 - 110 * i);
 
-                foreach (MeshRenderer mr in _guis[i].GetComponentsInChildren<MeshRenderer>())
-                    mr.material.color = GameMgr.Instance.players[i].ID.GetColor();
+                foreach ((MeshRenderer mr, Building b) in _guis[i].GetComponentsInChildren<MeshRenderer>()
+                             .Select(static (mr, i) => (mr, (Building) i + 1)))
+                {
+                    mr.materials[b switch
+                    {
+                        Building.Barrack => 1,
+                        Building.Tower => 0,
+                        Building.Temple => 4,
+                    }].color = GameMgr.Instance.Players[i].IdColor;
+                }
 
                 _guis[i].transform.GetChild(0).GetComponent<Text>().text = $"Player {i}";
-                _guis[i].transform.GetChild(1).GetComponent<Image>().color = GameMgr.Instance.players[i].ID.GetColor();
+                _guis[i].transform.GetChild(1).GetComponent<Image>().color = GameMgr.Instance.Players[i].ID.GetColor();
             }
         }
 
@@ -371,11 +379,11 @@ namespace UI
         public void ToggleMenu()
         {
             if (!menuCanva.activeSelf && !SaveMgr.Instance.gameObject.activeSelf
-                && !SettingsMgr.Instance.gameObject.activeSelf)
+                                      && !SettingsMgr.Instance.gameObject.activeSelf)
                 EnableScript();
 
             if (menuCanva.activeSelf && !SaveMgr.Instance.gameObject.activeSelf
-                && !SettingsMgr.Instance.gameObject.activeSelf)
+                                     && !SettingsMgr.Instance.gameObject.activeSelf)
                 EnableScript();
 
             menuCanva.SetActive(!menuCanva.activeSelf);
