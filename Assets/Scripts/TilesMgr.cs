@@ -14,6 +14,7 @@ using Utils;
 using Wrapper;
 
 using static UnityEditor.PlayerSettings;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 {
@@ -65,7 +66,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                 _currentFf = hit.transform.gameObject;
                 (GameMgr.Instance.actualPhase switch
                 {
-                    TurnPhase.SelectCells => (Action<Vector3>) PutTile,
+                    TurnPhase.SelectCells => (Action<Vector3>)PutTile,
                     TurnPhase.PlaceBuilding => PutBuild
                 }).Invoke(hit.transform.position);
                 break;
@@ -99,7 +100,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         {
             _currentPreviews[0].transform.position = pos;
             _currentPreviews[0].transform.rotation = Quaternion.Euler(270,
-                _gos == null ? 270 : ((Rotation) Array.IndexOf(_gos[_currentFf].rotations, true)).YDegree(),
+                _gos == null ? 270 : ((Rotation)Array.IndexOf(_gos[_currentFf].rotations, true)).YDegree(),
                 0);
         }
 
@@ -112,7 +113,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         for (int i = 0; i < pos.Rotations.Length; i++)
         {
             if (pos.Rotations[i])
-                r = (Rotation) i;
+                r = (Rotation)i;
         }
 
         PutAiTile(pos.Point, V2IToV3(pos.Point), r, GameMgr.Instance.ActualChunk, true);
@@ -134,9 +135,44 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
         Rotation rot = RotationExt.Of(Mathf.Round(_currentPreviews[0].transform.rotation.eulerAngles.y));
 
+        if(!GameMgr.Instance.IsVoid(_gos[_currentFf].Point))
+            ClearInformations(_gos[_currentFf].Point, rot);
+
         _currentPreviews = null;
         if (sendToLogic)
             GameMgr.Instance.Phase1(new(_gos[_currentFf].point, rot), rot);
+    }
+
+    public void ClearInformations(Vector2Int chunkPos, Rotation rotation)
+    {
+        if (!GameMgr.Instance.gameBoard.WorldMap.IsVoid(chunkPos))
+        {
+            Vector2Int[] positionChunk = GameMgr.Instance.gameBoard.GetChunksCoords(chunkPos, rotation);
+            List<Vector2Int[]> chunkRecouvert = new();
+
+            foreach (Vector2Int positionCell in positionChunk)
+            {
+                Chunk tile = GameMgr.Instance.gameBoard.WorldMap[positionCell].ParentChunk;
+                Vector2Int posVolcano = GameMgr.Instance.gameBoard.GetCellCoord(tile.Coords[0]);
+                Vector2Int[] positions = GameMgr.Instance.gameBoard.GetChunksCoords(posVolcano, tile.Rotation);
+                if (!chunkRecouvert.Contains(positions))
+                    chunkRecouvert.Add(positions);
+            }
+
+            foreach (Vector2Int[] positions in chunkRecouvert)
+            {
+                for (int i = 0; i < positions.Length; i++)
+                {
+                    for (int j = 0; j < positionChunk.Length; j++)
+                    {
+                        if (positions[i] == positionChunk[j])
+                        {
+                            ClearHouseAndBiomes(positions, i);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void ReputTile(Vector2Int pos, Rotation rot)
@@ -174,8 +210,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             {
                 [_currentFf] = new(pos, rot)
             };
-        }
-        else
+        } else
         {
             for (int i = 0; i < feedForwardParent.childCount; ++i)
             {
@@ -209,7 +244,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     {
         Vector2Int currentPos;
         if (position != null)
-            currentPos = (Vector2Int) position;
+            currentPos = (Vector2Int)position;
         else
         {
             currentPos = _gos[_currentFf].Point;
@@ -342,8 +377,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             );
 
             _currentFf = _gos.Keys.First();
-        }
-        else
+        } else
         {
             for (int i = 0; i < feedForwardParent.childCount; ++i)
             {
@@ -400,7 +434,35 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         {
             _currentPreviews[0].transform.Rotate(new(0, 360f / 6, 0), Space.World);
             rot = RotationExt.Of(Mathf.Round(_currentPreviews[0].transform.rotation.eulerAngles.y));
-        } while (_gos?[_currentFf]?.rotations?[(int) rot] == false);
+        } while (_gos?[_currentFf]?.rotations?[(int)rot] == false);
+    }
+
+    public Transform FindObject(Vector2Int pos)
+    {
+        Vector3 v3 = V2IToV3(pos);
+
+        return boardParent.Cast<Transform>().FirstOrDefault(t => t.position == v3);
+    }
+
+    private void ClearHouseAndBiomes(Vector2Int[] posChunk, int cell)
+    {
+        if (cell == 0)
+        {
+            ClearVolcano(posChunk[0]);
+        } else
+        {
+            Transform c = FindObject(posChunk[cell]);
+            if (c != null)
+                Destroy(c.gameObject);
+        }
+    }
+
+    private void ClearVolcano(Vector2Int pos)
+    {
+        Transform chunk = FindObject(pos);
+        // TODO
+        //A finir quand les mesh seront implementer
+
     }
 
     public void SetFeedForwards1()

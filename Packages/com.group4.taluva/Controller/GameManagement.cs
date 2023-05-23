@@ -13,7 +13,7 @@ namespace Taluva.Controller
     public class GameManagment
     {
         public Board gameBoard { get; private set; }
-        private Historic<Coup> historic;
+        public Historic<Coup> historic;
 
         #region Players
 
@@ -502,18 +502,18 @@ namespace Taluva.Controller
                 Vector2Int[] positions = gameBoard.GetChunksCoords(position, rotation);
                 Cell[] newCells = new Cell[gameBoard.WorldMap[position].ParentChunk.Coords.Length];
                 Building[] buildings = new Building[gameBoard.WorldMap[position].ParentChunk.Coords.Length];
-                for (int i = 0; i < gameBoard.WorldMap[position].ParentChunk.Coords.Length; i++)
+                for (int i = 0; i < 3; i++)
                 {
-                    newCells[i] = new(gameBoard.WorldMap[positions[i]].ParentChunk.Coords[i]);
+                    newCells[i] = gameBoard.WorldMap[positions[i]];
                     buildings[i] = gameBoard.WorldMap[positions[i]].ActualBuildings;
                 }
 
-                historic.Add(new(gameBoard.GetChunksCoords(position, rotation), rotation, ActualPlayerIndex, new(chunk),
+                historic.Add(new(gameBoard.GetChunksCoords(position, rotation), rotation, ActualPlayerIndex, new(chunk, false),
                     newCells, buildings));
             }
             else
             {
-                historic.Add(new(new[] { position }, rotation, ActualPlayerIndex, new(chunk)));
+                historic.Add(new(new[] { position }, rotation, ActualPlayerIndex, new(chunk, false)));
             }
         }
 
@@ -600,7 +600,7 @@ namespace Taluva.Controller
                     for (int i = 0; i < c.cells.Length; i++)
                     {
                         gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
-                        gameBoard.PlaceBuilding(c.cells[i], c.building[i], ActualPlayer);
+                        gameBoard.PlaceBuilding(c.cells[i], c.building[i], ActualPlayer, false);
                     }
                 }
 
@@ -668,6 +668,7 @@ namespace Taluva.Controller
             }
             else
             {
+                MaxTurn--;
                 gameBoard.AddChunk(actualChunk, players[c.playerIndex], new(c.positions[0], (Rotation)c.rotation),
                     (Rotation)c.rotation);
                 c.chunk = actualChunk;
