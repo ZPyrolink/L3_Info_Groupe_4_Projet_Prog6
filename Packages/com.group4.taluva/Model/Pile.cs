@@ -34,9 +34,10 @@ namespace Taluva.Model
 
         public Pile(Pile<T> p)
         {
-            Content = new Stack<T>(p.Content);
-            Played = new List<T>(p.Played);
+            Content = new Stack<T>(p.Content.Reverse().Select(item => (T)item.Clone()));
+            Played = new List<T>(p.Played.Select(item => (T)item.Clone()));
         }
+
 
         public Pile<T> Clone()
         {

@@ -347,10 +347,10 @@ namespace Taluva.Controller
                                 Players[i] = new AIRandom(id, this);
                                 break;
                             case Difficulty.Normal:
-                                throw new NotImplementedException();
+                                Players[i] = new AITree(id, this);
                                 break;
                             case Difficulty.SkillIssue:
-                                throw new NotImplementedException();
+                                Players[i] = new AIMonteCarlo(id, this);
                                 break;
                         }
                     }
@@ -539,23 +539,25 @@ namespace Taluva.Controller
             historic.Add(new(positions, null, ActualPlayerIndex, newCells, buildings));
         }
 
-        public void PrecedentPhase()
+        public void PrecedentPhase(bool AIMode = false)
         {
             if (actualPhase != TurnPhase.IAPlays)
             {
                 int precedantPhaseValue =
                     Math.Abs(((int)actualPhase - 1) % (Enum.GetNames(typeof(TurnPhase)).Length - 1));
                 actualPhase = (TurnPhase)precedantPhaseValue;
-                OnChangePhase(actualPhase);
+                if(!AIMode)
+                    OnChangePhase(actualPhase);
             }
             else
             {
                 actualPhase = TurnPhase.NextPlayer; //Change Player ?
-                OnChangePhase(actualPhase);
+                if(AIMode)
+                    OnChangePhase(actualPhase);
             }
         }
 
-        public void NextPhase(bool pioche = true)
+        public void NextPhase(bool pioche = true,bool AIMode = false)
         {
             bool b = true;
             if (actualPhase != TurnPhase.IAPlays)
@@ -574,8 +576,8 @@ namespace Taluva.Controller
                         InitPlay(b);
                     }
                 }
-
-                OnChangePhase(actualPhase);
+                if(!AIMode)
+                    OnChangePhase(actualPhase);
                 if (!b)
                 {
                     actualChunk = pile.Draw();
@@ -584,11 +586,13 @@ namespace Taluva.Controller
             else
             {
                 actualPhase = TurnPhase.NextPlayer;
-                OnChangePhase(actualPhase);
+                if(AIMode)
+                    OnChangePhase(actualPhase);
             }
         }
 
-        public Coup Undo()
+        
+        public Coup Undo(bool AIMode = false)
         {
             if (!historic.CanUndo)
                 return null;
@@ -646,13 +650,12 @@ namespace Taluva.Controller
                     pile.Stack(actualChunk);
                 }
             }
-
             PrecedentPhase();
             return c;
         }
         
         
-        public Coup Redo()
+        public Coup Redo(bool AIMode = false)
         {
             if (!historic.CanRedo)
                 return null;
@@ -681,13 +684,13 @@ namespace Taluva.Controller
                 }
             }
 
-            if (actualPlayer is AI ai)
+            if (actualPlayer is AI ai && AIMode)
             {
                 actualPhase = TurnPhase.IAPlays;
                 AiChunk();
             }
             else
-                NextPhase(false);
+                NextPhase(false,AIMode);
 
             return c;
         }
