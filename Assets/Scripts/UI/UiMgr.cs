@@ -379,9 +379,17 @@ namespace UI
 
         public void ToggleMenu()
         {
+            if (!menuCanva.activeSelf && !SaveMgr.Instance.gameObject.activeSelf
+                && !SettingsMgr.Instance.gameObject.activeSelf)
+                EnableScript();
+
+            if (menuCanva.activeSelf && !SaveMgr.Instance.gameObject.activeSelf
+                && !SettingsMgr.Instance.gameObject.activeSelf)
+                EnableScript();
+
             menuCanva.SetActive(!menuCanva.activeSelf);
             SaveMgr.Instance.gameObject.SetActive(false);
-            EnableScript();
+            SettingsMgr.Instance.gameObject.SetActive(false);
         }
 
         public void ToggleVictory()

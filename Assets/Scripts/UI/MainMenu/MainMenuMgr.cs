@@ -13,7 +13,8 @@
         private GameObject contactUs,
             main,
             play,
-            load;
+            load,
+            settings;
         
         public void OpenSettings() { }
 
@@ -27,6 +28,17 @@
         {
             ToggleMain();
             Toggle(load);
+        }
+
+        public void ToggleSettings()
+        {
+            ToggleMain();
+            Toggle(settings);
+        }
+
+        public void AllowSound(AudioSource audio)
+        {
+            audio.enabled = !audio.enabled;
         }
 
         public void Rules() { }
