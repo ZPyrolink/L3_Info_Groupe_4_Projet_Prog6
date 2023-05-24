@@ -1479,6 +1479,8 @@ MonoBehaviour:
     value: {fileID: 2100000, guid: 4bd549ff786b3de438cccea3a97404b5, type: 2}
   - key: 1
     value: {fileID: 2100000, guid: 78eb38e7302dee841b5253f3e893d656, type: 2}
+  - key: 2
+    value: {fileID: 2100000, guid: 0e9ffe6682f500947aacb3f46de2951f, type: 2}
   transparentMaterials:
   - key: 3
     value: {fileID: 2100000, guid: df411f68065cadd4781033fbabfb65bb, type: 2}
@@ -1490,6 +1492,8 @@ MonoBehaviour:
     value: {fileID: 2100000, guid: d601afcf187af164dae5882eaa357ccd, type: 2}
   - key: 1
     value: {fileID: 2100000, guid: 087e0f89970882944aeaea080d0a849b, type: 2}
+  - key: 2
+    value: {fileID: 2100000, guid: b79bfaf551c64364b8aa3bf734076066, type: 2}
   biomeProps:
     _content:
     - _key: 3
