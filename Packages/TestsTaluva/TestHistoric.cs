@@ -64,8 +64,8 @@ namespace TestsTaluva
             Assert.IsTrue(_gm.IsVoid(new(0, 0)));
             Assert.IsTrue(_gm.IsVoid(new(-1, 0)));
             Assert.IsTrue(_gm.IsVoid(new(-1, -1)));
-            Assert.AreEqual(47, _gm.Pile._stack.Count);
-            Assert.AreEqual(1, _gm.Pile._played.Count);
+            Assert.AreEqual(47, _gm.Pile.Content.Count);
+            Assert.AreEqual(1, _gm.Pile.Played.Count);
             _gm.ValidateTile(new(new(0, 0), new[] { true, false, false, false, false, false }), Rotation.N);
             _gm.ValidateBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
 
@@ -96,8 +96,8 @@ namespace TestsTaluva
             Assert.IsFalse(_gm.IsVoid(new(0, 0)));
             Assert.IsFalse(_gm.IsVoid(new(-1, 0)));
             Assert.IsFalse(_gm.IsVoid(new(-1, -1)));
-            Assert.AreEqual(47, _gm.Pile._stack.Count);
-            Assert.AreEqual(1, _gm.Pile._played.Count);
+            Assert.AreEqual(47, _gm.Pile.Content.Count);
+            Assert.AreEqual(1, _gm.Pile.Played.Count);
 
             _gm.ValidateBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
 
@@ -116,7 +116,7 @@ namespace TestsTaluva
 
             _gm.Undo();  
             _gm.Redo();
-            Assert.AreEqual(46, _gm.Pile._stack.Count);
+            Assert.AreEqual(46, _gm.Pile.Content.Count);
             Assert.AreEqual(18, _gm.CurrentPlayer.NbBarrack);
         }
 
@@ -133,7 +133,7 @@ namespace TestsTaluva
             Assert.IsFalse(gm.IsVoid(new(0, 0)));
             Assert.IsFalse(gm.IsVoid(new(-1, 0)));
             Assert.IsFalse(gm.IsVoid(new(-1, -1)));
-            Assert.AreEqual(_gm.Pile._stack.Count, gm.Pile._stack.Count);
+            Assert.AreEqual(_gm.Pile.Content.Count, gm.Pile.Content.Count);
 
             Assert.AreEqual(_gm.CurrentChunk.Coords[1].ActualBiome, gm.CurrentChunk.Coords[1].ActualBiome);
             Assert.AreEqual(_gm.CurrentChunk.Coords[2].ActualBiome, gm.CurrentChunk.Coords[2].ActualBiome);

@@ -247,8 +247,8 @@ namespace Taluva.Controller
                         writer.Write((int)((AI)Players[i]).Difficulty);
                 }
 
-                Chunk[] stackArray = Pile._stack.ToArray();
-                writer.Write(stackArray.Length + Pile._played.Count);
+                Chunk[] stackArray = Pile.Content.ToArray();
+                writer.Write(stackArray.Length + Pile.Played.Count);
 
                 for (int i = stackArray.Length - 1; i >= 0; i--)
                 {
@@ -256,10 +256,10 @@ namespace Taluva.Controller
                     writer.Write((int)stackArray[i].Coords[2].ActualBiome);
                 }
 
-                for (int i = Pile._played.Count - 1; i >= 0; i--)
+                for (int i = Pile.Played.Count - 1; i >= 0; i--)
                 {
-                    writer.Write((int)Pile._played[i].Coords[1].ActualBiome);
-                    writer.Write((int)Pile._played[i].Coords[2].ActualBiome);
+                    writer.Write((int)Pile.Played[i].Coords[1].ActualBiome);
+                    writer.Write((int)Pile.Played[i].Coords[2].ActualBiome);
                 }
 
                 writer.Write(historic.Count);

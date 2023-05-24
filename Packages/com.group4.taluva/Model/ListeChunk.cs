@@ -61,12 +61,12 @@ namespace Taluva.Model
                 stack.Push(chunk);
             }
     
-            pileChunk._stack.Clear(); // Vider la pile à l'aide de la méthode Clear()
+            pileChunk.Content.Clear(); // Vider la pile à l'aide de la méthode Clear()
     
             for (int i = 0; i < nb; i++)
             {
                 Chunk chunk = stack.Pop();
-                pileChunk._stack.Push(chunk); // Ajouter les éléments à la pile corrigée
+                pileChunk.Content.Push(chunk); // Ajouter les éléments à la pile corrigée
             }
         }
 
