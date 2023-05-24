@@ -71,10 +71,10 @@ namespace Taluva.Model
         }
 
 
-        [Obsolete("Use Chunk.ToString() instead")]
+        [Obsolete("Use Chunk.ToString() instead", true)]
         public static void PrintChunkToString(Chunk c) => Console.WriteLine(c);
 
-        [Obsolete("Use Chunk.ListToString(List<Chunk>) instead")]
+        [Obsolete("Use Chunk.ListToString(List<Chunk>) instead", true)]
         public static void PrintChunkList(List<Chunk> l) => Console.WriteLine(Chunk.ListToString(l));
     }
 }
