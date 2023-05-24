@@ -20,7 +20,10 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     public const float xOffset = 1.5f, yOffset = .41f, zOffset = 1.73205f;
 
     [SerializeField]
-    private Transform boardParent;
+    private Transform boardParent, propsParent;
+
+    public Transform BoardParent => boardParent;
+    public Transform PropsParent => propsParent;
 
     private GameObject _currentFf;
     private GameObject[] _currentPreviews;
@@ -62,6 +65,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     [SerializeField]
     private EditableDictionary<Biomes, GameObject> biomeProps;
+    public EditableDictionary<Biomes, GameObject> BiomeProps => biomeProps;
 
     private void Update()
     {
@@ -171,7 +175,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             Vector3 propsPos = V2IToV3(coord);
             Vector3 propsRot = V2IToEul(coord);
             
-            Instantiate(biomeProps[c.CurrentBiome], propsPos, Quaternion.Euler(propsRot), boardParent);
+            Instantiate(biomeProps[c.CurrentBiome], propsPos, Quaternion.Euler(propsRot), propsParent);
         }
     }
 
@@ -379,7 +383,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             GameMgr.Instance.Phase2(_gos[_currentFf].Point, _currentBuild);
     }
 
-    private static Vector3 V2IToV3(Vector2Int v)
+    public static Vector3 V2IToV3(Vector2Int v)
     {
         Vector3 v3 = new(v.x, 0, v.y);
         if (!GameMgr.Instance.IsVoid(v))
@@ -392,7 +396,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         return v3;
     }
 
-    private static Vector3 V2IToEul(Vector2Int v) => new(270,
+    public static Vector3 V2IToEul(Vector2Int v) => new(270,
         GameMgr.Instance.IsVoid(v) ? 270 : GameMgr.Instance.gameBoard.WorldMap[v].ParentChunk.Rotation.YDegree(),
         GameMgr.Instance.CellPositionInChunk(v) switch { 1 => -120, 2 => 120, _ => 0 });
 
@@ -511,10 +515,18 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         return boardParent.Cast<Transform>().FirstOrDefault(t => t.position == v3);
     }
 
+    public Transform FindProps(Vector2Int pos)
+    {
+        Vector3 v3 = V2IToV3(pos);
+
+        return propsParent.Cast<Transform>().FirstOrDefault(t => t.position == v3);
+    }
+
     private void ClearHouseAndBiomes(Vector2Int[] posChunk, int cell)
     {
-        Transform c = FindObject(posChunk[cell]);
-        Destroy(c.gameObject);
+        Transform c = FindProps(posChunk[cell]);
+        if(c != null)
+            Destroy(c.gameObject);
         if (cell != 0)
         {
             c = FindObject(posChunk[cell]);
