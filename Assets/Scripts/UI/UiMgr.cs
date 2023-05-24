@@ -180,9 +180,9 @@ namespace UI
 
         public void UpdateCurrentPlayerBuild()
         {
-            currentPlayerBuildCount[0].text = GameMgr.Instance.actualPlayer.NbBarrack.ToString();
-            currentPlayerBuildCount[1].text = GameMgr.Instance.actualPlayer.NbTowers.ToString();
-            currentPlayerBuildCount[2].text = GameMgr.Instance.actualPlayer.NbTemple.ToString();
+            currentPlayerBuildCount[0].text = GameMgr.Instance.CurrentPlayer.NbBarrack.ToString();
+            currentPlayerBuildCount[1].text = GameMgr.Instance.CurrentPlayer.NbTowers.ToString();
+            currentPlayerBuildCount[2].text = GameMgr.Instance.CurrentPlayer.NbTemple.ToString();
         }
 
         public void Next()
@@ -196,7 +196,7 @@ namespace UI
 
         public void MoveSuggestion()
         {
-            AIRandom ai = new(GameMgr.Instance.ActualPlayer.ID, GameMgr.Instance);
+            AIRandom ai = new(GameMgr.Instance.CurrentPlayer.ID, GameMgr.Instance);
 
             switch (GameMgr.Instance.actualPhase)
             {
@@ -245,7 +245,7 @@ namespace UI
             foreach ((MeshRenderer mr, Building b) in builds.transform.Cast<Transform>()
                          .Select((t, i) => (t.GetComponentInChildren<MeshRenderer>(), (Building) i + 1)))
             {
-                mr.materials[TilesMgr.BuildOwnerMatIndex[b]].color = GameMgr.Instance.ActualPlayer.IdColor;
+                mr.materials[TilesMgr.BuildOwnerMatIndex[b]].color = GameMgr.Instance.CurrentPlayer.IdColor;
             }
 
             UpdateTiles();
@@ -278,7 +278,7 @@ namespace UI
             }).Invoke(coup);
 
 
-            while (GameMgr.Instance.actualPlayer is AI)
+            while (GameMgr.Instance.CurrentPlayer is AI)
             {
                 coup = GameMgr.Instance.Undo();
 

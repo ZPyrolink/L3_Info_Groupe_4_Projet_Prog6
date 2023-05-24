@@ -71,7 +71,7 @@ namespace TestsTaluva
 
             _gm.Undo();
             Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.None);
-            Assert.AreEqual(20, _gm.actualPlayer.NbBarrack);
+            Assert.AreEqual(20, _gm.CurrentPlayer.NbBarrack);
 
             _gm.actualChunk = _gm.pile.Draw();
             _gm.ValidateTile(new(new(0, 1), new[] { false, false, false, true, false, false }), Rotation.S);
@@ -106,7 +106,7 @@ namespace TestsTaluva
             _gm.NextPlayer();
 
             Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.Barrack);
-            Assert.AreEqual(19, _gm.actualPlayer.NbBarrack);
+            Assert.AreEqual(19, _gm.CurrentPlayer.NbBarrack);
 
             _gm.actualChunk = _gm.pile.Draw();
             _gm.ValidateTile(new(new(0, 1), new[] { false, false, false, true, false, false }), Rotation.S);
@@ -117,7 +117,7 @@ namespace TestsTaluva
             _gm.Undo();  
             _gm.Redo();
             Assert.AreEqual(46, _gm.pile._stack.Count);
-            Assert.AreEqual(18, _gm.actualPlayer.NbBarrack);
+            Assert.AreEqual(18, _gm.CurrentPlayer.NbBarrack);
         }
 
         [Test]

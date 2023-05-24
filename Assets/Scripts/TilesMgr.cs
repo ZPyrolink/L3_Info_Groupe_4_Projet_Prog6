@@ -130,7 +130,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     public void PreviewBuild(Vector2Int pos, Building b)
     {
-        PutAiBuild(GameMgr.Instance.FindBiomesAroundVillage(pos).ToArray(), b, GameMgr.Instance.ActualPlayer, true);
+        PutAiBuild(GameMgr.Instance.FindBiomesAroundVillage(pos).ToArray(), b, GameMgr.Instance.CurrentPlayer, true);
     }
 
     public void ValidateTile(bool sendToLogic = true)
@@ -266,7 +266,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     public bool CurrentPreviewsNotNull => _currentPreviews != null;
 
-    private void PutBuild(Vector3 _) => PutBuild(GameMgr.Instance.actualPlayer.ID.GetColor());
+    private void PutBuild(Vector3 _) => PutBuild(GameMgr.Instance.CurrentPlayer.IdColor);
 
     private void PutBuild(Color color, Vector2Int? position = null)
     {
@@ -499,7 +499,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     public void SetFeedForwards1()
     {
         ClearFeedForward();
-        if (GameMgr.Instance.ActualPlayer is AI)
+        if (GameMgr.Instance.CurrentPlayer is AI)
             return;
 
         foreach (PointRotation pr in GameMgr.Instance.ChunkSlots())
@@ -520,8 +520,8 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         Vector2Int[] poss = build switch
         {
             Building.Barrack => GameMgr.Instance.BarracksSlots(),
-            Building.Tower => GameMgr.Instance.TowerSlots(GameMgr.Instance.actualPlayer),
-            Building.Temple => GameMgr.Instance.TempleSlots(GameMgr.Instance.actualPlayer)
+            Building.Tower => GameMgr.Instance.TowerSlots(GameMgr.Instance.CurrentPlayer),
+            Building.Temple => GameMgr.Instance.TempleSlots(GameMgr.Instance.CurrentPlayer)
         };
 
         foreach (Vector2Int p in poss)
@@ -531,7 +531,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     public GameObject SetFeedForward(Vector3 pos, Vector3 euler)
     {
         GameObject go = Instantiate(feedForward, pos, Quaternion.Euler(euler), feedForwardParent);
-        go.GetComponent<MeshRenderer>().materials[1].color = GameMgr.Instance.actualPlayer.ID.GetColor();
+        go.GetComponent<MeshRenderer>().materials[1].color = GameMgr.Instance.CurrentPlayer.IdColor;
         return go;
     }
 

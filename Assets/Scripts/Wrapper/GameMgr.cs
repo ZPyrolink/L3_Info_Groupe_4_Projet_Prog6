@@ -113,7 +113,7 @@ namespace Wrapper
             {
                 if (TilesMgr.Instance != null)
                 {
-                    TilesMgr.Instance.ReputBuild(pos, b, Instance.actualPlayer);
+                    TilesMgr.Instance.ReputBuild(pos, b, Instance.CurrentPlayer);
                 }
             };
 
@@ -176,7 +176,7 @@ namespace Wrapper
                         Instance.AiBuild();
                         break;
                     case TurnPhase.PlaceBuilding:
-                        TilesMgr.Instance.PutAiBuild(aiMove.BoardPos, aiMove.Build, Instance.actualPlayer);
+                        TilesMgr.Instance.PutAiBuild(aiMove.BoardPos, aiMove.Build, Instance.CurrentPlayer);
                         Instance.ContinueAi();
                         break;
                 }

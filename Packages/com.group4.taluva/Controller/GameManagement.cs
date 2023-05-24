@@ -26,10 +26,11 @@ namespace Taluva.Controller
 
         public Player[] Players { get; set; }
 
-        [Obsolete("use ActualPlayer instead")] public Player actualPlayer => ActualPlayer;
-        public Player ActualPlayer => Players[ActualPlayerIndex];
+        [Obsolete("use CurrentPlayer instead", true)]
+        public Player actualPlayer => CurrentPlayer;
+        public Player CurrentPlayer => Players[ActualPlayerIndex];
         public Player PreviousPlayer => Players[Math.Abs((ActualPlayerIndex - 1) % NbPlayers)];
-        private AI ActualAi => (AI)actualPlayer;
+        private AI ActualAi => (AI)CurrentPlayer;
         public int NbPlayers { get; private set; }
         public int ActualPlayerIndex { get; private set; }
 
@@ -577,7 +578,7 @@ namespace Taluva.Controller
                     b = pioche;
                     PlayerEliminated();
 
-                    if (ActualPlayer.Eliminated)
+                    if (CurrentPlayer.Eliminated)
                     {
                         actualPhase = TurnPhase.NextPlayer;
                         InitPlay(b);
@@ -614,7 +615,7 @@ namespace Taluva.Controller
                     for (int i = 0; i < c.cells.Length; i++)
                     {
                         gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
-                        gameBoard.PlaceBuilding(c.cells[i], c.building[i], ActualPlayer, false);
+                        gameBoard.PlaceBuilding(c.cells[i], c.building[i], CurrentPlayer, false);
                     }
                 }
 
@@ -642,13 +643,13 @@ namespace Taluva.Controller
                         case Building.None:
                             break;
                         case Building.Temple:
-                            ActualPlayer.NbTemple++;
+                            CurrentPlayer.NbTemple++;
                             break;
                         case Building.Tower:
-                            ActualPlayer.NbTowers++;
+                            CurrentPlayer.NbTowers++;
                             break;
                         case Building.Barrack:
-                            ActualPlayer.NbBarrack += gameBoard.WorldMap[c.positions[i]].ParentChunk.Level;
+                            CurrentPlayer.NbBarrack += gameBoard.WorldMap[c.positions[i]].ParentChunk.Level;
                             break;
                     }
 
@@ -673,7 +674,7 @@ namespace Taluva.Controller
                 for (int i = 0; i < c.cells.Length; i++)
                 {
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
-                    gameBoard.PlaceBuilding(c.cells[i], c.building[i], ActualPlayer);
+                    gameBoard.PlaceBuilding(c.cells[i], c.building[i], CurrentPlayer);
                 }
 
                 actualPhase = TurnPhase.NextPlayer;
@@ -691,7 +692,7 @@ namespace Taluva.Controller
                 }
             }
 
-            if (actualPlayer is AI ai && AIMode)
+            if (CurrentPlayer is AI && AIMode)
             {
                 actualPhase = TurnPhase.IAPlays;
                 AiChunk();
@@ -860,7 +861,7 @@ namespace Taluva.Controller
             {
                 NextPlayer();
 
-                while (ActualPlayer.Eliminated)
+                while (CurrentPlayer.Eliminated)
                 {
                     NextPlayer();
                 }
@@ -869,7 +870,7 @@ namespace Taluva.Controller
             if (pioche && pile.NbKeeping > 0)
                 actualChunk = pile.Draw();
 
-            if (ActualPlayer is AI)
+            if (CurrentPlayer is AI)
             {
                 if (checkIa)
                 {
@@ -893,7 +894,7 @@ namespace Taluva.Controller
         
         public void Phase1IA(Chunk c,PointRotation pr, Rotation r)
         {
-            if (gameBoard.AddChunk(c, ActualPlayer, pr, r))
+            if (gameBoard.AddChunk(c, CurrentPlayer, pr, r))
             {
                 AddHistoric(pr.point, r, c);
                 NextPhase(false,true);
@@ -915,11 +916,11 @@ namespace Taluva.Controller
 
         public void PlayerEliminated()
         {
-            if (BarracksSlots().Length == 0 && TempleSlots(ActualPlayer).Length == 0 &&
-                TowerSlots(ActualPlayer).Length == 0)
+            if (BarracksSlots().Length == 0 && TempleSlots(CurrentPlayer).Length == 0 &&
+                TowerSlots(CurrentPlayer).Length == 0)
             {
-                ActualPlayer.Eliminate();
-                OnPlayerElimination(ActualPlayer);
+                CurrentPlayer.Eliminate();
+                OnPlayerElimination(CurrentPlayer);
             }
         }
 
@@ -961,7 +962,7 @@ namespace Taluva.Controller
         {
             OnChangePhase(TurnPhase.IAPlays);
             actualPhase = TurnPhase.IAPlays;
-            PointRotation pr = ((AI)ActualPlayer).PlayChunk();
+            PointRotation pr = ((AI)CurrentPlayer).PlayChunk();
             Rotation r = Rotation.N;
             for (int i = 0; i < 6; i++)
             {
@@ -981,11 +982,11 @@ namespace Taluva.Controller
 
         public void AiBuild()
         {
-            (Building b, Vector2Int pos) = ((AI)actualPlayer).PlayBuild();
+            (Building b, Vector2Int pos) = ((AI)CurrentPlayer).PlayBuild();
             PointRotation p = new(pos);
             Cell c = gameBoard.WorldMap[p.point];
             PlayerEliminated();
-            if (!ActualPlayer.Eliminated)
+            if (!CurrentPlayer.Eliminated)
             {
                 List<Vector2Int> build = new(){pos};
                 if(b == Building.Barrack) 
@@ -1033,13 +1034,13 @@ namespace Taluva.Controller
         // }
 
         public List<Vector2Int> FindBiomesAroundVillage(Vector2Int cell) =>
-            gameBoard.FindBiomesAroundVillage(cell, ActualPlayer);
+            gameBoard.FindBiomesAroundVillage(cell, CurrentPlayer);
 
 
         public bool ValidateTile(PointRotation pr, Rotation r)
         {
             AddHistoric(pr.point, r, actualChunk);
-            return gameBoard.AddChunk(actualChunk, ActualPlayer, pr, r);
+            return gameBoard.AddChunk(actualChunk, CurrentPlayer, pr, r);
         }
 
         public bool ValidateBuilding(Cell c, Building b)
@@ -1056,7 +1057,7 @@ namespace Taluva.Controller
                 }
             }
 
-            building = gameBoard.PlaceBuilding(c, b, ActualPlayer);
+            building = gameBoard.PlaceBuilding(c, b, CurrentPlayer);
 
             if (building)
                 AddHistoric
@@ -1071,17 +1072,17 @@ namespace Taluva.Controller
 
         public Vector2Int[] BarracksSlots()
         {
-            return gameBoard.GetBarrackSlots(ActualPlayer);
+            return gameBoard.GetBarrackSlots(CurrentPlayer);
         }
 
         public Vector2Int[] TowerSlots(Player actualPlayer)
         {
-            return gameBoard.GetTowerSlots(ActualPlayer);
+            return gameBoard.GetTowerSlots(CurrentPlayer);
         }
 
         public Vector2Int[] TempleSlots(Player actualPlayer)
         {
-            return gameBoard.GetTempleSlots(ActualPlayer);
+            return gameBoard.GetTempleSlots(CurrentPlayer);
         }
 
         public PointRotation[] ChunkSlots()
