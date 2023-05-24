@@ -1466,7 +1466,7 @@ MonoBehaviour:
   feedForward: {fileID: 1639800871305748350, guid: 8de9e8e8be058844cb8b88a4c9bbb137, type: 3}
   feedForwardParent: {fileID: 897227192}
   barrack: {fileID: 919132149155446097, guid: 16751b1d9cb52f94b8c79d4879e31bab, type: 3}
-  tower: {fileID: 919132149155446097, guid: 1bfe7bae8d80166468e94a363daf2bc5, type: 3}
+  tower: {fileID: 919132149155446097, guid: 5e9bde89cb6975e4796b2cbe12301f91, type: 3}
   temple: {fileID: 919132149155446097, guid: 656e3ad17e7b78b49a62bb20d060c472, type: 3}
   materials:
   - key: 6
@@ -1490,6 +1490,18 @@ MonoBehaviour:
     value: {fileID: 2100000, guid: d601afcf187af164dae5882eaa357ccd, type: 2}
   - key: 1
     value: {fileID: 2100000, guid: 087e0f89970882944aeaea080d0a849b, type: 2}
+  biomeProps:
+    _content:
+    - _key: 3
+      _value: {fileID: 919132149155446097, guid: 4df5ed5b3742630488fb51ab881216e8, type: 3}
+    - _key: 1
+      _value: {fileID: 919132149155446097, guid: 6c3b666718d1a5c4e83cd43f77762f6d, type: 3}
+    - _key: 4
+      _value: {fileID: 919132149155446097, guid: fb73edb49f558cf4998e90a1d46a16ed, type: 3}
+    - _key: 5
+      _value: {fileID: 919132149155446097, guid: 68245385f279b5d4496990e118d06e4e, type: 3}
+    - _key: 6
+      _value: {fileID: 919132149155446097, guid: 3419185c4c04d2643802a3feec86b1bc, type: 3}
 --- !u!4 &338899226
 Transform:
   m_ObjectHideFlags: 0
