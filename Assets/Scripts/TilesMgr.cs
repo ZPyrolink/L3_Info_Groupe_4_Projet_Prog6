@@ -185,10 +185,15 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             Material tmp = mats
                 .FirstOrDefault(kv => kv.Key == coords[coordIndex].CurrentBiome)?.Value;
 
-            if (tmp is null) // ToDo: Remove when all materials are ready
+            if (tmp is null)
+            {
+                Debug.LogException(new($"The biome {coords[coordIndex].CurrentBiome} doesn't exists!"));
                 mrs[mrIndex].color = coords[coordIndex].CurrentBiome.GetColor();
+            }
             else
+            {
                 mrs[mrIndex] = tmp;
+            }
         }
 
         SetMat(0, 1);
