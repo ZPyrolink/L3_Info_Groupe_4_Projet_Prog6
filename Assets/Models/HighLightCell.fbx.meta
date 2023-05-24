@@ -12,6 +12,11 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Exterior
+    second: {fileID: 2100000, guid: 9af3ff22e24aeac45a3d8e136bc8e06b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Invisible
     second: {fileID: 2100000, guid: f72c5fd9a0f7bb5429f16b48875e1cb1, type: 2}
   materials:
