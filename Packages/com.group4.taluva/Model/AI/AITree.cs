@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Transactions;
 using Taluva.Controller;
 
 using UnityEngine;
@@ -115,7 +112,7 @@ namespace Taluva.Model.AI
         private void ComputeBestMove()
         {
             GameManagment AI_gm = new(Gm);
-            List<Chunk> possibleChunk = AI_gm.GetPossibleChunks();
+            List<Chunk> possibleChunk = new List<Chunk>(){AI_gm.CurrentChunk};
             AITurn = TreeExplore(AI_gm,possibleChunk,1,AI_gm.CurrentPlayer).Item1;
         }
 
@@ -142,14 +139,21 @@ namespace Taluva.Model.AI
         protected virtual (Turn, int) GetBest(Dictionary<Turn, int> possible)
         {
             KeyValuePair<Turn, int> max = new(null,0);
+            List<KeyValuePair<Turn,int>> possibleMax= new();
             foreach (var set in possible)
             {
                 if (set.Value > max.Value)
                 {
                     max = set;
+                    possibleMax.Clear();
                 }
+
+                if (set.Value == max.Value)
+                    possibleMax.Add(set);
             }
-            return (max.Key,max.Value);
+
+            int rand = Random.Range(0, possibleMax.Count);
+            return (possibleMax[rand].Key,possibleMax[rand].Value);
         }
     }
     

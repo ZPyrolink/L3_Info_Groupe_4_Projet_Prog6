@@ -208,7 +208,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             foreach (Vector2Int positionCell in positionChunk)
             {
                 Chunk tile = GameMgr.Instance.gameBoard.WorldMap[positionCell].ParentChunk;
-                Vector2Int posVolcano = GameMgr.Instance.gameBoard.GetCellCoord(tile.Coords[0]);
+                Vector2Int posVolcano = tile.Coords[0].position;
                 Vector2Int[] positions = GameMgr.Instance.gameBoard.GetChunksCoords(posVolcano, tile.Rotation);
                 if (!chunkRecouvert.Contains(positions))
                     chunkRecouvert.Add(positions);
@@ -509,23 +509,14 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     private void ClearHouseAndBiomes(Vector2Int[] posChunk, int cell)
     {
-        if (cell == 0)
+        Transform c = FindObject(posChunk[cell]);
+        Destroy(c.gameObject);
+        if (cell != 0)
         {
-            ClearVolcano(posChunk[0]);
-        }
-        else
-        {
-            Transform c = FindObject(posChunk[cell]);
+            c = FindObject(posChunk[cell]);
             if (c != null)
                 Destroy(c.gameObject);
         }
-    }
-
-    private void ClearVolcano(Vector2Int pos)
-    {
-        Transform chunk = FindObject(pos);
-        // TODO
-        //A finir quand les mesh seront implementer
     }
 
     public void SetFeedForwards1()
