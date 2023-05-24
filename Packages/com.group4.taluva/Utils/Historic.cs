@@ -14,7 +14,7 @@ namespace Taluva.Utils
         {
             foreach (var c in original)
             {
-                this.Add((T)c.Clone());
+                Add((T)c.Clone());
             }
         }
 

@@ -28,7 +28,7 @@ namespace UI
 
         private int NbTiles
         {
-            get => GameMgr.Instance.maxTurn;
+            get => GameMgr.Instance.KeepingTiles;
             set => uiNbTiles.text = NB_TILES_PLACEHOLDER.Replace("%nb%", value.ToString());
         }
 
@@ -146,14 +146,14 @@ namespace UI
         {
             for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
             {
-                _guis[i].GetComponent<Image>().color = i == GameMgr.Instance.ActualPlayerIndex ?
+                _guis[i].GetComponent<Image>().color = i == GameMgr.Instance.CurrentPlayerIndex ?
                     Color.white :
-                    GameMgr.Instance.players[i].Eliminated ?
+                    GameMgr.Instance.Players[i].Eliminated ?
                         new(1, 0, 0, .25f) :
                         new(.75f, .75f, .75f);
 
                 foreach (Animator anim in _guis[i].GetComponentsInChildren<Animator>())
-                    if (GameMgr.Instance.ActualPlayerIndex == i)
+                    if (GameMgr.Instance.CurrentPlayerIndex == i)
                     {
                         anim.enabled = true;
                     }
@@ -169,24 +169,24 @@ namespace UI
             for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
             {
                 _guis[i].transform.GetChild(2).GetComponentInChildren<Text>().text =
-                    GameMgr.Instance.players[i].NbBarrack.ToString();
+                    GameMgr.Instance.Players[i].NbBarrack.ToString();
                 _guis[i].transform.GetChild(3).GetComponentInChildren<Text>().text =
-                    GameMgr.Instance.players[i].NbTowers.ToString();
+                    GameMgr.Instance.Players[i].NbTowers.ToString();
                 _guis[i].transform.GetChild(4).GetComponentInChildren<Text>().text =
-                    GameMgr.Instance.players[i].NbTemple.ToString();
+                    GameMgr.Instance.Players[i].NbTemple.ToString();
             }
         }
 
         public void UpdateCurrentPlayerBuild()
         {
-            currentPlayerBuildCount[0].text = GameMgr.Instance.actualPlayer.NbBarrack.ToString();
-            currentPlayerBuildCount[1].text = GameMgr.Instance.actualPlayer.NbTowers.ToString();
-            currentPlayerBuildCount[2].text = GameMgr.Instance.actualPlayer.NbTemple.ToString();
+            currentPlayerBuildCount[0].text = GameMgr.Instance.CurrentPlayer.NbBarrack.ToString();
+            currentPlayerBuildCount[1].text = GameMgr.Instance.CurrentPlayer.NbTowers.ToString();
+            currentPlayerBuildCount[2].text = GameMgr.Instance.CurrentPlayer.NbTemple.ToString();
         }
 
         public void Next()
         {
-            (GameMgr.Instance.actualPhase switch
+            (GameMgr.Instance.CurrentPhase switch
             {
                 TurnPhase.SelectCells => (Action<bool>) TilesMgr.Instance.ValidateTile,
                 TurnPhase.PlaceBuilding => TilesMgr.Instance.ValidateBuild
@@ -195,9 +195,9 @@ namespace UI
 
         public void MoveSuggestion()
         {
-            AIRandom ai = new(GameMgr.Instance.ActualPlayer.ID, GameMgr.Instance);
+            AIRandom ai = new(GameMgr.Instance.CurrentPlayer.ID, GameMgr.Instance);
 
-            switch (GameMgr.Instance.actualPhase)
+            switch (GameMgr.Instance.CurrentPhase)
             {
                 case TurnPhase.SelectCells:
                     PointRotation p = ai.PlayChunk();
@@ -221,7 +221,7 @@ namespace UI
 
             CurrentTile.SetActive(true);
 
-            ChangeTileColor(GameMgr.Instance.actualChunk);
+            ChangeTileColor(GameMgr.Instance.CurrentChunk);
 
             currentTile.SetActive(true);
             currentTile.transform.GetChild(0).gameObject.SetActive(true);
@@ -244,7 +244,7 @@ namespace UI
             foreach ((MeshRenderer mr, Building b) in builds.transform.Cast<Transform>()
                          .Select((t, i) => (t.GetComponentInChildren<MeshRenderer>(), (Building) i + 1)))
             {
-                mr.materials[TilesMgr.BuildOwnerMatIndex[b]].color = GameMgr.Instance.ActualPlayer.IdColor;
+                mr.materials[TilesMgr.BuildOwnerMatIndex[b]].color = GameMgr.Instance.CurrentPlayer.IdColor;
             }
 
             UpdateTiles();
@@ -270,18 +270,18 @@ namespace UI
                 TilesMgr.Instance.ClearCurrentPreviews();
             GameManagment.Coup coup = GameMgr.Instance.Undo();
 
-            (GameMgr.Instance.actualPhase switch
+            (GameMgr.Instance.CurrentPhase switch
             {
                 TurnPhase.SelectCells => (Action<GameManagment.Coup>) UndoPhase1,
                 TurnPhase.PlaceBuilding => UndoPhase2
             }).Invoke(coup);
 
 
-            while (GameMgr.Instance.actualPlayer is AI)
+            while (GameMgr.Instance.CurrentPlayer is AI)
             {
                 coup = GameMgr.Instance.Undo();
 
-                (GameMgr.Instance.actualPhase switch
+                (GameMgr.Instance.CurrentPhase switch
                 {
                     TurnPhase.SelectCells => (Action<GameManagment.Coup>) UndoPhase1,
                     TurnPhase.PlaceBuilding => UndoPhase2
@@ -321,7 +321,7 @@ namespace UI
 
             GameManagment.Coup coup = GameMgr.Instance.Redo();
 
-            (GameMgr.Instance.actualPhase switch
+            (GameMgr.Instance.CurrentPhase switch
             {
                 TurnPhase.PlaceBuilding => (Action<GameManagment.Coup>) RedoPhase1,
                 TurnPhase.SelectCells => RedoPhase2,
@@ -336,7 +336,7 @@ namespace UI
         {
             // ReSharper disable once PossibleInvalidOperationException
             TilesMgr.Instance.ReputTile(coup.positions[0], (Rotation) coup.rotation);
-            if (GameMgr.Instance.actualPhase == TurnPhase.PlaceBuilding)
+            if (GameMgr.Instance.CurrentPhase == TurnPhase.PlaceBuilding)
                 TilesMgr.Instance.SetFeedForwards2(Building.Barrack);
             else
                 CurrentTile.SetActive(true);
@@ -344,7 +344,7 @@ namespace UI
 
         private void RedoPhase2(GameManagment.Coup coup)
         {
-            if (GameMgr.Instance.players[coup.playerIndex].Eliminated)
+            if (GameMgr.Instance.Players[coup.playerIndex].Eliminated)
             {
                 RedoPhase1(coup);
             }

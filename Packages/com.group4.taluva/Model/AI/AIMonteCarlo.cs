@@ -8,7 +8,7 @@ namespace Taluva.Model.AI
 {
     public class AIMonteCarlo : AITree
     {
-        public AIMonteCarlo(PlayerColor id, GameManagment gm) : base(id, gm)
+        public AIMonteCarlo(Color id, GameManagment gm) : base(id, gm)
         {
         }
 
@@ -25,7 +25,7 @@ namespace Taluva.Model.AI
         protected override int Heuristic(GameManagment AI_gm, Player previousPlayer)
         {
         int val = 0;
-                GameManagment virtualGM = new GameManagment(Gm);
+                GameManagment virtualGM = new(Gm);
                 for (int i = 0; i < 100; i++)
                 {
                     while (false) //TODO condition go on till the games end.
@@ -63,7 +63,7 @@ namespace Taluva.Model.AI
             PointRotation[] possible = board.GetChunkSlots();
             foreach (PointRotation p in possible)
             {
-                foreach (bool rot in p.rotations)
+                foreach (bool rot in p.Rotations)
                 {
                     if (rot)
                     {
@@ -77,14 +77,14 @@ namespace Taluva.Model.AI
             {
                 for (int i = 0; i<6;i++)
                 {
-                    if (p.rotations[i])
+                    if (p.Rotations[i])
                     {
                         rand--;
                     }
 
                     if (rand == 0)
                     {
-                        return new PointRotation(p.point, (Rotation)i);
+                        return new(p.Point, (Rotation)i);
                     }
                 }
             }

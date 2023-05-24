@@ -23,9 +23,9 @@ namespace TestsTaluva
         public void TestInit()
         {
             for (int i = 0; i < _cell.Length; i++) {
-                Assert.AreEqual((Biomes)i, _cell[i].ActualBiome);
+                Assert.AreEqual((Biomes)i, _cell[i].CurrentBiome);
                 Assert.IsFalse(_cell[i].ContainsBuilding());
-                if (_cell[i].ActualBiome == Biomes.Volcano || _cell[i].ActualBiome == Biomes.None) {
+                if (_cell[i].CurrentBiome == Biomes.Volcano || _cell[i].CurrentBiome == Biomes.None) {
                     Assert.IsFalse(_cell[i].IsBuildable);
                 } else {
                     Assert.IsTrue(_cell[i].IsBuildable);
@@ -37,7 +37,7 @@ namespace TestsTaluva
         public void TestToString()
         {
             for (int i = 0; i < _cell.Length; i++) {
-                switch (_cell[i].ActualBiome) {
+                switch (_cell[i].CurrentBiome) {
                     case Biomes.Desert:
                         Assert.AreEqual("D", _cell[i].ToString());
                         break;
@@ -71,12 +71,12 @@ namespace TestsTaluva
                     c.Build(Building.Barrack);
 
             foreach (Cell c in _cell) {
-                if (c.ActualBiome == Biomes.Volcano || c.ActualBiome == Biomes.None) {
-                    Assert.AreEqual(c.ActualBuildings, Building.None);
+                if (c.CurrentBiome == Biomes.Volcano || c.CurrentBiome == Biomes.None) {
+                    Assert.AreEqual(c.CurrentBuildings, Building.None);
                     Assert.IsFalse(c.ContainsBuilding());
                 }  
                 else {
-                    Assert.AreEqual(c.ActualBuildings, Building.Barrack);
+                    Assert.AreEqual(c.CurrentBuildings, Building.Barrack);
                     Assert.IsTrue(c.ContainsBuilding());
                 }   
                 Assert.IsFalse(c.IsBuildable);
@@ -94,11 +94,11 @@ namespace TestsTaluva
                     c.Build(Building.Tower);
 
             foreach (Cell c in _cell) {
-                if (c.ActualBiome == Biomes.Volcano || c.ActualBiome == Biomes.None) {
-                    Assert.AreEqual(c.ActualBuildings, Building.None);
+                if (c.CurrentBiome == Biomes.Volcano || c.CurrentBiome == Biomes.None) {
+                    Assert.AreEqual(c.CurrentBuildings, Building.None);
                     Assert.IsFalse(c.ContainsBuilding());
                 } else {
-                    Assert.AreEqual(c.ActualBuildings, Building.Tower);
+                    Assert.AreEqual(c.CurrentBuildings, Building.Tower);
                     Assert.IsTrue(c.ContainsBuilding());
                 }
                 Assert.IsFalse(c.IsBuildable);
@@ -116,11 +116,11 @@ namespace TestsTaluva
                     c.Build(Building.Temple);
 
             foreach (Cell c in _cell) {
-                if (c.ActualBiome == Biomes.Volcano || c.ActualBiome == Biomes.None) {
-                    Assert.AreEqual(c.ActualBuildings, Building.None);
+                if (c.CurrentBiome == Biomes.Volcano || c.CurrentBiome == Biomes.None) {
+                    Assert.AreEqual(c.CurrentBuildings, Building.None);
                     Assert.IsFalse(c.ContainsBuilding());
                 } else {
-                    Assert.AreEqual(c.ActualBuildings, Building.Temple);
+                    Assert.AreEqual(c.CurrentBuildings, Building.Temple);
                     Assert.IsTrue(c.ContainsBuilding());
                 }
                 Assert.IsFalse(c.IsBuildable);

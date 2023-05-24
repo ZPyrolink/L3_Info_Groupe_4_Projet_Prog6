@@ -19,7 +19,7 @@ namespace Taluva.Model
 
         public Board(Board b)
         {
-            WorldMap = new DynamicMatrix<Cell>(b.WorldMap);
+            WorldMap = new(b.WorldMap);
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Taluva.Model
         ///     <see langword="true"/> if the position is not a void and his build is not <see cref="Building.None"/>
         /// </returns>
         private bool ContainsBuild(Vector2Int pos) => !WorldMap.IsVoid(pos) &&
-                                                      WorldMap[pos].ActualBuildings != Building.None;
+                                                      WorldMap[pos].CurrentBuildings != Building.None;
 
         /// <summary>
         /// Find all the position of the village.
@@ -51,7 +51,7 @@ namespace Taluva.Model
         /// <returns>Return all the position of the village.</returns>
         public List<Vector2Int> GetVillage(Vector2Int c)
         {
-            PlayerColor color = WorldMap[c].Owner;
+            Player.Color color = WorldMap[c].Owner;
 
             bool TestNeighbor(Vector2Int neighbor) =>
                 ContainsBuild(neighbor) && WorldMap[neighbor].Owner == color;
@@ -216,7 +216,7 @@ namespace Taluva.Model
             if (leftCell.ParentChunk.Level != level || rightCell.ParentChunk.Level != level)
                 return false;
 
-            if (WorldMap[pt].ParentChunk.rotation == r)
+            if (WorldMap[pt].ParentChunk.Rotation == r)
                 return false;
 
 
@@ -225,16 +225,16 @@ namespace Taluva.Model
 
             if (leftCell.ContainsBuilding() && !rightCell.ContainsBuilding() &&
                 GetVillage(left).Count > 1)
-                return leftCell.ActualBuildings == Building.Barrack;
+                return leftCell.CurrentBuildings == Building.Barrack;
 
             if (!leftCell.ContainsBuilding() && rightCell.ContainsBuilding() &&
                 GetVillage(right).Count > 1)
-                return rightCell.ActualBuildings == Building.Barrack;
+                return rightCell.CurrentBuildings == Building.Barrack;
 
             if (leftCell.ContainsBuilding() && rightCell.ContainsBuilding())
                 if((leftCell.Owner == rightCell.Owner && GetVillage(left).Count > 2) ||
                     leftCell.Owner != rightCell.Owner && GetVillage(left).Count >= 2 && GetVillage(right).Count >= 2)
-                    return leftCell.ActualBuildings == Building.Barrack && rightCell.ActualBuildings == Building.Barrack;
+                    return leftCell.CurrentBuildings == Building.Barrack && rightCell.CurrentBuildings == Building.Barrack;
 
 
             return false;
@@ -260,7 +260,7 @@ namespace Taluva.Model
             foreach (Cell c in WorldMap)
             {
                 Vector2Int p = GetCellCoord(c);
-                if (c.ActualBiome == Biomes.Volcano)
+                if (c.CurrentBiome == Biomes.Volcano)
                     slots.Add(p);
 
                 Vector2Int[] neighbors = GetNeighbors(p);
@@ -282,7 +282,7 @@ namespace Taluva.Model
             {
                 if (!WorldMap.IsVoid(pt))
                 {
-                    if (WorldMap[pt].ActualBiome == Biomes.Volcano)
+                    if (WorldMap[pt].CurrentBiome == Biomes.Volcano)
                         continue;
 
                     pointRemove.Add(pt);
@@ -341,7 +341,7 @@ namespace Taluva.Model
         /// <param name="right">Right position of the cell</param>
         private void AddCell(Chunk c, PointRotation p, Vector2Int left, Vector2Int right)
         {
-            WorldMap.Add(c.Coords[0], p.point);
+            WorldMap.Add(c.Coords[0], p.Point);
             WorldMap.Add(c.Coords[1], left);
             WorldMap.Add(c.Coords[2], right);
         }
@@ -357,32 +357,32 @@ namespace Taluva.Model
         public bool AddChunk(Chunk c, Player player, PointRotation p, Rotation r)
         {
             if (!GetChunkSlots()
-                    .Where(pr => pr.point.Equals(p.point))
-                    .Any(pr => pr.rotations.Where((t, i) => t == p.rotations[i]).Any())) {
+                    .Where(pr => pr.Point.Equals(p.Point))
+                    .Any(pr => pr.Rotations.Where((t, i) => t == p.Rotations[i]).Any())) {
                 return false;
             }
 
-            if (!WorldMap.IsVoid(p.point))
-                c.Level = WorldMap[p.point].ParentChunk.Level + 1;
+            if (!WorldMap.IsVoid(p.Point))
+                c.Level = WorldMap[p.Point].ParentChunk.Level + 1;
 
             player.LastChunk = c;
 
-            Vector2Int[] neighbors = GetNeighbors(p.point);
+            Vector2Int[] neighbors = GetNeighbors(p.Point);
 
-            if (p.rotations[(int) Rotation.N] && r == Rotation.N)
+            if (p.Rotations[(int) Rotation.N] && r == Rotation.N)
                 AddCell(c, p, neighbors[0], neighbors[5]);
-            else if (p.rotations[(int) Rotation.S] && r == Rotation.S)
+            else if (p.Rotations[(int) Rotation.S] && r == Rotation.S)
                 AddCell(c, p, neighbors[3], neighbors[2]);
-            else if (p.rotations[(int) Rotation.NE] && r == Rotation.NE)
+            else if (p.Rotations[(int) Rotation.NE] && r == Rotation.NE)
                 AddCell(c, p, neighbors[1], neighbors[0]);
-            else if (p.rotations[(int) Rotation.SE] && r == Rotation.SE)
+            else if (p.Rotations[(int) Rotation.SE] && r == Rotation.SE)
                 AddCell(c, p, neighbors[2], neighbors[1]);
-            else if (p.rotations[(int) Rotation.SW] && r == Rotation.SW)
+            else if (p.Rotations[(int) Rotation.SW] && r == Rotation.SW)
                 AddCell(c, p, neighbors[4], neighbors[3]);
-            else if (p.rotations[(int) Rotation.NW] && r == Rotation.NW)
+            else if (p.Rotations[(int) Rotation.NW] && r == Rotation.NW)
                 AddCell(c, p, neighbors[5], neighbors[4]);
 
-            c.rotation = r;
+            c.Rotation = r;
             return true;
         }
 
@@ -449,7 +449,7 @@ namespace Taluva.Model
         {
             List<List<Vector2Int>> allVillages = GetAllVillage(cell);
             List<Vector2Int> sameBiome = new() { cell };
-            Biomes biomes = WorldMap[cell].ActualBiome;
+            Biomes biomes = WorldMap[cell].CurrentBiome;
 
             sameBiome.AddRange(allVillages
                 // On ne garde que les villages du joueur
@@ -459,10 +459,10 @@ namespace Taluva.Model
                 // On récupère la liste de tous les voisins qui ne sont pas vides et n'ont pas de builds
                 .SelectMany(
                     neighbors => neighbors
-                        .Where(n => !WorldMap.IsVoid(n) && WorldMap[n].ActualBuildings == Building.None),
+                        .Where(n => !WorldMap.IsVoid(n) && WorldMap[n].CurrentBuildings == Building.None),
                     (_, neighbor) => neighbor)
                 // On ne garde que les villages qui ont le bon biome et qui n'est pas déjà enregistré
-                .Where(n => WorldMap[n].ActualBiome == biomes && !sameBiome.Contains(n)));
+                .Where(n => WorldMap[n].CurrentBiome == biomes && !sameBiome.Contains(n)));
 
             return sameBiome;
         }
@@ -474,8 +474,8 @@ namespace Taluva.Model
         public Vector2Int[] GetBarrackSlots(Player player) => WorldMap
             .Select(GetCellCoord)
             .Where(p => !WorldMap.IsVoid(p) && (WorldMap[p].ParentChunk.Level == 1 || IsAdjacentToCity(p, player)) 
-                        && WorldMap[p].ActualBuildings == Building.None &&
-                        WorldMap[p].ActualBiome != Biomes.Volcano && WorldMap[p].ParentChunk.Level <= player.NbBarrack)
+                        && WorldMap[p].CurrentBuildings == Building.None &&
+                        WorldMap[p].CurrentBiome != Biomes.Volcano && WorldMap[p].ParentChunk.Level <= player.NbBarrack)
             .ToArray();
 
         /// <summary>
@@ -485,7 +485,7 @@ namespace Taluva.Model
         /// <returns>Return the possible position for a tower for the player actualPlayer</returns>
         public Vector2Int[] GetTowerSlots(Player actualPlayer) => WorldMap
             .Select(GetCellCoord)
-            .Where(p => !WorldMap.IsVoid(p) && WorldMap[p].ActualBuildings == Building.None && WorldMap[p].IsBuildable)
+            .Where(p => !WorldMap.IsVoid(p) && WorldMap[p].CurrentBuildings == Building.None && WorldMap[p].IsBuildable)
             .Where(p => WorldMap[p].ParentChunk.Level >= 3)
             .Where(p => IsAdjacentToCity(p, actualPlayer))
             .Where(p => !GetAllVillage(p)
@@ -512,7 +512,7 @@ namespace Taluva.Model
         /// <param name="village">Position of the different building of the village</param>
         /// <returns>Return if the village has a tower</returns>
         public bool CityHasTower(List<Vector2Int> village) =>
-            village.Any(vp => WorldMap[vp].ActualBuildings == Building.Tower);
+            village.Any(vp => WorldMap[vp].CurrentBuildings == Building.Tower);
 
         /// <summary>
         /// Find all the slots for the temple
@@ -560,7 +560,7 @@ namespace Taluva.Model
         /// <param name="village">Position of the different building of the village</param>
         /// <returns>Return if the city has a temple</returns>
         public bool CityHasTemple(List<Vector2Int> village) =>
-            village.Any(vp => WorldMap[vp].ActualBuildings == Building.Temple);
+            village.Any(vp => WorldMap[vp].CurrentBuildings == Building.Temple);
 
         /// <summary>
         /// Find the position of a cell.
@@ -584,7 +584,7 @@ namespace Taluva.Model
 
         public void SetChunkLevel(PointRotation pr)
         {
-            WorldMap[pr.point].ParentChunk.Level++;
+            WorldMap[pr.Point].ParentChunk.Level++;
         }
     }
 }

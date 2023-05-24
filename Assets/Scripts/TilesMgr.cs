@@ -76,7 +76,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         {
             case "Feed Forward":
                 _currentFf = hit.transform.gameObject;
-                (GameMgr.Instance.actualPhase switch
+                (GameMgr.Instance.CurrentPhase switch
                 {
                     TurnPhase.SelectCells => (Action<Vector3>) PutTile,
                     TurnPhase.PlaceBuilding => PutBuild
@@ -99,7 +99,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             _currentPreviews[0].transform.localScale = new(100, 100, 100);
             _currentPreviews[0].layer = LayerMask.NameToLayer("Default");
 
-            ChangeTileColor(GameMgr.Instance.ActualChunk, _currentPreviews[0].GetComponent<MeshRenderer>(),
+            ChangeTileColor(GameMgr.Instance.CurrentChunk, _currentPreviews[0].GetComponent<MeshRenderer>(),
                 transparentMaterials);
         }
 
@@ -109,11 +109,11 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         {
             _currentPreviews[0].transform.position = pos;
             _currentPreviews[0].transform.rotation = Quaternion.Euler(270,
-                _gos == null ? 270 : ((Rotation) Array.IndexOf(_gos[_currentFf].rotations, true)).YDegree(),
+                _gos == null ? 270 : ((Rotation) Array.IndexOf(_gos[_currentFf].Rotations, true)).YDegree(),
                 0);
         }
 
-        UiMgr.Instance.InteractiveValidate = GameMgr.Instance.actualPhase != TurnPhase.IAPlays;
+        UiMgr.Instance.InteractiveValidate = GameMgr.Instance.CurrentPhase != TurnPhase.IAPlays;
     }
 
     public void PreviewTile(PointRotation pos)
@@ -125,17 +125,17 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                 r = (Rotation) i;
         }
 
-        PutAiTile(pos.Point, V2IToV3(pos.Point), r, GameMgr.Instance.ActualChunk, true);
+        PutAiTile(pos.Point, V2IToV3(pos.Point), r, GameMgr.Instance.CurrentChunk, true);
     }
 
     public void PreviewBuild(Vector2Int pos, Building b)
     {
-        PutAiBuild(GameMgr.Instance.FindBiomesAroundVillage(pos).ToArray(), b, GameMgr.Instance.ActualPlayer, true);
+        PutAiBuild(GameMgr.Instance.FindBiomesAroundVillage(pos).ToArray(), b, GameMgr.Instance.CurrentPlayer, true);
     }
 
     public void ValidateTile(bool sendToLogic = true)
     {
-        ChangeTileColor(GameMgr.Instance.ActualChunk, _currentPreviews[0].GetComponent<MeshRenderer>(), materials);
+        ChangeTileColor(GameMgr.Instance.CurrentChunk, _currentPreviews[0].GetComponent<MeshRenderer>(), materials);
 
         Rotation rot = RotationExt.Of(Mathf.Round(_currentPreviews[0].transform.rotation.eulerAngles.y));
 
@@ -144,7 +144,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
         _currentPreviews = null;
         if (sendToLogic)
-            GameMgr.Instance.Phase1(new(_gos[_currentFf].point, rot), rot);
+            GameMgr.Instance.Phase1(new(_gos[_currentFf].Point, rot), rot);
     }
 
     public static void ChangeTileColor(Chunk chunk, MeshRenderer mr, List<KeyValueS<Biomes, Material>> mats)
@@ -155,10 +155,10 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         void SetMat(int mrIndex, int coordIndex)
         {
             Material tmp = mats
-                .FirstOrDefault(kv => kv.Key == coords[coordIndex].ActualBiome)?.Value;
+                .FirstOrDefault(kv => kv.Key == coords[coordIndex].CurrentBiome)?.Value;
 
             if (tmp is null) // ToDo: Remove when all materials are ready
-                mrs[mrIndex].color = coords[coordIndex].ActualBiome.GetColor();
+                mrs[mrIndex].color = coords[coordIndex].CurrentBiome.GetColor();
             else
                 mrs[mrIndex] = tmp;
         }
@@ -266,7 +266,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     public bool CurrentPreviewsNotNull => _currentPreviews != null;
 
-    private void PutBuild(Vector3 _) => PutBuild(GameMgr.Instance.actualPlayer.ID.GetColor());
+    private void PutBuild(Vector3 _) => PutBuild(GameMgr.Instance.CurrentPlayer.IdColor);
 
     private void PutBuild(Color color, Vector2Int? position = null)
     {
@@ -317,7 +317,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             }
 
             _currentPreviews[i].transform.position = _gos
-                .First(go => go.Value.point == tmp[i])
+                .First(go => go.Value.Point == tmp[i])
                 .Key.transform.position;
 
             _currentPreviews[i].transform.rotation = Quaternion.Euler(V2IToEul(tmp[i]));
@@ -326,7 +326,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         for (int i = tmp.Count; i < _currentPreviews.Length; i++)
             Destroy(_currentPreviews[i]);
 
-        UiMgr.Instance.InteractiveValidate = GameMgr.Instance.actualPhase != TurnPhase.IAPlays;
+        UiMgr.Instance.InteractiveValidate = GameMgr.Instance.CurrentPhase != TurnPhase.IAPlays;
     }
 
     public void ValidateBuild(bool sendToLogic = true)
@@ -342,7 +342,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
         _currentPreviews = null;
         if (sendToLogic)
-            GameMgr.Instance.Phase2(_gos[_currentFf].point, _currentBuild);
+            GameMgr.Instance.Phase2(_gos[_currentFf].Point, _currentBuild);
     }
 
     private static Vector3 V2IToV3(Vector2Int v)
@@ -445,7 +445,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             }
 
             _currentPreviews[i].transform.position = _gos
-                .First(go => go.Value.point == pos[i])
+                .First(go => go.Value.Point == pos[i])
                 .Key.transform.position;
         }
 
@@ -468,7 +468,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         {
             _currentPreviews[0].transform.Rotate(new(0, 360f / 6, 0), Space.World);
             rot = RotationExt.Of(Mathf.Round(_currentPreviews[0].transform.rotation.eulerAngles.y));
-        } while (_gos?[_currentFf]?.rotations?[(int) rot] == false);
+        } while (_gos?[_currentFf]?.Rotations?[(int) rot] == false);
     }
 
     public Transform FindObject(Vector2Int pos)
@@ -502,7 +502,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     public void SetFeedForwards1()
     {
         ClearFeedForward();
-        if (GameMgr.Instance.ActualPlayer is AI)
+        if (GameMgr.Instance.CurrentPlayer is AI)
             return;
 
         foreach (PointRotation pr in GameMgr.Instance.ChunkSlots())
@@ -523,8 +523,8 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         Vector2Int[] poss = build switch
         {
             Building.Barrack => GameMgr.Instance.BarracksSlots(),
-            Building.Tower => GameMgr.Instance.TowerSlots(GameMgr.Instance.actualPlayer),
-            Building.Temple => GameMgr.Instance.TempleSlots(GameMgr.Instance.actualPlayer)
+            Building.Tower => GameMgr.Instance.TowerSlots(GameMgr.Instance.CurrentPlayer),
+            Building.Temple => GameMgr.Instance.TempleSlots(GameMgr.Instance.CurrentPlayer)
         };
 
         foreach (Vector2Int p in poss)
@@ -534,7 +534,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     public GameObject SetFeedForward(Vector3 pos, Vector3 euler)
     {
         GameObject go = Instantiate(feedForward, pos, Quaternion.Euler(euler), feedForwardParent);
-        go.GetComponent<MeshRenderer>().materials[1].color = GameMgr.Instance.actualPlayer.ID.GetColor();
+        go.GetComponent<MeshRenderer>().materials[1].color = GameMgr.Instance.CurrentPlayer.IdColor;
         return go;
     }
 

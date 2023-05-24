@@ -77,7 +77,7 @@ namespace Wrapper
             
             if (Instance.gameBoard.WorldMap.Empty)
                 Instance.InitPlay();
-            else if (Instance.actualPhase == TurnPhase.PlaceBuilding)
+            else if (Instance.CurrentPhase == TurnPhase.PlaceBuilding)
                 Instance.InitPlay(false, false);
             else
                 Instance.InitPlay(true, false);
@@ -113,22 +113,22 @@ namespace Wrapper
             {
                 if (TilesMgr.Instance != null)
                 {
-                    TilesMgr.Instance.ReputBuild(pos, b, Instance.actualPlayer);
+                    TilesMgr.Instance.ReputBuild(pos, b, Instance.CurrentPlayer);
                 }
             };
 
             Instance.NotifyAIChunkPlacement = pr =>
             {
-                Vector3 p = new Vector3(pr.point.x, 0, pr.point.y);
-                if (!Instance.IsVoid(pr.point))
-                    p.y = Instance.LevelAt(pr.point) * TilesMgr.yOffset;
+                Vector3 p = new Vector3(pr.Point.x, 0, pr.Point.y);
+                if (!Instance.IsVoid(pr.Point))
+                    p.y = Instance.LevelAt(pr.Point) * TilesMgr.yOffset;
                 p.Scale(new Vector3(TilesMgr.xOffset, 1, TilesMgr.zOffset));
 
-                if (pr.point.x % 2 != 0)
+                if (pr.Point.x % 2 != 0)
                     p.z += TilesMgr.zOffset / 2;
         
-                _aiMoves.Enqueue(new AiMove(new[] { pr.point }, p, (Rotation)Array.IndexOf(pr.rotations, true),
-                    Instance.actualChunk));
+                _aiMoves.Enqueue(new AiMove(new[] { pr.Point }, p, (Rotation)Array.IndexOf(pr.Rotations, true),
+                    Instance.CurrentChunk));
                 if (!_coroutineStarted)
                     StartCoroutine(CTemporateAi());
             };
@@ -154,7 +154,7 @@ namespace Wrapper
             {
                 TurnPhase.SelectCells => (Action) ui.Phase1,
                 TurnPhase.PlaceBuilding => ui.Phase2,
-                _ => () => Debug.LogWarning($"The {Instance.actualPhase} is not implemented!")
+                _ => () => Debug.LogWarning($"The {Instance.CurrentPhase} is not implemented!")
             }).Invoke();
         }
 
@@ -176,7 +176,7 @@ namespace Wrapper
                         Instance.AiBuild();
                         break;
                     case TurnPhase.PlaceBuilding:
-                        TilesMgr.Instance.PutAiBuild(aiMove.BoardPos, aiMove.Build, Instance.actualPlayer);
+                        TilesMgr.Instance.PutAiBuild(aiMove.BoardPos, aiMove.Build, Instance.CurrentPlayer);
                         Instance.ContinueAi();
                         break;
                 }

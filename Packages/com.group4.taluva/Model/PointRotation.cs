@@ -9,16 +9,18 @@ namespace Taluva.Model
     public class PointRotation
     {
         public Vector2Int Point { get; }
-        [Obsolete("Use Point instead")] public Vector2Int point => Point;
+        [Obsolete("Use Point instead", true)]
+        public Vector2Int point => Point;
         public bool[] Rotations { get; }
-        [Obsolete("Use Rotation instead")] public bool[] rotations => Rotations;
+        [Obsolete("Use Rotation instead", true)]
+        public bool[] rotations => Rotations;
 
         public PointRotation(Vector2Int point)
         {
             Point = point;
             Rotations = new bool[6];
-            for (int i = 0; i < rotations.Length; i++)
-                this.rotations[i] = false;
+            for (int i = 0; i < Rotations.Length; i++)
+                Rotations[i] = false;
         }
 
         public PointRotation(Vector2Int point, bool[] rot) : this(point)
@@ -28,36 +30,36 @@ namespace Taluva.Model
 
         public PointRotation(Vector2Int point, Rotation rot) : this(point)
         {
-            rotations[(int) rot] = true;
+            Rotations[(int) rot] = true;
         }
 
-        public bool RotationEquals(PointRotation rotations) => !this.rotations
+        public bool RotationEquals(PointRotation rotations) => !Rotations
             // On ne garde que les rotations qui sont différentes
-            .Where((t, i) => t != rotations.rotations[i])
+            .Where((t, i) => t != rotations.Rotations[i])
             // On regardes s'il en existe un
             .Any();
 
-        public bool HaveRotation() => rotations.Any(b => b);
+        public bool HaveRotation() => Rotations.Any(b => b);
 
         public void SetAllTrue()
         {
-            for (int i = 0; i < rotations.Length; i++)
-                rotations[i] = true;
+            for (int i = 0; i < Rotations.Length; i++)
+                Rotations[i] = true;
         }
 
         public void AddRotation(Rotation r)
         {
-            rotations[(int) r] = true;
+            Rotations[(int) r] = true;
         }
 
-        [Obsolete("Use ToString() instead")]
+        [Obsolete("Use ToString() instead", true)]
         public string RotationString() => ToString();
 
         public override string ToString()
         {
             StringBuilder sb = new();
-            for (int i = 0; i < rotations.Length; i++)
-                if (rotations[i])
+            for (int i = 0; i < Rotations.Length; i++)
+                if (Rotations[i])
                     sb.Append((Rotation) i switch
                     {
                         Rotation.N => sb.Append("N"),
