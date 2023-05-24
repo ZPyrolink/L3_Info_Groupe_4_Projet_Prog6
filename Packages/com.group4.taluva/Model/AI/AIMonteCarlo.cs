@@ -25,7 +25,7 @@ namespace Taluva.Model.AI
         protected override int Heuristic(GameManagment AI_gm, Player previousPlayer)
         {
         int val = 0;
-                GameManagment virtualGM = new GameManagment(Gm);
+                GameManagment virtualGM = new(Gm);
                 for (int i = 0; i < 500; i++)
                 {
                     while (false) //TODO condition go on till the games end.
@@ -75,7 +75,7 @@ namespace Taluva.Model.AI
 
                     if (rand == 0)
                     {
-                        return new PointRotation(p.Point, (Rotation)i);
+                        return new(p.Point, (Rotation)i);
                     }
                 }
             }

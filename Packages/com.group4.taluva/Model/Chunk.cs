@@ -30,10 +30,8 @@ namespace Taluva.Model
         {
             Coords = new Cell[3];
             Coords[0] = new(Biomes.Volcano, this);
-            Coords[1] = new Cell(c.Coords[1].CurrentBiome); 
-            Coords[1].ParentChunk = this;
-            Coords[2] = new Cell(c.Coords[2].CurrentBiome);
-            Coords[2].ParentChunk = this;
+            Coords[1] = new(c.Coords[1].CurrentBiome) { ParentChunk = this };
+            Coords[2] = new(c.Coords[2].CurrentBiome) { ParentChunk = this };
             if (building)
             {
                 Coords[1].Owner = c.Coords[1].Owner;
@@ -41,15 +39,17 @@ namespace Taluva.Model
                 Coords[2].Owner = c.Coords[2].Owner;
                 Coords[2].CurrentBuildings = c.Coords[2].CurrentBuildings;
             }
+
             Level = c.Level;
         }
 
-        public Object Clone()
+        public object Clone()
         {
             return new Chunk(this);
         }
 
-        public override string ToString() => $"{Coords[0].CurrentBiome}, {Coords[1].CurrentBiome}, {Coords[2].CurrentBiome}";
+        public override string ToString() =>
+            $"{Coords[0].CurrentBiome}, {Coords[1].CurrentBiome}, {Coords[2].CurrentBiome}";
 
         public static string ListToString(IEnumerable<Chunk> l) => string.Join("\n", l);
     }

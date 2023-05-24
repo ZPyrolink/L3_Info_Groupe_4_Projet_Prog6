@@ -44,7 +44,7 @@ namespace Taluva.Model.AI
             if (depth <= 0 || AI_gm.CheckWinner() != null)
                 return (null,Heuristic(AI_gm,previousPlayer));
             PointRotation[] possibleChunk = AI_gm.gameBoard.GetChunkSlots();
-            Dictionary<Turn, int> possiblePlay = new Dictionary<Turn, int>();
+            Dictionary<Turn, int> possiblePlay = new();
             foreach (PointRotation p in possibleChunk)
             {
                 for (int i = 0; i < p.Rotations.Length; i++)
@@ -71,26 +71,26 @@ namespace Taluva.Model.AI
                         Vector2Int[] possibleBarracks = AI_gm.gameBoard.GetBarrackSlots(AI_gm.CurrentPlayer);
                         foreach (Vector2Int pos in possibleBarracks)
                         {
-                            AI_gm.Phase2IA(new PointRotation(pos), Building.Barrack);
+                            AI_gm.Phase2IA(new(pos), Building.Barrack);
                             AI_gm.InitPlay(true,true,true);
-                            possiblePlay.Add(new Turn(p,(Rotation)i,pos,Building.Barrack), TreeExplore(AI_gm,chunks,depth-1,AI_gm.CurrentPlayer).Item2);
+                            possiblePlay.Add(new(p,(Rotation)i,pos,Building.Barrack), TreeExplore(AI_gm,chunks,depth-1,AI_gm.CurrentPlayer).Item2);
                             AI_gm.Undo(true);
                         }
                         Vector2Int[] possibleTower = AI_gm.gameBoard.GetTowerSlots(AI_gm.CurrentPlayer);
                         foreach (Vector2Int pos in possibleTower)
                         {
-                            AI_gm.Phase2IA(new PointRotation(pos), Building.Tower);
+                            AI_gm.Phase2IA(new(pos), Building.Tower);
                             AI_gm.InitPlay(true,true,true);
-                            possiblePlay.Add(new Turn(p,(Rotation)i,pos,Building.Tower), TreeExplore(AI_gm,chunks,depth-1,AI_gm.CurrentPlayer).Item2);
+                            possiblePlay.Add(new(p,(Rotation)i,pos,Building.Tower), TreeExplore(AI_gm,chunks,depth-1,AI_gm.CurrentPlayer).Item2);
                             AI_gm.Undo(true);
                         }
                         
                         Vector2Int[] possibleTemple = AI_gm.gameBoard.GetTempleSlots(AI_gm.CurrentPlayer);
                         foreach (Vector2Int pos in possibleTemple)
                         {
-                            AI_gm.Phase2IA(new PointRotation(pos), Building.Temple);
+                            AI_gm.Phase2IA(new(pos), Building.Temple);
                             AI_gm.InitPlay(true,true,true);
-                            possiblePlay.Add(new Turn(p,(Rotation)i,pos,Building.Temple), TreeExplore(AI_gm,chunks,depth-1,AI_gm.CurrentPlayer).Item2);
+                            possiblePlay.Add(new(p,(Rotation)i,pos,Building.Temple), TreeExplore(AI_gm,chunks,depth-1,AI_gm.CurrentPlayer).Item2);
                             AI_gm.Undo(true);
                         }
                         AI_gm.Undo(true);
@@ -104,7 +104,7 @@ namespace Taluva.Model.AI
 
         private void ComputeBestMove()
         {
-            GameManagment AI_gm = new GameManagment(Gm);
+            GameManagment AI_gm = new(Gm);
             List<Chunk> possibleChunk = AI_gm.GetPossibleChunks();
             AITurn = TreeExplore(AI_gm,possibleChunk,1,AI_gm.CurrentPlayer).Item1;
         }
@@ -117,7 +117,7 @@ namespace Taluva.Model.AI
         public override PointRotation PlayChunk()
         { 
             ComputeBestMove();
-            return new PointRotation(AITurn.ChunkPos.Point, AITurn.ChunkRot);
+            return new(AITurn.ChunkPos.Point, AITurn.ChunkRot);
         }
 
         public override (Building buil, Vector2Int pos) PlayBuild()
@@ -132,7 +132,7 @@ namespace Taluva.Model.AI
 
         protected virtual (Turn, int) GetBest(Dictionary<Turn, int> possible)
         {
-            KeyValuePair<Turn, int> max = new KeyValuePair<Turn, int>(null,0);
+            KeyValuePair<Turn, int> max = new(null,0);
             foreach (var set in possible)
             {
                 if (set.Value > max.Value)
