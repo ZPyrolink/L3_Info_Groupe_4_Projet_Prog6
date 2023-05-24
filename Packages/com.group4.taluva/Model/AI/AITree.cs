@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Transactions;
 using Taluva.Controller;
 
 using UnityEngine;
@@ -9,7 +10,9 @@ namespace Taluva.Model.AI
 {
     public class AITree : AI
     {
-        public AITree(Color id, GameManagment gm) : base(id, gm){}
+        public AITree(Color id, GameManagment gm) : base(id, gm){
+            this.Difficulty = Difficulty.Normal;
+        }
 
         public AITree(AITree orignal) : base(orignal){}
 

@@ -9,7 +9,7 @@ namespace Taluva.Model.AI
     {
         public AIRandom(Color id,GameManagment gm) : base(id,gm)
         {
-            
+            this.Difficulty = Difficulty.BadPlayer;
         }
         public AIRandom(AIRandom original) : base(original)
         {

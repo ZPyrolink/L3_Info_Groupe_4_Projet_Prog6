@@ -10,6 +10,7 @@ namespace Taluva.Model.AI
     {
         public AIMonteCarlo(Color id, GameManagment gm) : base(id, gm)
         {
+            this.Difficulty = Difficulty.SkillIssue;
         }
 
         public AIMonteCarlo(AIMonteCarlo original) : base(original)
