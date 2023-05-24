@@ -127,13 +127,7 @@ namespace UI
                 foreach ((MeshRenderer mr, Building b) in _guis[i].GetComponentsInChildren<MeshRenderer>()
                              .Select(static (mr, i) => (mr, (Building) i + 1)))
                 {
-                    // mr.materials[TilesMgr.BuildOwnerMatIndex[b]].color = GameMgr.Instance.ActualPlayer.IdColor;
-                    mr.materials[b switch
-                    {
-                        Building.Barrack => 1,
-                        Building.Tower => 0,
-                        Building.Temple => 4,
-                    }].color = GameMgr.Instance.Players[i].IdColor;
+                    mr.materials[TilesMgr.BuildOwnerMatIndex[b]].color = GameMgr.Instance.Players[i].IdColor;
                 }
 
                 _guis[i].transform.GetChild(0).GetComponent<Text>().text = $"Player {i}";
