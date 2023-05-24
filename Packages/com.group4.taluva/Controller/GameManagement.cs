@@ -40,7 +40,7 @@ namespace Taluva.Controller
         public string savePath => SavePath;
         public string SavePath { get; } = Directory.GetCurrentDirectory() + "/Save/";
 
-        [Obsolete("Use Pile instead")]
+        [Obsolete("Use Pile instead", true)]
         public Pile<Chunk> pile
         {
             get => Pile;
@@ -110,7 +110,7 @@ namespace Taluva.Controller
             this.NbPlayers = original.NbPlayers;
             this.gameBoard = new Board(original.gameBoard);
             this.historic = new Historic<Coup>(original.historic);
-            this.pile = new Pile<Chunk>(original.pile);
+            this.Pile = new Pile<Chunk>(original.Pile);
             this.Players = new Player[NbPlayers];
             this.ActualPlayerIndex = original.ActualPlayerIndex;
             this.maxTurn = original.MaxTurn;
@@ -123,8 +123,8 @@ namespace Taluva.Controller
         public GameManagment(int nbPlayers, Type[] typeAI)
         {
             historic = new();
-            pile = ListeChunk.Pile;
-            ListeChunk.ResetChunk(pile);
+            Pile = ListeChunk.Pile;
+            ListeChunk.ResetChunk(Pile);
             this.Players = new Player[nbPlayers];
             this.ActualPlayerIndex = -1;
             this.gameBoard = new();
@@ -247,8 +247,8 @@ namespace Taluva.Controller
                         writer.Write((int)((AI)Players[i]).Difficulty);
                 }
 
-                Chunk[] stackArray = pile._stack.ToArray();
-                writer.Write(stackArray.Length + pile._played.Count);
+                Chunk[] stackArray = Pile._stack.ToArray();
+                writer.Write(stackArray.Length + Pile._played.Count);
 
                 for (int i = stackArray.Length - 1; i >= 0; i--)
                 {
@@ -256,10 +256,10 @@ namespace Taluva.Controller
                     writer.Write((int)stackArray[i].Coords[2].ActualBiome);
                 }
 
-                for (int i = pile._played.Count - 1; i >= 0; i--)
+                for (int i = Pile._played.Count - 1; i >= 0; i--)
                 {
-                    writer.Write((int)pile._played[i].Coords[1].ActualBiome);
-                    writer.Write((int)pile._played[i].Coords[2].ActualBiome);
+                    writer.Write((int)Pile._played[i].Coords[1].ActualBiome);
+                    writer.Write((int)Pile._played[i].Coords[2].ActualBiome);
                 }
 
                 writer.Write(historic.Count);
@@ -374,7 +374,7 @@ namespace Taluva.Controller
                 }
 
                 Pile = new(chunks);
-                actualChunk = pile.Draw();
+                actualChunk = Pile.Draw();
 
                 int historicCount = reader.ReadInt32();
                 for (int i = 0; i < historicCount; i++)
@@ -589,7 +589,7 @@ namespace Taluva.Controller
                     OnChangePhase(actualPhase);
                 if (!b)
                 {
-                    actualChunk = pile.Draw();
+                    actualChunk = Pile.Draw();
                 }
             }
             else
@@ -622,7 +622,7 @@ namespace Taluva.Controller
 
                 if (Players[c.playerIndex].Eliminated)
                 {
-                    pile.Stack(actualChunk);
+                    Pile.Stack(actualChunk);
                     Players[c.playerIndex].Eliminated = false;
                     actualPhase = TurnPhase.PlaceBuilding;
                     ActualPlayerIndex = c.playerIndex;
@@ -630,9 +630,9 @@ namespace Taluva.Controller
 
                 Chunk chunk = new(c.chunk.Level, new(c.chunk.Coords[1].ActualBiome),
                     new(c.chunk.Coords[2].ActualBiome));
-                pile.Stack(chunk);
+                Pile.Stack(chunk);
                 if (!Players[c.playerIndex].Eliminated)
-                    actualChunk = pile.Draw();
+                    actualChunk = Pile.Draw();
             }
             else
             {
@@ -656,7 +656,7 @@ namespace Taluva.Controller
 
                     c.cells[i].ActualBuildings = Building.None;
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
-                    pile.Stack(actualChunk);
+                    Pile.Stack(actualChunk);
                 }
             }
             PrecedentPhase();
@@ -868,8 +868,8 @@ namespace Taluva.Controller
                 }
             }
 
-            if (pioche && pile.NbKeeping > 0)
-                actualChunk = pile.Draw();
+            if (pioche && Pile.NbKeeping > 0)
+                actualChunk = Pile.Draw();
 
             if (CurrentPlayer is AI)
             {
