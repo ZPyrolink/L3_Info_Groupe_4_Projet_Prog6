@@ -36,7 +36,8 @@ namespace Taluva.Controller
 
         #endregion
 
-        [Obsolete("Use SavePath instead")] public string savePath => SavePath;
+        [Obsolete("Use SavePath instead", true)]
+        public string savePath => SavePath;
         public string SavePath { get; } = Directory.GetCurrentDirectory() + "/Save/";
 
         [Obsolete("Use Pile instead")]
@@ -231,9 +232,9 @@ namespace Taluva.Controller
         public void Save(string path)
         {
             PlayerColor[] pc = (PlayerColor[])Enum.GetValues(typeof(PlayerColor));
-            Debug.Log(savePath + path);
-            Directory.CreateDirectory(savePath);
-            using (FileStream file = File.Open(savePath + path, FileMode.OpenOrCreate, FileAccess.Write))
+            Debug.Log(SavePath + path);
+            Directory.CreateDirectory(SavePath);
+            using (FileStream file = File.Open(SavePath + path, FileMode.OpenOrCreate, FileAccess.Write))
             using (BinaryWriter writer = new(file))
             {
                 writer.Write(historic.Index);
