@@ -17,17 +17,7 @@ namespace Taluva.Controller
 
         #region Players
 
-        [Obsolete("Use the Players property instead", true)]
-        public Player[] players
-        {
-            get => Players;
-            set => Players = value;
-        }
-
         public Player[] Players { get; set; }
-
-        [Obsolete("use CurrentPlayer instead", true)]
-        public Player actualPlayer => CurrentPlayer;
         public Player CurrentPlayer => Players[ActualPlayerIndex];
         public Player PreviousPlayer => Players[Math.Abs((ActualPlayerIndex - 1) % NbPlayers)];
         private AI ActualAi => (AI)CurrentPlayer;
@@ -35,39 +25,54 @@ namespace Taluva.Controller
         public int ActualPlayerIndex { get; private set; }
 
         #endregion
-
-        [Obsolete("Use SavePath instead", true)]
-        public string savePath => SavePath;
+        
         public string SavePath { get; } = Directory.GetCurrentDirectory() + "/Save/";
-
-        [Obsolete("Use Pile instead", true)]
-        public Pile<Chunk> pile
-        {
-            get => Pile;
-            set => Pile = value;
-        }
 
         public Pile<Chunk> Pile = ListeChunk.Pile;
 
         public TurnPhase actualPhase { get; private set; } = TurnPhase.NextPlayer;
 
+        public int KeepingTiles { get; private set; }
+
+        public Chunk CurrentChunk { get; set; }
+        
+        #region Obsolete
+        
+        [Obsolete("Use SavePath instead", true)]
+        public string savePath => throw new NotImplementedException();
+        
         [Obsolete("Use KeepingTiles instead", true)]
         public int maxTurn
         {
             get => KeepingTiles;
-            private set => KeepingTiles = value;
+            private set => throw new NotImplementedException();
         }
-
-        public int KeepingTiles { get; private set; }
-
-        [Obsolete("Use Current Instead", true)]
+        
+        [Obsolete("Use CurrentChunk Instead", true)]
         public Chunk actualChunk
         {
-            get => CurrentChunk;
-            set => CurrentChunk = value;
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
         }
-
-        public Chunk CurrentChunk { get; set; }
+        
+        [Obsolete("Use Pile instead", true)]
+        public Pile<Chunk> pile
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+        
+        [Obsolete("use CurrentPlayer instead", true)]
+        public Player actualPlayer => throw new NotImplementedException();
+        
+        [Obsolete("Use the Players property instead", true)]
+        public Player[] players
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+        
+        #endregion
 
         #region Events
 
