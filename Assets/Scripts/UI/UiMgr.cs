@@ -146,14 +146,14 @@ namespace UI
         {
             for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
             {
-                _guis[i].GetComponent<Image>().color = i == GameMgr.Instance.ActualPlayerIndex ?
+                _guis[i].GetComponent<Image>().color = i == GameMgr.Instance.CurrentPlayerIndex ?
                     Color.white :
                     GameMgr.Instance.Players[i].Eliminated ?
                         new(1, 0, 0, .25f) :
                         new(.75f, .75f, .75f);
 
                 foreach (Animator anim in _guis[i].GetComponentsInChildren<Animator>())
-                    if (GameMgr.Instance.ActualPlayerIndex == i)
+                    if (GameMgr.Instance.CurrentPlayerIndex == i)
                     {
                         anim.enabled = true;
                     }
@@ -187,7 +187,7 @@ namespace UI
 
         public void Next()
         {
-            (GameMgr.Instance.actualPhase switch
+            (GameMgr.Instance.CurrentPhase switch
             {
                 TurnPhase.SelectCells => (Action<bool>) TilesMgr.Instance.ValidateTile,
                 TurnPhase.PlaceBuilding => TilesMgr.Instance.ValidateBuild
@@ -198,7 +198,7 @@ namespace UI
         {
             AIRandom ai = new(GameMgr.Instance.CurrentPlayer.ID, GameMgr.Instance);
 
-            switch (GameMgr.Instance.actualPhase)
+            switch (GameMgr.Instance.CurrentPhase)
             {
                 case TurnPhase.SelectCells:
                     PointRotation p = ai.PlayChunk();
@@ -271,7 +271,7 @@ namespace UI
                 TilesMgr.Instance.ClearCurrentPreviews();
             GameManagment.Coup coup = GameMgr.Instance.Undo();
 
-            (GameMgr.Instance.actualPhase switch
+            (GameMgr.Instance.CurrentPhase switch
             {
                 TurnPhase.SelectCells => (Action<GameManagment.Coup>) UndoPhase1,
                 TurnPhase.PlaceBuilding => UndoPhase2
@@ -282,7 +282,7 @@ namespace UI
             {
                 coup = GameMgr.Instance.Undo();
 
-                (GameMgr.Instance.actualPhase switch
+                (GameMgr.Instance.CurrentPhase switch
                 {
                     TurnPhase.SelectCells => (Action<GameManagment.Coup>) UndoPhase1,
                     TurnPhase.PlaceBuilding => UndoPhase2
@@ -322,7 +322,7 @@ namespace UI
 
             GameManagment.Coup coup = GameMgr.Instance.Redo();
 
-            (GameMgr.Instance.actualPhase switch
+            (GameMgr.Instance.CurrentPhase switch
             {
                 TurnPhase.PlaceBuilding => (Action<GameManagment.Coup>) RedoPhase1,
                 TurnPhase.SelectCells => RedoPhase2,
@@ -337,7 +337,7 @@ namespace UI
         {
             // ReSharper disable once PossibleInvalidOperationException
             TilesMgr.Instance.ReputTile(coup.positions[0], (Rotation) coup.rotation);
-            if (GameMgr.Instance.actualPhase == TurnPhase.PlaceBuilding)
+            if (GameMgr.Instance.CurrentPhase == TurnPhase.PlaceBuilding)
                 TilesMgr.Instance.SetFeedForwards2(Building.Barrack);
             else
                 CurrentTile.SetActive(true);

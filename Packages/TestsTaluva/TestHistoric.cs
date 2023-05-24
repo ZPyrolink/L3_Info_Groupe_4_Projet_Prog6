@@ -70,7 +70,7 @@ namespace TestsTaluva
             _gm.ValidateBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
 
             _gm.Undo();
-            Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.None);
+            Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].CurrentBuildings == Building.None);
             Assert.AreEqual(20, _gm.CurrentPlayer.NbBarrack);
 
             _gm.CurrentChunk = _gm.Pile.Draw();
@@ -81,7 +81,7 @@ namespace TestsTaluva
             _gm.ValidateTile(new(new(0, 1), new[] { false, false, false, false, false, true }), Rotation.NW);
 
             _gm.Undo();
-            Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.Barrack);
+            Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].CurrentBuildings == Building.Barrack);
 
             
         }
@@ -105,7 +105,7 @@ namespace TestsTaluva
             _gm.Redo();
             _gm.NextPlayer();
 
-            Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.Barrack);
+            Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].CurrentBuildings == Building.Barrack);
             Assert.AreEqual(19, _gm.CurrentPlayer.NbBarrack);
 
             _gm.CurrentChunk = _gm.Pile.Draw();
@@ -135,15 +135,15 @@ namespace TestsTaluva
             Assert.IsFalse(gm.IsVoid(new(-1, -1)));
             Assert.AreEqual(_gm.Pile.Content.Count, gm.Pile.Content.Count);
 
-            Assert.AreEqual(_gm.CurrentChunk.Coords[1].ActualBiome, gm.CurrentChunk.Coords[1].ActualBiome);
-            Assert.AreEqual(_gm.CurrentChunk.Coords[2].ActualBiome, gm.CurrentChunk.Coords[2].ActualBiome);
-            Assert.AreEqual(_gm.gameBoard.WorldMap[new(0, 0)].ActualBiome, gm.gameBoard.WorldMap[new(0, 0)].ActualBiome);
-            Assert.AreEqual(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBiome, gm.gameBoard.WorldMap[new(-1, 0)].ActualBiome);
-            Assert.AreEqual(_gm.gameBoard.WorldMap[new(-1, -1)].ActualBiome, gm.gameBoard.WorldMap[new(-1, -1)].ActualBiome);
+            Assert.AreEqual(_gm.CurrentChunk.Coords[1].CurrentBiome, gm.CurrentChunk.Coords[1].CurrentBiome);
+            Assert.AreEqual(_gm.CurrentChunk.Coords[2].CurrentBiome, gm.CurrentChunk.Coords[2].CurrentBiome);
+            Assert.AreEqual(_gm.gameBoard.WorldMap[new(0, 0)].CurrentBiome, gm.gameBoard.WorldMap[new(0, 0)].CurrentBiome);
+            Assert.AreEqual(_gm.gameBoard.WorldMap[new(-1, 0)].CurrentBiome, gm.gameBoard.WorldMap[new(-1, 0)].CurrentBiome);
+            Assert.AreEqual(_gm.gameBoard.WorldMap[new(-1, -1)].CurrentBiome, gm.gameBoard.WorldMap[new(-1, -1)].CurrentBiome);
 
-            Assert.AreEqual(_gm.gameBoard.WorldMap[new(0, 0)].ActualBuildings, gm.gameBoard.WorldMap[new(0, 0)].ActualBuildings);
-            Assert.AreEqual(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings, gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings);
-            Assert.AreEqual(_gm.gameBoard.WorldMap[new(-1, -1)].ActualBuildings, gm.gameBoard.WorldMap[new(-1, -1)].ActualBuildings);
+            Assert.AreEqual(_gm.gameBoard.WorldMap[new(0, 0)].CurrentBuildings, gm.gameBoard.WorldMap[new(0, 0)].CurrentBuildings);
+            Assert.AreEqual(_gm.gameBoard.WorldMap[new(-1, 0)].CurrentBuildings, gm.gameBoard.WorldMap[new(-1, 0)].CurrentBuildings);
+            Assert.AreEqual(_gm.gameBoard.WorldMap[new(-1, -1)].CurrentBuildings, gm.gameBoard.WorldMap[new(-1, -1)].CurrentBuildings);
 
         }
 
@@ -158,7 +158,7 @@ namespace TestsTaluva
             GameManagment gm = new(2);
             gm.LoadGame(path);
 
-            Assert.AreEqual(Building.Barrack, gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings);
+            Assert.AreEqual(Building.Barrack, gm.gameBoard.WorldMap[new(-1, 0)].CurrentBuildings);
             Assert.AreEqual(19, gm.PreviousPlayer.NbBarrack);
         }
 

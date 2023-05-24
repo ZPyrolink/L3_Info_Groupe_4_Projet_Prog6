@@ -54,8 +54,8 @@ namespace Taluva.Model
             for (int i = 0; i < nb; i++)
             {
                 Chunk chunk = pileChunk.Draw(); // Utiliser la méthode Draw() pour retirer un élément de la pile
-                chunk.Coords[1].ActualBuildings = Building.None;
-                chunk.Coords[2].ActualBuildings = Building.None;
+                chunk.Coords[1].CurrentBuildings = Building.None;
+                chunk.Coords[2].CurrentBuildings = Building.None;
                 chunk.Level = 1;
 
                 stack.Push(chunk);

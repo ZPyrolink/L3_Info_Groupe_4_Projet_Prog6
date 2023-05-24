@@ -77,7 +77,7 @@ namespace Wrapper
             
             if (Instance.gameBoard.WorldMap.Empty)
                 Instance.InitPlay();
-            else if (Instance.actualPhase == TurnPhase.PlaceBuilding)
+            else if (Instance.CurrentPhase == TurnPhase.PlaceBuilding)
                 Instance.InitPlay(false, false);
             else
                 Instance.InitPlay(true, false);
@@ -154,7 +154,7 @@ namespace Wrapper
             {
                 TurnPhase.SelectCells => (Action) ui.Phase1,
                 TurnPhase.PlaceBuilding => ui.Phase2,
-                _ => () => Debug.LogWarning($"The {Instance.actualPhase} is not implemented!")
+                _ => () => Debug.LogWarning($"The {Instance.CurrentPhase} is not implemented!")
             }).Invoke();
         }
 

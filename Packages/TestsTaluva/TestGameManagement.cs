@@ -21,7 +21,7 @@ namespace TestsTaluva
             // Assert
             // Verify that both instances have the same state
             Assert.AreEqual(original.NbPlayers, copy.NbPlayers);
-            Assert.AreEqual(original.ActualPlayerIndex, copy.ActualPlayerIndex);
+            Assert.AreEqual(original.CurrentPlayerIndex, copy.CurrentPlayerIndex);
             Assert.AreEqual(original.KeepingTiles, copy.KeepingTiles);
 
             // Verify that the game board has been copied correctly

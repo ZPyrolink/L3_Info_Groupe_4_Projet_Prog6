@@ -52,9 +52,9 @@ namespace TestsTaluva
             Assert.IsFalse(_map.IsVoid(new(-1, -1)));
             Assert.IsFalse(_map.IsVoid(new(-1, 0)));
 
-            Assert.AreEqual(Biomes.Volcano, _map[new(0, 0)].ActualBiome);
-            Assert.AreEqual(Biomes.Plain, _map[new(-1, -1)].ActualBiome);
-            Assert.AreEqual(Biomes.Desert, _map[new(-1, 0)].ActualBiome);
+            Assert.AreEqual(Biomes.Volcano, _map[new(0, 0)].CurrentBiome);
+            Assert.AreEqual(Biomes.Plain, _map[new(-1, -1)].CurrentBiome);
+            Assert.AreEqual(Biomes.Desert, _map[new(-1, 0)].CurrentBiome);
         }
 
         [Test]
@@ -106,7 +106,7 @@ namespace TestsTaluva
         public void TestPlaceBuilding()
         {
             _board.PlaceBuilding(_matrix[new(-1, -1)], Building.Barrack, _player1);
-            Assert.AreEqual(Building.Barrack, _matrix[new(-1, -1)].ActualBuildings);
+            Assert.AreEqual(Building.Barrack, _matrix[new(-1, -1)].CurrentBuildings);
 
             Chunk _chunk = new(1, new(Biomes.Lake), new(Biomes.Forest));
             PointRotation _pointRot = new(new(-3, 0), Rotation.S);
@@ -115,14 +115,14 @@ namespace TestsTaluva
             _board.PlaceBuilding(_matrix[new(-2, 1)], Building.Barrack, _player1);
 
             _board.PlaceBuilding(_matrix[new(-1, 0)], Building.Temple, _player1);
-            Assert.AreEqual(Building.Temple, _matrix[new(-1, 0)].ActualBuildings);
+            Assert.AreEqual(Building.Temple, _matrix[new(-1, 0)].CurrentBuildings);
 
             _chunk = new(3, new(Biomes.Desert), new(Biomes.Plain));
             _pointRot = new(new(0, 1), Rotation.NE);
             _board.AddChunk(_chunk, _player2, _pointRot, Rotation.NE);
 
             _board.PlaceBuilding(_matrix[new(-1, 1)], Building.Tower, _player1);
-            Assert.AreEqual(Building.Tower, _matrix[new(-1, 1)].ActualBuildings);
+            Assert.AreEqual(Building.Tower, _matrix[new(-1, 1)].CurrentBuildings);
         }
 
         [Test]

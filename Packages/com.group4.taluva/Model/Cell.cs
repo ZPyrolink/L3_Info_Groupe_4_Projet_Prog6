@@ -2,8 +2,8 @@
 {
     public class Cell
     {
-        public Biomes ActualBiome { get; }
-        public Building ActualBuildings { get; set; }
+        public Biomes CurrentBiome { get; }
+        public Building CurrentBuildings { get; set; }
         public PlayerColor Owner { get; set; }
 
         public Chunk ParentChunk;
@@ -13,24 +13,24 @@
             ParentChunk = c;
         }
 
-        public Cell(Cell c) : this(c.ActualBiome, new(c.ParentChunk))
+        public Cell(Cell c) : this(c.CurrentBiome, new(c.ParentChunk))
         {
-            ActualBuildings = c.ActualBuildings;
+            CurrentBuildings = c.CurrentBuildings;
             Owner = c.Owner;
         }
 
         public Cell(Biomes biome)
         {
-            ActualBiome = biome;
-            ActualBuildings = Building.None;
+            CurrentBiome = biome;
+            CurrentBuildings = Building.None;
         }
 
-        public bool IsBuildable => !(ActualBiome is Biomes.None or Biomes.Volcano || ActualBuildings != Building.None);
+        public bool IsBuildable => !(CurrentBiome is Biomes.None or Biomes.Volcano || CurrentBuildings != Building.None);
 
-        public void Build(Building building) => ActualBuildings = building;
+        public void Build(Building building) => CurrentBuildings = building;
 
-        public override string ToString() => ActualBiome.GetChar().ToString();
+        public override string ToString() => CurrentBiome.GetChar().ToString();
 
-        public bool ContainsBuilding() => ActualBuildings != Building.None;
+        public bool ContainsBuilding() => CurrentBuildings != Building.None;
     }
 }

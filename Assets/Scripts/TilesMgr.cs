@@ -76,7 +76,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         {
             case "Feed Forward":
                 _currentFf = hit.transform.gameObject;
-                (GameMgr.Instance.actualPhase switch
+                (GameMgr.Instance.CurrentPhase switch
                 {
                     TurnPhase.SelectCells => (Action<Vector3>) PutTile,
                     TurnPhase.PlaceBuilding => PutBuild
@@ -113,7 +113,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                 0);
         }
 
-        UiMgr.Instance.InteractiveValidate = GameMgr.Instance.actualPhase != TurnPhase.IAPlays;
+        UiMgr.Instance.InteractiveValidate = GameMgr.Instance.CurrentPhase != TurnPhase.IAPlays;
     }
 
     public void PreviewTile(PointRotation pos)
@@ -155,10 +155,10 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         void SetMat(int mrIndex, int coordIndex)
         {
             Material tmp = mats
-                .FirstOrDefault(kv => kv.Key == coords[coordIndex].ActualBiome)?.Value;
+                .FirstOrDefault(kv => kv.Key == coords[coordIndex].CurrentBiome)?.Value;
 
             if (tmp is null) // ToDo: Remove when all materials are ready
-                mrs[mrIndex].color = coords[coordIndex].ActualBiome.GetColor();
+                mrs[mrIndex].color = coords[coordIndex].CurrentBiome.GetColor();
             else
                 mrs[mrIndex] = tmp;
         }
@@ -326,7 +326,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         for (int i = tmp.Count; i < _currentPreviews.Length; i++)
             Destroy(_currentPreviews[i]);
 
-        UiMgr.Instance.InteractiveValidate = GameMgr.Instance.actualPhase != TurnPhase.IAPlays;
+        UiMgr.Instance.InteractiveValidate = GameMgr.Instance.CurrentPhase != TurnPhase.IAPlays;
     }
 
     public void ValidateBuild(bool sendToLogic = true)
