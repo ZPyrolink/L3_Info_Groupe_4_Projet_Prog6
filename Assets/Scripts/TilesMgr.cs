@@ -75,12 +75,20 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         switch (hit.transform.tag)
         {
             case "Feed Forward":
+                if (_currentFf != null && GameMgr.Instance.CurrentPhase == TurnPhase.SelectCells)
+                    _currentFf.GetComponent<MeshRenderer>().materials[0].SetInt(Shader.PropertyToID("_Rotation"), 0);
+                
                 _currentFf = hit.transform.gameObject;
-                (GameMgr.Instance.CurrentPhase switch
+                switch (GameMgr.Instance.CurrentPhase)
                 {
-                    TurnPhase.SelectCells => (Action<Vector3>) PutTile,
-                    TurnPhase.PlaceBuilding => PutBuild
-                }).Invoke(hit.transform.position);
+                    case TurnPhase.SelectCells:
+                        _currentFf.GetComponent<MeshRenderer>().materials[0].SetInt(Shader.PropertyToID("_Rotation"), 1);
+                        PutTile(hit.transform.position);
+                        break;
+                    case TurnPhase.PlaceBuilding:
+                        PutBuild(GameMgr.Instance.CurrentPlayer.IdColor);
+                        break;
+                }
                 break;
 
             default:
@@ -266,6 +274,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     public bool CurrentPreviewsNotNull => _currentPreviews != null;
 
+    [Obsolete("Use PutBuild(Color) instead", true)]
     private void PutBuild(Vector3 _) => PutBuild(GameMgr.Instance.CurrentPlayer.IdColor);
 
     private void PutBuild(Color color, Vector2Int? position = null)
