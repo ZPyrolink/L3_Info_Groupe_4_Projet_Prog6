@@ -1001,7 +1001,7 @@ namespace Taluva.Controller
         {
             (Building b, Vector2Int pos) = ((AI)CurrentPlayer).PlayBuild();
             PointRotation p = new(pos);
-            Cell c = gameBoard.WorldMap[p.Point];
+            Cell c;
             PlayerEliminated();
             if (!CurrentPlayer.Eliminated)
             {
@@ -1009,7 +1009,11 @@ namespace Taluva.Controller
                 if(b == Building.Barrack) 
                     build = FindBiomesAroundVillage(p.Point);
                 OnAIBuildingPlacement(b, build.ToArray());
-                ValidateBuilding(c, b);
+                foreach (Vector2Int v in build)
+                {
+                    c = gameBoard.WorldMap[v];
+                    ValidateBuilding(c, b);
+                }
             }
         }
 

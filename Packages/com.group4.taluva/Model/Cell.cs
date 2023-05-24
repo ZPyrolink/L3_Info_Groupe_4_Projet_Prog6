@@ -1,6 +1,8 @@
-﻿namespace Taluva.Model
+﻿using System;
+
+namespace Taluva.Model
 {
-    public class Cell
+    public class Cell : ICloneable
     {
         public Biomes CurrentBiome { get; }
         public Building CurrentBuildings { get; set; }
@@ -30,6 +32,10 @@
         public void Build(Building building) => CurrentBuildings = building;
 
         public override string ToString() => CurrentBiome.GetChar().ToString();
+        public object Clone()
+        {
+            return new Cell(this);
+        }
 
         public bool ContainsBuilding() => CurrentBuildings != Building.None;
     }

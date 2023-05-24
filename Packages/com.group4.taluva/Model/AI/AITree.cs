@@ -68,11 +68,11 @@ namespace Taluva.Model.AI
                             if(chunk != c)
                                 AI_gm.Pile.Content.Push(chunk);
                         }
-                        AI_gm.Phase1(p, (Rotation)i,false,true);
                         //AI_gm.Phase1IA(c,p,(Rotation)i);
                         AI_gm.Pile.Played.Remove(AI_gm.CurrentChunk);
                         AI_gm.Pile.Played.Add(c);
                         AI_gm.CurrentChunk = c;
+                        AI_gm.Phase1(p, (Rotation)i,false,true);
                         
                         
                         Vector2Int[] possibleBarracks = AI_gm.gameBoard.GetBarrackSlots(AI_gm.CurrentPlayer);

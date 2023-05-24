@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Taluva.Utils
 {
-    public class DynamicMatrix<T> : IEnumerable<T>
+    public class DynamicMatrix<T> : IEnumerable<T> where T : ICloneable
     {
         private readonly Dictionary<int, Dictionary<int, T>> _matrix;
 
@@ -17,8 +17,14 @@ namespace Taluva.Utils
         public DynamicMatrix(DynamicMatrix<T> dynMatrix)
         {
             _matrix = new();
-            foreach ((int index, Dictionary<int, T> row) in dynMatrix._matrix)
-                _matrix.Add(index, new(row));
+            foreach ((int x, Dictionary<int, T> row) in dynMatrix._matrix)
+            {
+                foreach ((int y, T value) in row)
+                {
+                    Add((T)value.Clone(), new(x,y));
+                }
+            }
+            
         }
 
         public void Clear()
