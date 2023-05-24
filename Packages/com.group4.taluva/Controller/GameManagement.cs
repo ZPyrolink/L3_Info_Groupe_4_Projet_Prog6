@@ -897,14 +897,14 @@ namespace Taluva.Controller
         {
             if (gameBoard.AddChunk(c, CurrentPlayer, pr, r))
             {
-                AddHistoric(pr.point, r, c);
+                AddHistoric(pr.Point, r, c);
                 NextPhase(false,true);
                 this.KeepingTiles--;
             }
         }
         public void Phase2IA(PointRotation pr, Building b)
         {
-            Cell c = gameBoard.WorldMap[pr.point];
+            Cell c = gameBoard.WorldMap[pr.Point];
             if (ValidateBuilding(c, b))
             {
                 NextPhase(false,true);
@@ -967,7 +967,7 @@ namespace Taluva.Controller
             Rotation r = Rotation.N;
             for (int i = 0; i < 6; i++)
             {
-                if (pr.rotations[i])
+                if (pr.Rotations[i])
                     r = (Rotation)i;
             }
 
@@ -985,7 +985,7 @@ namespace Taluva.Controller
         {
             (Building b, Vector2Int pos) = ((AI)CurrentPlayer).PlayBuild();
             PointRotation p = new(pos);
-            Cell c = gameBoard.WorldMap[p.point];
+            Cell c = gameBoard.WorldMap[p.Point];
             PlayerEliminated();
             if (!CurrentPlayer.Eliminated)
             {
@@ -1040,7 +1040,7 @@ namespace Taluva.Controller
 
         public bool ValidateTile(PointRotation pr, Rotation r)
         {
-            AddHistoric(pr.point, r, CurrentChunk);
+            AddHistoric(pr.Point, r, CurrentChunk);
             return gameBoard.AddChunk(CurrentChunk, CurrentPlayer, pr, r);
         }
 

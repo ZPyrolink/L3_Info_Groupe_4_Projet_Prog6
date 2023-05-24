@@ -109,7 +109,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         {
             _currentPreviews[0].transform.position = pos;
             _currentPreviews[0].transform.rotation = Quaternion.Euler(270,
-                _gos == null ? 270 : ((Rotation) Array.IndexOf(_gos[_currentFf].rotations, true)).YDegree(),
+                _gos == null ? 270 : ((Rotation) Array.IndexOf(_gos[_currentFf].Rotations, true)).YDegree(),
                 0);
         }
 
@@ -144,7 +144,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
         _currentPreviews = null;
         if (sendToLogic)
-            GameMgr.Instance.Phase1(new(_gos[_currentFf].point, rot), rot);
+            GameMgr.Instance.Phase1(new(_gos[_currentFf].Point, rot), rot);
     }
 
     public static void ChangeTileColor(Chunk chunk, MeshRenderer mr, List<KeyValueS<Biomes, Material>> mats)
@@ -317,7 +317,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             }
 
             _currentPreviews[i].transform.position = _gos
-                .First(go => go.Value.point == tmp[i])
+                .First(go => go.Value.Point == tmp[i])
                 .Key.transform.position;
 
             _currentPreviews[i].transform.rotation = Quaternion.Euler(V2IToEul(tmp[i]));
@@ -342,7 +342,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
         _currentPreviews = null;
         if (sendToLogic)
-            GameMgr.Instance.Phase2(_gos[_currentFf].point, _currentBuild);
+            GameMgr.Instance.Phase2(_gos[_currentFf].Point, _currentBuild);
     }
 
     private static Vector3 V2IToV3(Vector2Int v)
@@ -442,7 +442,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             }
 
             _currentPreviews[i].transform.position = _gos
-                .First(go => go.Value.point == pos[i])
+                .First(go => go.Value.Point == pos[i])
                 .Key.transform.position;
         }
 
@@ -465,7 +465,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         {
             _currentPreviews[0].transform.Rotate(new(0, 360f / 6, 0), Space.World);
             rot = RotationExt.Of(Mathf.Round(_currentPreviews[0].transform.rotation.eulerAngles.y));
-        } while (_gos?[_currentFf]?.rotations?[(int) rot] == false);
+        } while (_gos?[_currentFf]?.Rotations?[(int) rot] == false);
     }
 
     public Transform FindObject(Vector2Int pos)

@@ -341,7 +341,7 @@ namespace Taluva.Model
         /// <param name="right">Right position of the cell</param>
         private void AddCell(Chunk c, PointRotation p, Vector2Int left, Vector2Int right)
         {
-            WorldMap.Add(c.Coords[0], p.point);
+            WorldMap.Add(c.Coords[0], p.Point);
             WorldMap.Add(c.Coords[1], left);
             WorldMap.Add(c.Coords[2], right);
         }
@@ -357,29 +357,29 @@ namespace Taluva.Model
         public bool AddChunk(Chunk c, Player player, PointRotation p, Rotation r)
         {
             if (!GetChunkSlots()
-                    .Where(pr => pr.point.Equals(p.point))
-                    .Any(pr => pr.rotations.Where((t, i) => t == p.rotations[i]).Any())) {
+                    .Where(pr => pr.Point.Equals(p.Point))
+                    .Any(pr => pr.Rotations.Where((t, i) => t == p.Rotations[i]).Any())) {
                 return false;
             }
 
-            if (!WorldMap.IsVoid(p.point))
-                c.Level = WorldMap[p.point].ParentChunk.Level + 1;
+            if (!WorldMap.IsVoid(p.Point))
+                c.Level = WorldMap[p.Point].ParentChunk.Level + 1;
 
             player.LastChunk = c;
 
-            Vector2Int[] neighbors = GetNeighbors(p.point);
+            Vector2Int[] neighbors = GetNeighbors(p.Point);
 
-            if (p.rotations[(int) Rotation.N] && r == Rotation.N)
+            if (p.Rotations[(int) Rotation.N] && r == Rotation.N)
                 AddCell(c, p, neighbors[0], neighbors[5]);
-            else if (p.rotations[(int) Rotation.S] && r == Rotation.S)
+            else if (p.Rotations[(int) Rotation.S] && r == Rotation.S)
                 AddCell(c, p, neighbors[3], neighbors[2]);
-            else if (p.rotations[(int) Rotation.NE] && r == Rotation.NE)
+            else if (p.Rotations[(int) Rotation.NE] && r == Rotation.NE)
                 AddCell(c, p, neighbors[1], neighbors[0]);
-            else if (p.rotations[(int) Rotation.SE] && r == Rotation.SE)
+            else if (p.Rotations[(int) Rotation.SE] && r == Rotation.SE)
                 AddCell(c, p, neighbors[2], neighbors[1]);
-            else if (p.rotations[(int) Rotation.SW] && r == Rotation.SW)
+            else if (p.Rotations[(int) Rotation.SW] && r == Rotation.SW)
                 AddCell(c, p, neighbors[4], neighbors[3]);
-            else if (p.rotations[(int) Rotation.NW] && r == Rotation.NW)
+            else if (p.Rotations[(int) Rotation.NW] && r == Rotation.NW)
                 AddCell(c, p, neighbors[5], neighbors[4]);
 
             c.Rotation = r;
@@ -584,7 +584,7 @@ namespace Taluva.Model
 
         public void SetChunkLevel(PointRotation pr)
         {
-            WorldMap[pr.point].ParentChunk.Level++;
+            WorldMap[pr.Point].ParentChunk.Level++;
         }
     }
 }

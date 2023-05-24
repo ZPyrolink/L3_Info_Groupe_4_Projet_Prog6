@@ -47,9 +47,9 @@ namespace Taluva.Model.AI
             Dictionary<Turn, int> possiblePlay = new Dictionary<Turn, int>();
             foreach (PointRotation p in possibleChunk)
             {
-                for (int i = 0; i < p.rotations.Length; i++)
+                for (int i = 0; i < p.Rotations.Length; i++)
                 {
-                    if (!p.rotations[i])
+                    if (!p.Rotations[i])
                         continue;
 
                     foreach (Chunk c in possibleDraw)

@@ -25,17 +25,17 @@ namespace Taluva.Model.AI
         {
             int rand;
             PointRotation[] possible = this.Gm.gameBoard.GetChunkSlots();
-            int max = possible.SelectMany(p => p.rotations).Count(rot => rot);
+            int max = possible.SelectMany(p => p.Rotations).Count(rot => rot);
 
             rand = Random.Range(1, max + 1);
             foreach (PointRotation p in possible)
                 for (int i = 0; i < 6; i++)
                 {
-                    if (p.rotations[i])
+                    if (p.Rotations[i])
                         rand--;
 
                     if (rand == 0)
-                        return new(p.point, (Rotation) i);
+                        return new(p.Point, (Rotation) i);
                 }
 
             return null;

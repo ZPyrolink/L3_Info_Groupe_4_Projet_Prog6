@@ -35,9 +35,9 @@ namespace TestsTaluva
         {
             _board = new();
             PointRotation[] possible = _board.GetChunkSlots();
-            Assert.AreEqual(0, possible[0].point.x);
-            Assert.AreEqual(0, possible[0].point.y);
-            foreach (bool rot in possible[0].rotations)
+            Assert.AreEqual(0, possible[0].Point.x);
+            Assert.AreEqual(0, possible[0].Point.y);
+            foreach (bool rot in possible[0].Rotations)
             {
                 Assert.IsTrue(rot);
             }
@@ -96,7 +96,7 @@ namespace TestsTaluva
             foreach (PointRotation pr in possible)
             {
                 Assert.IsTrue(neighbors.Exists(p =>
-                    p.point.x == pr.point.x && p.point.y == p.point.y && p.RotationEquals(pr)));
+                    p.Point.x == pr.Point.x && p.Point.y == p.Point.y && p.RotationEquals(pr)));
             }
 
             Assert.AreEqual(neighbors.Count, possible.Length);

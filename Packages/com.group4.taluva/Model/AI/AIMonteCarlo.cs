@@ -54,7 +54,7 @@ namespace Taluva.Model.AI
             PointRotation[] possible = board.GetChunkSlots();
             foreach (PointRotation p in possible)
             {
-                foreach (bool rot in p.rotations)
+                foreach (bool rot in p.Rotations)
                 {
                     if (rot)
                     {
@@ -68,14 +68,14 @@ namespace Taluva.Model.AI
             {
                 for (int i = 0; i<6;i++)
                 {
-                    if (p.rotations[i])
+                    if (p.Rotations[i])
                     {
                         rand--;
                     }
 
                     if (rand == 0)
                     {
-                        return new PointRotation(p.point, (Rotation)i);
+                        return new PointRotation(p.Point, (Rotation)i);
                     }
                 }
             }
