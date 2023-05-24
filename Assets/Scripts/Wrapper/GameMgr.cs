@@ -60,7 +60,8 @@ namespace Wrapper
                 return new(StartSettings.PlayerNb, StartSettings.Ais.Select(d => d switch
                 {
                     Difficulty.BadPlayer => typeof(AIRandom),
-                    Difficulty.Normal => typeof(AITree)
+                    Difficulty.Normal => typeof(AITree),
+                    Difficulty.SkillIssue => typeof(AIMonteCarlo)
                 }).ToArray());
             }
         }
