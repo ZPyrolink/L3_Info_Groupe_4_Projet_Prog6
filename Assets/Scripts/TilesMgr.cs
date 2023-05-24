@@ -37,11 +37,26 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     private readonly Dictionary<Building, Vector3> _buildsScale = new()
     {
         [Building.Barrack] = new(100, 100, 100),
-        [Building.Tower] = new(120, 120, 29),
-        [Building.Temple] = new(38, 27, 23)
+        [Building.Tower] = new(70, 70, 100),
+        [Building.Temple] = new(100, 100, 100)
+    };
+
+    public static Dictionary<Building, int> BuildOwnerMatIndex { get; } = new()
+    {
+        [Building.Barrack] = 1,
+        [Building.Tower] = 1,
+        [Building.Temple] = 4
     };
 
     private Dictionary<GameObject, PointRotation> _gos;
+
+    [SerializeField]
+    private List<KeyValueS<Biomes, Material>> materials;
+
+    public List<KeyValueS<Biomes, Material>> Materials => materials;
+
+    [SerializeField]
+    private List<KeyValueS<Biomes, Material>> transparentMaterials;
 
     private void Update()
     {
@@ -83,12 +98,9 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             tmp.SetActive(false);
             _currentPreviews[0].transform.localScale = new(100, 100, 100);
             _currentPreviews[0].layer = LayerMask.NameToLayer("Default");
-            Material[] mats = _currentPreviews[0].GetComponent<MeshRenderer>().materials;
-            foreach (Material mat in mats.Where((_, i) => i != 1))
-            {
-                mat.SetSurfaceType(MaterialExtensions.SurfaceType.Transparent);
-                mat.SetInt(Shader.PropertyToID("_Preview"), 1);
-            }
+
+            ChangeTileColor(GameMgr.Instance.ActualChunk, _currentPreviews[0].GetComponent<MeshRenderer>(),
+                transparentMaterials);
         }
 
         if (_currentPreviews[0].transform.position == pos)
@@ -123,12 +135,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     public void ValidateTile(bool sendToLogic = true)
     {
-        Material[] mats = _currentPreviews[0].GetComponent<MeshRenderer>().materials;
-        foreach (Material mat in mats.Where((_, i) => i != 1))
-        {
-            mat.SetSurfaceType(MaterialExtensions.SurfaceType.Opaque);
-            mat.SetInt(Shader.PropertyToID("_Preview"), 0);
-        }
+        ChangeTileColor(GameMgr.Instance.ActualChunk, _currentPreviews[0].GetComponent<MeshRenderer>(), materials);
 
         Rotation rot = RotationExt.Of(Mathf.Round(_currentPreviews[0].transform.rotation.eulerAngles.y));
 
@@ -138,6 +145,29 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         _currentPreviews = null;
         if (sendToLogic)
             GameMgr.Instance.Phase1(new(_gos[_currentFf].point, rot), rot);
+    }
+
+    public static void ChangeTileColor(Chunk chunk, MeshRenderer mr, List<KeyValueS<Biomes, Material>> mats)
+    {
+        Material[] mrs = mr.materials;
+        Cell[] coords = chunk.Coords;
+
+        void SetMat(int mrIndex, int coordIndex)
+        {
+            Material tmp = mats
+                .FirstOrDefault(kv => kv.Key == coords[coordIndex].ActualBiome)?.Value;
+
+            if (tmp is null) // ToDo: Remove when all materials are ready
+                mrs[mrIndex].color = coords[coordIndex].ActualBiome.GetColor();
+            else
+                mrs[mrIndex] = tmp;
+        }
+
+        SetMat(0, 1);
+        SetMat(3, 2);
+        mrs[2] = mats.First(kv => kv.Key == Biomes.Volcano).Value;
+
+        mr.materials = mrs;
     }
 
     public void ClearInformations(Vector2Int chunkPos, Rotation rotation)
@@ -244,9 +274,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         if (position != null)
             currentPos = (Vector2Int) position;
         else
-        {
             currentPos = _gos[_currentFf].Point;
-        }
 
         List<Vector2Int> tmp = new() { currentPos };
         if (_currentBuild == Building.Barrack)
@@ -273,12 +301,19 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                 }, boardParent);
 
                 _currentPreviews[i].transform.localScale = _buildsScale[_currentBuild];
-                Material[] mats = _currentPreviews[i].GetComponent<MeshRenderer>().materials;
+                MeshRenderer mr = _currentPreviews[i].GetComponent<MeshRenderer>();
+                Material[] mats = mr.materials;
+
+                if (_currentBuild == Building.Barrack)
+                    foreach (Material mat in mats)
+                        mat.SetFloat(Shader.PropertyToID("_Level"), GameMgr.Instance.LevelAt(tmp[i]));
+
                 foreach (Material mat in mats)
-                {
-                    mat.SetFloat(Shader.PropertyToID("_Level"), GameMgr.Instance.LevelAt(tmp[i]));
-                    mat.color = color.With(a: .75f);
-                }
+                    mat.SetInt(Shader.PropertyToID("_Preview"), 1);
+
+                mats[BuildOwnerMatIndex[_currentBuild]].color = color;
+
+                mr.materials = mats;
             }
 
             _currentPreviews[i].transform.position = _gos
@@ -298,11 +333,11 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
     {
         foreach (GameObject currentPreview in _currentPreviews)
         {
-            Material[] mats = currentPreview.GetComponent<MeshRenderer>().materials;
-            foreach (Material mat in mats.Where((_, i) => i != 1))
-            {
-                mat.color = mat.color.With(a: 1);
-            }
+            MeshRenderer mr = currentPreview.GetComponent<MeshRenderer>();
+            Material[] mrs = mr.materials;
+            foreach (Material mat in mrs)
+                mat.SetInt(Shader.PropertyToID("_Preview"), 0);
+            mr.materials = mrs;
         }
 
         _currentPreviews = null;

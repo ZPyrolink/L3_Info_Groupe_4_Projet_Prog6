@@ -84,9 +84,6 @@ namespace UI
         [SerializeField]
         private Button redoButton;
 
-        [SerializeField]
-        private List<KeyValueS<Biomes, Material>> materials;
-
         #region Unity events
 
         protected override void Awake()
@@ -127,11 +124,14 @@ namespace UI
                 rt.anchorMax = Vector2.one;
                 rt.anchoredPosition = new(-10, -10 - 110 * i);
 
-                foreach (MeshRenderer mr in _guis[i].GetComponentsInChildren<MeshRenderer>())
-                    mr.material.color = GameMgr.Instance.players[i].ID.GetColor();
+                foreach ((MeshRenderer mr, Building b) in _guis[i].GetComponentsInChildren<MeshRenderer>()
+                             .Select(static (mr, i) => (mr, (Building) i + 1)))
+                {
+                    mr.materials[TilesMgr.BuildOwnerMatIndex[b]].color = GameMgr.Instance.Players[i].IdColor;
+                }
 
                 _guis[i].transform.GetChild(0).GetComponent<Text>().text = $"Player {i}";
-                _guis[i].transform.GetChild(1).GetComponent<Image>().color = GameMgr.Instance.players[i].ID.GetColor();
+                _guis[i].transform.GetChild(1).GetComponent<Image>().color = GameMgr.Instance.Players[i].ID.GetColor();
             }
         }
 
@@ -160,7 +160,6 @@ namespace UI
                     else
                     {
                         anim.enabled = false;
-                        anim.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                     }
             }
         }
@@ -229,29 +228,9 @@ namespace UI
             builds.SetActive(false);
         }
 
-        public void ChangeTileColor(Chunk chunk)
-        {
-            MeshRenderer mr = currentTile.transform.GetComponentInChildren<MeshRenderer>(true);
-            Material[] mrs = mr.materials;
-            Cell[] coords = chunk.Coords;
-
-            void SetMat(int mrIndex, int coordIndex)
-            {
-                Material tmp = materials
-                    .FirstOrDefault(kv => kv.Key == coords[coordIndex].ActualBiome)?.Value;
-
-                if (tmp is null) // ToDo: Remove when all materials are ready
-                    mrs[mrIndex].color = coords[coordIndex].ActualBiome.GetColor();
-                else
-                    mrs[mrIndex] = tmp;
-            }
-
-            SetMat(0, 1);
-            SetMat(3, 2);
-            mrs[2] = materials.First(kv => kv.Key == Biomes.Volcano).Value;
-
-            mr.materials = mrs;
-        }
+        public void ChangeTileColor(Chunk chunk) => TilesMgr.ChangeTileColor(chunk,
+            currentTile.transform.GetComponentInChildren<MeshRenderer>(true),
+            TilesMgr.Instance.Materials);
 
         public void UpdateTiles() => NbTiles = NbTiles;
 
@@ -265,18 +244,7 @@ namespace UI
             foreach ((MeshRenderer mr, Building b) in builds.transform.Cast<Transform>()
                          .Select((t, i) => (t.GetComponentInChildren<MeshRenderer>(), (Building) i + 1)))
             {
-                switch (b)
-                {
-                    case Building.Barrack:
-                        mr.materials[1].color = GameMgr.Instance.actualPlayer.ID.GetColor();
-                        break;
-                    case Building.Tower:
-                        mr.material.color = GameMgr.Instance.actualPlayer.ID.GetColor();
-                        break;
-                    case Building.Temple:
-                        mr.materials[4].color = GameMgr.Instance.actualPlayer.ID.GetColor();
-                        break;
-                }
+                mr.materials[TilesMgr.BuildOwnerMatIndex[b]].color = GameMgr.Instance.ActualPlayer.IdColor;
             }
 
             UpdateTiles();
@@ -394,11 +362,11 @@ namespace UI
         public void ToggleMenu()
         {
             if (!menuCanva.activeSelf && !SaveMgr.Instance.gameObject.activeSelf
-                && !SettingsMgr.Instance.gameObject.activeSelf)
+                                      && !SettingsMgr.Instance.gameObject.activeSelf)
                 EnableScript();
 
             if (menuCanva.activeSelf && !SaveMgr.Instance.gameObject.activeSelf
-                && !SettingsMgr.Instance.gameObject.activeSelf)
+                                     && !SettingsMgr.Instance.gameObject.activeSelf)
                 EnableScript();
 
             menuCanva.SetActive(!menuCanva.activeSelf);
