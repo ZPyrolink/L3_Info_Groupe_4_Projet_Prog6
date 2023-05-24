@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 using Taluva.Controller;
@@ -25,10 +27,32 @@ namespace Taluva.Model.AI
         {
             int rand;
             PointRotation[] possible = Gm.gameBoard.GetChunkSlots();
-            int max = possible.SelectMany(p => p.Rotations).Count(rot => rot);
+            
+            List<PointRotation> possibleOcean = new List<PointRotation>();
+            List<PointRotation> possibleVolcano =  new List<PointRotation>();
+            foreach (var pr in possible)
+            {
+                if (Gm.gameBoard.WorldMap.IsVoid(pr.Point))
+                    possibleOcean.Add(pr);
+                else
+                    possibleVolcano.Add(pr);
+            }
+
+            int max = 0;
+            List<PointRotation> possiblePointRotations;
+            if (possibleVolcano.Count > 0)
+            {
+                possiblePointRotations = possibleVolcano;
+            }
+            else
+            {
+                possiblePointRotations = possibleOcean;
+            }
+            max = possiblePointRotations.SelectMany(p => p.Rotations).Count(rot => rot);
+
 
             rand = Random.Range(1, max + 1);
-            foreach (PointRotation p in possible)
+            foreach (PointRotation p in possiblePointRotations)
                 for (int i = 0; i < 6; i++)
                 {
                     if (p.Rotations[i])
@@ -57,8 +81,20 @@ namespace Taluva.Model.AI
                 return (Building.Tower,towers[rand]);
             }
             Vector2Int[] barracks = Gm.gameBoard.GetBarrackSlots(this);
-            rand = Random.Range(0, barracks.Length);
-            return (Building.Barrack,barracks[rand]);
+            int maxlevel = 0;
+            List<Vector2Int> barracksAtMaxLevel = new List<Vector2Int>();
+            foreach (var pos in barracks)
+            {
+                if (Gm.gameBoard.WorldMap[pos].ParentChunk.Level > maxlevel)
+                    maxlevel = Gm.gameBoard.WorldMap[pos].ParentChunk.Level;
+                    barracksAtMaxLevel.Clear();
+                    barracksAtMaxLevel.Add(pos);
+                if(Gm.gameBoard.WorldMap[pos].ParentChunk.Level==maxlevel)
+                    barracksAtMaxLevel.Add(pos);
+            }
+                
+            rand = Random.Range(0, barracksAtMaxLevel.Count);
+            return (Building.Barrack,barracksAtMaxLevel[rand]);
         }
     }
 }
