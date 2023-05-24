@@ -21,10 +21,10 @@ namespace Taluva.Model.AI
         protected Turn AITurn;
         protected class Turn
         {
-            public PointRotation ChunkPos;
-            public Rotation ChunkRot;
-            public Vector2Int BuildPos;
-            public Building BuildType;
+            public PointRotation ChunkPos { get; }
+            public Rotation ChunkRot { get; }
+            public Vector2Int BuildPos { get; }
+            public Building BuildType { get; }
             
 
             public Turn(PointRotation ChunkPos, Rotation ChunkRot, Vector2Int BuildPos,Building BuildType)

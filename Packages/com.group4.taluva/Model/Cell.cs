@@ -6,7 +6,7 @@
         public Building CurrentBuildings { get; set; }
         public Player.Color Owner { get; set; }
 
-        public Chunk ParentChunk;
+        public Chunk ParentChunk { get; set; }
 
         public Cell(Biomes biome, Chunk c) : this(biome)
         {

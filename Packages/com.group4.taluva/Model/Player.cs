@@ -21,9 +21,9 @@ namespace Taluva.Model
 
         public Color ID { get; private set; }
         public UColor IdColor => ID.GetColor();
-        public int NbTowers = 2;
-        public int NbTemple = 3;
-        public int NbBarrack = 20;
+        public int NbTowers { get; set; } = 2;
+        public int NbTemple { get; set; } = 3;
+        public int NbBarrack { get; set; } = 20;
 
         public bool Eliminated { get; set; }
 
@@ -55,7 +55,7 @@ namespace Taluva.Model
             Yellow = 0xFFFFD700
         }
     }
-    
+
     public static class PlayerColorExt
     {
         public static Color GetColor(this Player.Color pc) => ColorUtils.From((uint) pc);
