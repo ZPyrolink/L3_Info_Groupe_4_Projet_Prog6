@@ -68,7 +68,7 @@ namespace Taluva.Model.AI
                         AI_gm.Pile.Played.Add(c);
                         
                         
-                        Vector2Int[] possibleBarracks = AI_gm.gameBoard.GetBarrackSlots(AI_gm.actualPlayer);
+                        Vector2Int[] possibleBarracks = AI_gm.gameBoard.GetBarrackSlots(AI_gm.ActualPlayer);
                         foreach (Vector2Int pos in possibleBarracks)
                         {
                             AI_gm.Phase2IA(new PointRotation(pos), Building.Barrack);
@@ -76,7 +76,7 @@ namespace Taluva.Model.AI
                             possiblePlay.Add(new Turn(p,(Rotation)i,pos,Building.Barrack), TreeExplore(AI_gm,chunks,depth-1,AI_gm.ActualPlayer).Item2);
                             AI_gm.Undo(true);
                         }
-                        Vector2Int[] possibleTower = AI_gm.gameBoard.GetTowerSlots(AI_gm.actualPlayer);
+                        Vector2Int[] possibleTower = AI_gm.gameBoard.GetTowerSlots(AI_gm.ActualPlayer);
                         foreach (Vector2Int pos in possibleTower)
                         {
                             AI_gm.Phase2IA(new PointRotation(pos), Building.Tower);
@@ -85,7 +85,7 @@ namespace Taluva.Model.AI
                             AI_gm.Undo(true);
                         }
                         
-                        Vector2Int[] possibleTemple = AI_gm.gameBoard.GetTempleSlots(AI_gm.actualPlayer);
+                        Vector2Int[] possibleTemple = AI_gm.gameBoard.GetTempleSlots(AI_gm.ActualPlayer);
                         foreach (Vector2Int pos in possibleTemple)
                         {
                             AI_gm.Phase2IA(new PointRotation(pos), Building.Temple);
