@@ -60,14 +60,14 @@ namespace Taluva.Controller
 
         public int KeepingTiles { get; private set; }
 
-        [Obsolete("Use ActualChunk Instead")]
+        [Obsolete("Use Current Instead", true)]
         public Chunk actualChunk
         {
-            get => ActualChunk;
-            set => ActualChunk = value;
+            get => CurrentChunk;
+            set => CurrentChunk = value;
         }
 
-        public Chunk ActualChunk { get; set; }
+        public Chunk CurrentChunk { get; set; }
 
         #region Events
 
@@ -114,7 +114,7 @@ namespace Taluva.Controller
             this.Players = new Player[NbPlayers];
             this.ActualPlayerIndex = original.ActualPlayerIndex;
             this.KeepingTiles = original.KeepingTiles;
-            this.ActualChunk = original.ActualChunk;
+            this.CurrentChunk = original.CurrentChunk;
             for (int i = 0; i < NbPlayers; i++)
             {
                 Players[i] = original.Players[i].Clone();
@@ -374,7 +374,7 @@ namespace Taluva.Controller
                 }
 
                 Pile = new(chunks);
-                actualChunk = Pile.Draw();
+                CurrentChunk = Pile.Draw();
 
                 int historicCount = reader.ReadInt32();
                 for (int i = 0; i < historicCount; i++)
@@ -545,7 +545,7 @@ namespace Taluva.Controller
         public List<Chunk> GetPossibleChunks()
         {
             List<Chunk> possible =  Pile.Content.ToList();
-            possible.Add(ActualChunk);
+            possible.Add(CurrentChunk);
             return possible;
         }
         public void PrecedentPhase(bool AIMode = false)
@@ -589,7 +589,7 @@ namespace Taluva.Controller
                     OnChangePhase(actualPhase);
                 if (!b)
                 {
-                    actualChunk = Pile.Draw();
+                    CurrentChunk = Pile.Draw();
                 }
             }
             else
@@ -622,7 +622,7 @@ namespace Taluva.Controller
 
                 if (Players[c.playerIndex].Eliminated)
                 {
-                    Pile.Stack(actualChunk);
+                    Pile.Stack(CurrentChunk);
                     Players[c.playerIndex].Eliminated = false;
                     actualPhase = TurnPhase.PlaceBuilding;
                     ActualPlayerIndex = c.playerIndex;
@@ -632,7 +632,7 @@ namespace Taluva.Controller
                     new(c.chunk.Coords[2].ActualBiome));
                 Pile.Stack(chunk);
                 if (!Players[c.playerIndex].Eliminated)
-                    actualChunk = Pile.Draw();
+                    CurrentChunk = Pile.Draw();
             }
             else
             {
@@ -656,7 +656,7 @@ namespace Taluva.Controller
 
                     c.cells[i].ActualBuildings = Building.None;
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
-                    Pile.Stack(actualChunk);
+                    Pile.Stack(CurrentChunk);
                 }
             }
             PrecedentPhase();
@@ -684,9 +684,9 @@ namespace Taluva.Controller
             else
             {
                 KeepingTiles--;
-                gameBoard.AddChunk(actualChunk, Players[c.playerIndex], new(c.positions[0], (Rotation)c.rotation),
+                gameBoard.AddChunk(CurrentChunk, Players[c.playerIndex], new(c.positions[0], (Rotation)c.rotation),
                     (Rotation)c.rotation);
-                c.chunk = actualChunk;
+                c.chunk = CurrentChunk;
                 if (Players[c.playerIndex].Eliminated)
                 {
                     actualPhase = TurnPhase.NextPlayer;
@@ -869,7 +869,7 @@ namespace Taluva.Controller
             }
 
             if (pioche && Pile.NbKeeping > 0)
-                actualChunk = Pile.Draw();
+                CurrentChunk = Pile.Draw();
 
             if (CurrentPlayer is AI)
             {
@@ -1040,8 +1040,8 @@ namespace Taluva.Controller
 
         public bool ValidateTile(PointRotation pr, Rotation r)
         {
-            AddHistoric(pr.point, r, actualChunk);
-            return gameBoard.AddChunk(actualChunk, CurrentPlayer, pr, r);
+            AddHistoric(pr.point, r, CurrentChunk);
+            return gameBoard.AddChunk(CurrentChunk, CurrentPlayer, pr, r);
         }
 
         public bool ValidateBuilding(Cell c, Building b)

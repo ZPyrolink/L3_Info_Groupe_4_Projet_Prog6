@@ -56,7 +56,7 @@ namespace Taluva.Model.AI
                     {
                         AI_gm.Phase1IA(c,p, (Rotation)i);
                         List<Chunk> chunks = AI_gm.Pile.Content.ToList();
-                        chunks.Add(AI_gm.ActualChunk);
+                        chunks.Add(AI_gm.CurrentChunk);
                         AI_gm.Pile.Content.Clear();
                         foreach (var chunk in chunks)
                         {
@@ -64,7 +64,7 @@ namespace Taluva.Model.AI
                                 AI_gm.Pile.Content.Push(chunk);
                         }
 
-                        AI_gm.Pile.Played.Remove(AI_gm.ActualChunk);
+                        AI_gm.Pile.Played.Remove(AI_gm.CurrentChunk);
                         AI_gm.Pile.Played.Add(c);
                         
                         

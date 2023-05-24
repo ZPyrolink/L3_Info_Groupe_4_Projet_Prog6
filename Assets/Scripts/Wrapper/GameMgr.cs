@@ -128,7 +128,7 @@ namespace Wrapper
                     p.z += TilesMgr.zOffset / 2;
         
                 _aiMoves.Enqueue(new AiMove(new[] { pr.point }, p, (Rotation)Array.IndexOf(pr.rotations, true),
-                    Instance.actualChunk));
+                    Instance.CurrentChunk));
                 if (!_coroutineStarted)
                     StartCoroutine(CTemporateAi());
             };

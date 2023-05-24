@@ -73,11 +73,11 @@ namespace TestsTaluva
             Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.None);
             Assert.AreEqual(20, _gm.CurrentPlayer.NbBarrack);
 
-            _gm.actualChunk = _gm.Pile.Draw();
+            _gm.CurrentChunk = _gm.Pile.Draw();
             _gm.ValidateTile(new(new(0, 1), new[] { false, false, false, true, false, false }), Rotation.S);
             _gm.ValidateBuilding(_gm.gameBoard.WorldMap[new(-1, 0)], Building.Barrack);
             _gm.ValidateBuilding(_gm.gameBoard.WorldMap[new(-1, -1)], Building.Barrack);
-            _gm.actualChunk = _gm.Pile.Draw();
+            _gm.CurrentChunk = _gm.Pile.Draw();
             _gm.ValidateTile(new(new(0, 1), new[] { false, false, false, false, false, true }), Rotation.NW);
 
             _gm.Undo();
@@ -108,10 +108,10 @@ namespace TestsTaluva
             Assert.IsTrue(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBuildings == Building.Barrack);
             Assert.AreEqual(19, _gm.CurrentPlayer.NbBarrack);
 
-            _gm.actualChunk = _gm.Pile.Draw();
+            _gm.CurrentChunk = _gm.Pile.Draw();
             _gm.ValidateTile(new(new(0, 1), new[] { false, false, false, true, false, false }), Rotation.S);
             _gm.ValidateBuilding(_gm.gameBoard.WorldMap[new(-1, -1)], Building.Barrack);
-            _gm.actualChunk = _gm.Pile.Draw();
+            _gm.CurrentChunk = _gm.Pile.Draw();
             _gm.ValidateTile(new(new(0, 1), new[] { false, false, false, false, false, true }), Rotation.NW);
 
             _gm.Undo();  
@@ -135,8 +135,8 @@ namespace TestsTaluva
             Assert.IsFalse(gm.IsVoid(new(-1, -1)));
             Assert.AreEqual(_gm.Pile._stack.Count, gm.Pile._stack.Count);
 
-            Assert.AreEqual(_gm.actualChunk.Coords[1].ActualBiome, gm.actualChunk.Coords[1].ActualBiome);
-            Assert.AreEqual(_gm.actualChunk.Coords[2].ActualBiome, gm.actualChunk.Coords[2].ActualBiome);
+            Assert.AreEqual(_gm.CurrentChunk.Coords[1].ActualBiome, gm.CurrentChunk.Coords[1].ActualBiome);
+            Assert.AreEqual(_gm.CurrentChunk.Coords[2].ActualBiome, gm.CurrentChunk.Coords[2].ActualBiome);
             Assert.AreEqual(_gm.gameBoard.WorldMap[new(0, 0)].ActualBiome, gm.gameBoard.WorldMap[new(0, 0)].ActualBiome);
             Assert.AreEqual(_gm.gameBoard.WorldMap[new(-1, 0)].ActualBiome, gm.gameBoard.WorldMap[new(-1, 0)].ActualBiome);
             Assert.AreEqual(_gm.gameBoard.WorldMap[new(-1, -1)].ActualBiome, gm.gameBoard.WorldMap[new(-1, -1)].ActualBiome);

@@ -222,7 +222,7 @@ namespace UI
 
             CurrentTile.SetActive(true);
 
-            ChangeTileColor(GameMgr.Instance.actualChunk);
+            ChangeTileColor(GameMgr.Instance.CurrentChunk);
 
             currentTile.SetActive(true);
             currentTile.transform.GetChild(0).gameObject.SetActive(true);

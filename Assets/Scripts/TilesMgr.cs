@@ -99,7 +99,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             _currentPreviews[0].transform.localScale = new(100, 100, 100);
             _currentPreviews[0].layer = LayerMask.NameToLayer("Default");
 
-            ChangeTileColor(GameMgr.Instance.ActualChunk, _currentPreviews[0].GetComponent<MeshRenderer>(),
+            ChangeTileColor(GameMgr.Instance.CurrentChunk, _currentPreviews[0].GetComponent<MeshRenderer>(),
                 transparentMaterials);
         }
 
@@ -125,7 +125,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                 r = (Rotation) i;
         }
 
-        PutAiTile(pos.Point, V2IToV3(pos.Point), r, GameMgr.Instance.ActualChunk, true);
+        PutAiTile(pos.Point, V2IToV3(pos.Point), r, GameMgr.Instance.CurrentChunk, true);
     }
 
     public void PreviewBuild(Vector2Int pos, Building b)
@@ -135,7 +135,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     public void ValidateTile(bool sendToLogic = true)
     {
-        ChangeTileColor(GameMgr.Instance.ActualChunk, _currentPreviews[0].GetComponent<MeshRenderer>(), materials);
+        ChangeTileColor(GameMgr.Instance.CurrentChunk, _currentPreviews[0].GetComponent<MeshRenderer>(), materials);
 
         Rotation rot = RotationExt.Of(Mathf.Round(_currentPreviews[0].transform.rotation.eulerAngles.y));
 
