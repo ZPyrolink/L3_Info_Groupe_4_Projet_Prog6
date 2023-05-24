@@ -8,7 +8,7 @@ namespace Taluva.Model.AI
         protected readonly GameManagment Gm;
         public Difficulty Difficulty;
 
-        public AI(PlayerColor id, GameManagment gm) : base(id)
+        public AI(Color id, GameManagment gm) : base(id)
         {
             this.Gm = gm;
         }

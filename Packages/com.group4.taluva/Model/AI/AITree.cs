@@ -9,7 +9,7 @@ namespace Taluva.Model.AI
 {
     public class AITree : AI
     {
-        public AITree(PlayerColor id, GameManagment gm) : base(id, gm){}
+        public AITree(Color id, GameManagment gm) : base(id, gm){}
 
         public AITree(AITree orignal) : base(orignal){}
 

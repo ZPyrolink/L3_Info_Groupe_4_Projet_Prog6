@@ -23,8 +23,8 @@ namespace TestsTaluva
         {
             _board = new();
             _matrix = _board.WorldMap;
-            _player1 = new(PlayerColor.Blue);
-            _player2 = new(PlayerColor.Red);
+            _player1 = new(Player.Color.Blue);
+            _player2 = new(Player.Color.Red);
             Chunk _chunk = new(1, new(Biomes.Desert), new(Biomes.Plain));
             PointRotation _pointRot = new(new(0, 0), Rotation.N);
             _board.AddChunk(_chunk, _player1, _pointRot, Rotation.N);
@@ -130,8 +130,8 @@ namespace TestsTaluva
         {
             _board = new();
             Assert.AreEqual(0, _board.GetBarrackSlots(_player1).Length);
-            Assert.AreEqual(0, _board.GetTempleSlots(new(PlayerColor.Blue)).Length);
-            Assert.AreEqual(0, _board.GetTowerSlots(new(PlayerColor.Blue)).Length);
+            Assert.AreEqual(0, _board.GetTempleSlots(new(Player.Color.Blue)).Length);
+            Assert.AreEqual(0, _board.GetTowerSlots(new(Player.Color.Blue)).Length);
         }
 
         [Test]

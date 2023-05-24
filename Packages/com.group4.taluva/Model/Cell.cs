@@ -4,7 +4,7 @@
     {
         public Biomes CurrentBiome { get; }
         public Building CurrentBuildings { get; set; }
-        public PlayerColor Owner { get; set; }
+        public Player.Color Owner { get; set; }
 
         public Chunk ParentChunk;
 

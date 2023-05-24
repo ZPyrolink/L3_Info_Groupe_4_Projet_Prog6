@@ -51,7 +51,7 @@ namespace Taluva.Model
         /// <returns>Return all the position of the village.</returns>
         public List<Vector2Int> GetVillage(Vector2Int c)
         {
-            PlayerColor color = WorldMap[c].Owner;
+            Player.Color color = WorldMap[c].Owner;
 
             bool TestNeighbor(Vector2Int neighbor) =>
                 ContainsBuild(neighbor) && WorldMap[neighbor].Owner == color;

@@ -139,7 +139,7 @@ namespace Taluva.Controller
             this.NbPlayers = nbPlayers;
             this.KeepingTiles = 12 * nbPlayers;
 
-            PlayerColor[] pc = (PlayerColor[])Enum.GetValues(typeof(PlayerColor));
+            Player.Color[] pc = (Player.Color[])Enum.GetValues(typeof(Player.Color));
 
             for (int i = 0; i < nbPlayers - typeAI.Length; i++)
                 Players[i] = new(pc[i]);
@@ -239,7 +239,7 @@ namespace Taluva.Controller
 
         public void Save(string path)
         {
-            PlayerColor[] pc = (PlayerColor[])Enum.GetValues(typeof(PlayerColor));
+            Player.Color[] pc = (Player.Color[])Enum.GetValues(typeof(Player.Color));
             Debug.Log(SavePath + path);
             Directory.CreateDirectory(SavePath);
             using (FileStream file = File.Open(SavePath + path, FileMode.OpenOrCreate, FileAccess.Write))
@@ -345,7 +345,7 @@ namespace Taluva.Controller
                 this.Players = new Player[this.NbPlayers];
                 for (int i = 0; i < NbPlayers; i++)
                 {
-                    PlayerColor id = (PlayerColor)reader.ReadInt32();
+                    Player.Color id = (Player.Color)reader.ReadInt32();
                     bool ia = reader.ReadBoolean();
                     if (ia)
                     {
@@ -415,7 +415,7 @@ namespace Taluva.Controller
                             cells[j - 1].CurrentBuildings = (Building)reader.ReadInt32();
                             if (cells[j - 1].CurrentBuildings != Building.None)
                             {
-                                cells[j - 1].Owner = (PlayerColor)reader.ReadInt32();
+                                cells[j - 1].Owner = (Player.Color)reader.ReadInt32();
                             }
                         }
 
@@ -434,7 +434,7 @@ namespace Taluva.Controller
                                 newCells[j] = new((Biomes)reader.ReadInt32());
                                 newCells[j].CurrentBuildings = (Building)reader.ReadInt32();
                                 if (newCells[j].CurrentBuildings != Building.None)
-                                    newCells[j].Owner = (PlayerColor)reader.ReadInt32();
+                                    newCells[j].Owner = (Player.Color)reader.ReadInt32();
                                 buildings[j] = (Building)reader.ReadInt32();
                             }
                         }
@@ -456,7 +456,7 @@ namespace Taluva.Controller
                             newCells[j] = new((Biomes)reader.ReadInt32());
                             newCells[j].CurrentBuildings = (Building)reader.ReadInt32();
                             if (newCells[j].CurrentBuildings != Building.None)
-                                newCells[j].Owner = (PlayerColor)reader.ReadInt32();
+                                newCells[j].Owner = (Player.Color)reader.ReadInt32();
                             buildings[j] = (Building)reader.ReadInt32();
                         }
                     }

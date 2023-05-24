@@ -1,6 +1,10 @@
 using System;
 
+using Taluva.Utils;
+
 using UnityEngine;
+
+using UColor = UnityEngine.Color;
 
 namespace Taluva.Model
 {
@@ -15,20 +19,20 @@ namespace Taluva.Model
             set => LastChunk = value;
         }
 
-        public PlayerColor ID { get; private set; }
-        public Color IdColor => ID.GetColor();
+        public Color ID { get; private set; }
+        public UColor IdColor => ID.GetColor();
         public int NbTowers = 2;
         public int NbTemple = 3;
         public int NbBarrack = 20;
 
         public bool Eliminated { get; set; }
 
-        public Player(PlayerColor id)
+        public Player(Color id)
         {
             ID = id;
         }
 
-    public virtual Player Clone() => new(this);
+        public virtual Player Clone() => new(this);
 
         public Player(Player original) : this(original.ID)
         {
@@ -40,5 +44,18 @@ namespace Taluva.Model
         }
 
         public void Eliminate() => Eliminated = true;
+
+        public enum Color : uint
+        {
+            Red = 0xFFD20F28,
+            Green = 0xFF00FF00,
+            Blue = 0xFF2E00FF,
+            Yellow = 0xFFFFD700
+        }
+    }
+    
+    public static class PlayerColorExt
+    {
+        public static Color GetColor(this Player.Color pc) => ColorUtils.From((uint) pc);
     }
 }
