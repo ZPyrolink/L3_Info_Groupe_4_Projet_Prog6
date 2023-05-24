@@ -464,13 +464,12 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
                 _currentPreviews[i].transform.localScale = _buildsScale[_currentBuild];
                 Material[] mats = _currentPreviews[i].GetComponent<MeshRenderer>().materials;
-                foreach (Material mat in mats)
-                {
-                    mat.color = player.ID.GetColor().With(a: .75f);
-                }
+                
                 if (_currentBuild == Building.Barrack)
                     foreach (Material mat in mats)
                         mat.SetFloat(Shader.PropertyToID("_Level"), GameMgr.Instance.LevelAt(pos[i]));
+                
+                mats[BuildOwnerMatIndex[_currentBuild]].color = player.IdColor;
             }
 
             _currentPreviews[i].transform.position = _gos
