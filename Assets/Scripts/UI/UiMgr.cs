@@ -315,6 +315,8 @@ namespace UI
         private void UndoPhase1(GameManagment.Coup c)
         {
             TilesMgr.Instance.RemoveTile(c.positions[0]);
+            if (c.building == null)
+                return;
             for (int i = 0; i < c.building.Length; i++)
             {
                 if (c.building[i] != Building.None)
