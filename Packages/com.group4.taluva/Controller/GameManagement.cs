@@ -709,7 +709,7 @@ namespace Taluva.Controller
                 }
             }
 
-            if (CurrentPlayer is AI && AIMode)
+            if (CurrentPlayer is AI && !AIMode)
             {
                 CurrentPhase = TurnPhase.IAPlays;
                 AiChunk();
@@ -953,24 +953,24 @@ namespace Taluva.Controller
             return Array.IndexOf(chunk.Coords, c);
         }
 
-        public void Phase1(PointRotation pr, Rotation r, bool ia = false)
+        public void Phase1(PointRotation pr, Rotation r, bool ia = false,bool AIMode = false)
         {
             if (ValidateTile(pr, r))
             {
                 KeepingTiles--;
                 if (!ia)
-                    NextPhase();
+                    NextPhase(true,AIMode);
             }
         }
 
         //Place building
-        public void Phase2(Vector2Int pr, Building b, bool init = true)
+        public void Phase2(Vector2Int pr, Building b, bool init = true,bool AIMode = false)
         {
             Cell c = gameBoard.WorldMap[pr];
             if (ValidateBuilding(c, b))
             {
-                NextPhase();
-                InitPlay(init);
+                NextPhase(true,AIMode);
+                InitPlay(init,true,AIMode);
             }
         }
 
