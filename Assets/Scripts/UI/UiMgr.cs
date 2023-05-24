@@ -160,7 +160,6 @@ namespace UI
                     else
                     {
                         anim.enabled = false;
-                        anim.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                     }
             }
         }
