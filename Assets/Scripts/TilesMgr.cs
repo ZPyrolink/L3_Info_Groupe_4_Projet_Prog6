@@ -489,23 +489,14 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     private void ClearHouseAndBiomes(Vector2Int[] posChunk, int cell)
     {
-        if (cell == 0)
+        Transform c = FindObject(posChunk[cell]);
+        Destroy(c.gameObject);
+        if (cell != 0)
         {
-            ClearVolcano(posChunk[0]);
-        }
-        else
-        {
-            Transform c = FindObject(posChunk[cell]);
+            c = FindObject(posChunk[cell]);
             if (c != null)
                 Destroy(c.gameObject);
         }
-    }
-
-    private void ClearVolcano(Vector2Int pos)
-    {
-        Transform chunk = FindObject(pos);
-        // TODO
-        //A finir quand les mesh seront implementer
     }
 
     public void SetFeedForwards1()
