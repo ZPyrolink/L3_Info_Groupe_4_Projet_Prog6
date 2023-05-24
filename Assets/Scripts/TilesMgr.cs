@@ -439,6 +439,9 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
                 {
                     mat.color = player.ID.GetColor().With(a: .75f);
                 }
+                if (_currentBuild == Building.Barrack)
+                    foreach (Material mat in mats)
+                        mat.SetFloat(Shader.PropertyToID("_Level"), GameMgr.Instance.LevelAt(pos[i]));
             }
 
             _currentPreviews[i].transform.position = _gos

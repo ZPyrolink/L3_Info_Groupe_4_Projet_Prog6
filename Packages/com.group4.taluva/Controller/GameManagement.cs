@@ -122,7 +122,7 @@ namespace Taluva.Controller
             Players = new Player[NbPlayers];
             CurrentPlayerIndex = original.CurrentPlayerIndex;
             KeepingTiles = original.KeepingTiles;
-            CurrentChunk = original.CurrentChunk;
+            CurrentChunk = new(original.CurrentChunk);
             for (int i = 0; i < NbPlayers; i++)
             {
                 Players[i] = original.Players[i].Clone();
@@ -577,7 +577,7 @@ namespace Taluva.Controller
             else
             {
                 CurrentPhase = TurnPhase.NextPlayer; //Change Player ?
-                if(AIMode)
+                if(!AIMode)
                     OnChangePhase(CurrentPhase);
             }
         }
@@ -611,7 +611,7 @@ namespace Taluva.Controller
             else
             {
                 CurrentPhase = TurnPhase.NextPlayer;
-                if(AIMode)
+                if(!AIMode)
                     OnChangePhase(CurrentPhase);
             }
         }
@@ -675,7 +675,7 @@ namespace Taluva.Controller
                     Pile.Stack(CurrentChunk);
                 }
             }
-            PrecedentPhase();
+            PrecedentPhase(AIMode);
             return c;
         }
         

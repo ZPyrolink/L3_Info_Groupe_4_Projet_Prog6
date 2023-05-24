@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
+using Taluva.Model;
 using Utils;
 
 namespace UI
@@ -13,9 +15,13 @@ namespace UI
         [SerializeField]
         private GameObject menuCanva;
 
+        [SerializeField]
+        private Toggle move;
+
         public void Start()
         {
             this.gameObject.SetActive(false);
+            move.isOn = Settings.allowMove;
         }
 
         public void Quit() => ToggleMenu();

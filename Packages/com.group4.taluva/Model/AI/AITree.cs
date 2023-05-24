@@ -105,8 +105,9 @@ namespace Taluva.Model.AI
         private void ComputeBestMove()
         {
             GameManagment AI_gm = new(Gm);
-            List<Chunk> possibleChunk = AI_gm.GetPossibleChunks();
-            AITurn = TreeExplore(AI_gm,possibleChunk,1,AI_gm.CurrentPlayer).Item1;
+            List<Chunk> possibleChunk = AI_gm.Pile.Content.ToList();
+            possibleChunk.Add(AI_gm.CurrentChunk);
+            AITurn = TreeExplore(AI_gm,possibleChunk,1,AI_gm.ActualPlayer).Item1;
         }
 
         public override Player Clone()
