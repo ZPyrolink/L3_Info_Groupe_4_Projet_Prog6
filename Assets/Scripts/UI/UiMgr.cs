@@ -148,7 +148,7 @@ namespace UI
             {
                 _guis[i].GetComponent<Image>().color = i == GameMgr.Instance.ActualPlayerIndex ?
                     Color.white :
-                    GameMgr.Instance.players[i].Eliminated ?
+                    GameMgr.Instance.Players[i].Eliminated ?
                         new(1, 0, 0, .25f) :
                         new(.75f, .75f, .75f);
 
@@ -170,11 +170,11 @@ namespace UI
             for (int i = 0; i < GameMgr.Instance.NbPlayers; i++)
             {
                 _guis[i].transform.GetChild(2).GetComponentInChildren<Text>().text =
-                    GameMgr.Instance.players[i].NbBarrack.ToString();
+                    GameMgr.Instance.Players[i].NbBarrack.ToString();
                 _guis[i].transform.GetChild(3).GetComponentInChildren<Text>().text =
-                    GameMgr.Instance.players[i].NbTowers.ToString();
+                    GameMgr.Instance.Players[i].NbTowers.ToString();
                 _guis[i].transform.GetChild(4).GetComponentInChildren<Text>().text =
-                    GameMgr.Instance.players[i].NbTemple.ToString();
+                    GameMgr.Instance.Players[i].NbTemple.ToString();
             }
         }
 
@@ -345,7 +345,7 @@ namespace UI
 
         private void RedoPhase2(GameManagment.Coup coup)
         {
-            if (GameMgr.Instance.players[coup.playerIndex].Eliminated)
+            if (GameMgr.Instance.Players[coup.playerIndex].Eliminated)
             {
                 RedoPhase1(coup);
             }

@@ -17,7 +17,7 @@ namespace Taluva.Controller
 
         #region Players
 
-        [Obsolete("Use the Players property instead")]
+        [Obsolete("Use the Players property instead", true)]
         public Player[] players
         {
             get => Players;
@@ -28,7 +28,7 @@ namespace Taluva.Controller
 
         [Obsolete("use ActualPlayer instead")] public Player actualPlayer => ActualPlayer;
         public Player ActualPlayer => Players[ActualPlayerIndex];
-        public Player PreviousPlayer => players[Math.Abs((ActualPlayerIndex - 1) % NbPlayers)];
+        public Player PreviousPlayer => Players[Math.Abs((ActualPlayerIndex - 1) % NbPlayers)];
         private AI ActualAi => (AI)actualPlayer;
         public int NbPlayers { get; private set; }
         public int ActualPlayerIndex { get; private set; }
@@ -618,10 +618,10 @@ namespace Taluva.Controller
                     }
                 }
 
-                if (players[c.playerIndex].Eliminated)
+                if (Players[c.playerIndex].Eliminated)
                 {
                     pile.Stack(actualChunk);
-                    players[c.playerIndex].Eliminated = false;
+                    Players[c.playerIndex].Eliminated = false;
                     actualPhase = TurnPhase.PlaceBuilding;
                     ActualPlayerIndex = c.playerIndex;
                 }
@@ -629,7 +629,7 @@ namespace Taluva.Controller
                 Chunk chunk = new(c.chunk.Level, new(c.chunk.Coords[1].ActualBiome),
                     new(c.chunk.Coords[2].ActualBiome));
                 pile.Stack(chunk);
-                if (!players[c.playerIndex].Eliminated)
+                if (!Players[c.playerIndex].Eliminated)
                     actualChunk = pile.Draw();
             }
             else
@@ -682,10 +682,10 @@ namespace Taluva.Controller
             else
             {
                 MaxTurn--;
-                gameBoard.AddChunk(actualChunk, players[c.playerIndex], new(c.positions[0], (Rotation)c.rotation),
+                gameBoard.AddChunk(actualChunk, Players[c.playerIndex], new(c.positions[0], (Rotation)c.rotation),
                     (Rotation)c.rotation);
                 c.chunk = actualChunk;
-                if (players[c.playerIndex].Eliminated)
+                if (Players[c.playerIndex].Eliminated)
                 {
                     actualPhase = TurnPhase.NextPlayer;
                 }
