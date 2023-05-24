@@ -43,12 +43,12 @@ namespace Taluva.Model.AI
         }
 
 
-        private (Turn,int) TreeExplore(GameManagment AI_gm,List<Chunk> possibleDraw,int depth,Player previousPlayer)
+        protected (Turn,int[]) TreeExplore(GameManagment AI_gm,List<Chunk> possibleDraw,int depth,Player previousPlayer)
         {
             if (depth <= 0 || AI_gm.CheckWinner() != null)
-                return (null,Heuristic(AI_gm,previousPlayer));
+                return (null,Heuristic(AI_gm));
             PointRotation[] possibleChunk = AI_gm.gameBoard.GetChunkSlots();
-            Dictionary<Turn, int> possiblePlay = new();
+            Dictionary<Turn, int[]> possiblePlay = new();
             foreach (PointRotation p in possibleChunk)
             {
                 for (int i = 0; i < p.Rotations.Length; i++)
@@ -106,10 +106,10 @@ namespace Taluva.Model.AI
                 }
             }
             
-            return GetBest(possiblePlay);
+            return GetBest(AI_gm,possiblePlay,AI_gm.CurrentPlayer);
     }
 
-        private void ComputeBestMove()
+        protected virtual void ComputeBestMove()
         {
             GameManagment AI_gm = new(Gm);
             List<Chunk> possibleChunk = new List<Chunk>(){AI_gm.CurrentChunk};
@@ -132,17 +132,30 @@ namespace Taluva.Model.AI
             return (AITurn.BuildType, AITurn.BuildPos);
         }
 
-        protected virtual int Heuristic(GameManagment AI_gm,Player player)
+        protected virtual int[] Heuristic(GameManagment AI_gm)
         {
-            return (20-player.NbBarrack) * 2 + (2-player.NbTowers) * 100 + (3-player.NbTemple);
+            int[] playerValues = new int[AI_gm.NbPlayers];
+            Player player;
+            for(int i = 0; i<AI_gm.NbPlayers;i++)
+            {
+                player = AI_gm.Players[i];
+                playerValues[i] = (20 - player.NbBarrack) * 2 + (2 - player.NbTowers) * 100 + (3 - player.NbTemple);
+            }
+            return playerValues;
         }
-        protected virtual (Turn, int) GetBest(Dictionary<Turn, int> possible)
+        protected virtual (Turn, int[]) GetBest(GameManagment AI_gm,Dictionary<Turn, int[]> possible,Player previousPlayer)
         {
-            KeyValuePair<Turn, int> max = new(null,0);
-            List<KeyValuePair<Turn,int>> possibleMax= new();
+            KeyValuePair<Turn, int[]> max = new(null,new []{0,0,0,0});
+            List<KeyValuePair<Turn,int[]>> possibleMax= new();
+            int previousPlayerIndex = -1;
+            for(int i = 0; i<AI_gm.NbPlayers;i++)
+            {
+                if(AI_gm.Players[i]==previousPlayer)
+                    previousPlayerIndex = i;
+            }
             foreach (var set in possible)
             {
-                if (set.Value > max.Value)
+                if (set.Value[previousPlayerIndex] > max.Value[previousPlayerIndex])
                 {
                     max = set;
                     possibleMax.Clear();
