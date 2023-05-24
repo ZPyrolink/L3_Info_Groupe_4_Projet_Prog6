@@ -189,10 +189,15 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             Material tmp = mats
                 .FirstOrDefault(kv => kv.Key == coords[coordIndex].CurrentBiome)?.Value;
 
-            if (tmp is null) // ToDo: Remove when all materials are ready
+            if (tmp is null)
+            {
+                Debug.LogException(new($"The biome {coords[coordIndex].CurrentBiome} doesn't exists!"));
                 mrs[mrIndex].color = coords[coordIndex].CurrentBiome.GetColor();
+            }
             else
+            {
                 mrs[mrIndex] = tmp;
+            }
         }
 
         SetMat(0, 1);
@@ -468,13 +473,12 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
                 _currentPreviews[i].transform.localScale = _buildsScale[_currentBuild];
                 Material[] mats = _currentPreviews[i].GetComponent<MeshRenderer>().materials;
-                foreach (Material mat in mats)
-                {
-                    mat.color = player.ID.GetColor().With(a: .75f);
-                }
+                
                 if (_currentBuild == Building.Barrack)
                     foreach (Material mat in mats)
                         mat.SetFloat(Shader.PropertyToID("_Level"), GameMgr.Instance.LevelAt(pos[i]));
+                
+                mats[BuildOwnerMatIndex[_currentBuild]].color = player.IdColor;
             }
 
             _currentPreviews[i].transform.position = _gos

@@ -18,12 +18,12 @@ namespace Taluva.Model.AI
             return new AITree2(this);
         }
 
-        protected override int Heuristic(GameManagment AI_gm, Player previousPlayer)
+        protected override int[] Heuristic(GameManagment AI_gm)
         {
-            return 0;
+            throw new System.NotImplementedException();
             //TODO Create your heuristic here
         }
-        protected override (Turn,int) GetBest(Dictionary<Turn,int> possible)
+        protected override (Turn,int[]) GetBest(GameManagment AI_gm,Dictionary<Turn,int[]> possible,Player previousPlayer)
         {
             throw new System.NotImplementedException();
         }

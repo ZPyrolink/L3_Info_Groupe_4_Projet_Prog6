@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 
 using Taluva.Controller;
@@ -88,7 +87,6 @@ namespace Taluva.Model.AI
                 if (Gm.gameBoard.WorldMap[pos].ParentChunk.Level > maxlevel)
                     maxlevel = Gm.gameBoard.WorldMap[pos].ParentChunk.Level;
                     barracksAtMaxLevel.Clear();
-                    barracksAtMaxLevel.Add(pos);
                 if(Gm.gameBoard.WorldMap[pos].ParentChunk.Level==maxlevel)
                     barracksAtMaxLevel.Add(pos);
             }
