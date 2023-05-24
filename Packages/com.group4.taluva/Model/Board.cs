@@ -342,8 +342,11 @@ namespace Taluva.Model
         private void AddCell(Chunk c, PointRotation p, Vector2Int left, Vector2Int right)
         {
             WorldMap.Add(c.Coords[0], p.Point);
+            c.Coords[0].position = p.Point;
             WorldMap.Add(c.Coords[1], left);
+            c.Coords[1].position = left;
             WorldMap.Add(c.Coords[2], right);
+            c.Coords[2].position = right;
         }
 
         /// <summary>

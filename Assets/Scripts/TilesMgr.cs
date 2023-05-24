@@ -208,7 +208,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             foreach (Vector2Int positionCell in positionChunk)
             {
                 Chunk tile = GameMgr.Instance.gameBoard.WorldMap[positionCell].ParentChunk;
-                Vector2Int posVolcano = GameMgr.Instance.gameBoard.GetCellCoord(tile.Coords[0]);
+                Vector2Int posVolcano = tile.Coords[0].position;
                 Vector2Int[] positions = GameMgr.Instance.gameBoard.GetChunksCoords(posVolcano, tile.Rotation);
                 if (!chunkRecouvert.Contains(positions))
                     chunkRecouvert.Add(positions);

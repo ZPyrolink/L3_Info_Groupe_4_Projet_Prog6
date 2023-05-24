@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace Taluva.Model
 {
@@ -9,6 +10,8 @@ namespace Taluva.Model
         public Player.Color Owner { get; set; }
 
         public Chunk ParentChunk { get; set; }
+
+        public Vector2Int position;
 
         public Cell(Biomes biome, Chunk c) : this(biome)
         {
