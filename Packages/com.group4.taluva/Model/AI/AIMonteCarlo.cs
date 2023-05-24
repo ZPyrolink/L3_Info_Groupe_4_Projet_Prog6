@@ -26,7 +26,7 @@ namespace Taluva.Model.AI
         {
         int val = 0;
                 GameManagment virtualGM = new GameManagment(Gm);
-                for (int i = 0; i < 500; i++)
+                for (int i = 0; i < 100; i++)
                 {
                     while (false) //TODO condition go on till the games end.
                     {
@@ -41,11 +41,20 @@ namespace Taluva.Model.AI
                 }
                 return val;
         }
-
-        protected override (Turn,int) GetBest(Dictionary<Turn,int> possible)
+        
+        protected virtual (Turn, int) GetBest(Dictionary<Turn, int> possible)
         {
-            throw new System.NotImplementedException();
+            KeyValuePair<Turn, int> max = new KeyValuePair<Turn, int>(null,0);
+            foreach (var set in possible)
+            {
+                if (set.Value > max.Value)
+                {
+                    max = set;
+                }
+            }
+            return (max.Key,max.Value);
         }
+        
         
         public PointRotation PlayRandomChunk(Board board)
         {
