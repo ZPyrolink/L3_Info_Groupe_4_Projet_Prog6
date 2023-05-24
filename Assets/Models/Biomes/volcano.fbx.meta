@@ -3,7 +3,17 @@ guid: 3419185c4c04d2643802a3feec86b1bc
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Lava
+    second: {fileID: 2100000, guid: 3ecb00c729880254c865e34d9af86f2b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Volcano
+    second: {fileID: 2100000, guid: 3f6fe744f5a451546bc3cdae7a872314, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
