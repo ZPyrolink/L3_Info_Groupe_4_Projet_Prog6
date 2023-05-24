@@ -15,6 +15,7 @@ namespace Taluva.Model.AI
 
         public AIMonteCarlo(AIMonteCarlo original) : base(original)
         {
+            this.Difficulty = Difficulty.SkillIssue;
         }
 
         public override Player Clone()

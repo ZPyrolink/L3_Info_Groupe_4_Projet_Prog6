@@ -10,11 +10,15 @@ namespace Taluva.Model.AI
 {
     public class AITree : AI
     {
-        public AITree(Color id, GameManagment gm) : base(id, gm){
+        public AITree(Color id, GameManagment gm) : base(id, gm)
+        {
             this.Difficulty = Difficulty.Normal;
         }
 
-        public AITree(AITree orignal) : base(orignal){}
+        public AITree(AITree orignal) : base(orignal)
+        {
+            this.Difficulty = Difficulty.Normal;
+        }
 
 
         protected PointRotation ChunkPos;

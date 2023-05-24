@@ -15,7 +15,7 @@ namespace Taluva.Model.AI
         }
         public AIRandom(AIRandom original) : base(original)
         {
-            
+            this.Difficulty = Difficulty.BadPlayer;
         }
 
         public override Player Clone()
