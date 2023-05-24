@@ -1,4 +1,5 @@
- using UnityEngine;
+using Taluva.Model;
+using UnityEngine;
 
  namespace UI.MainMenu
 {
@@ -38,7 +39,8 @@
 
         public void AllowSound(AudioSource audio)
         {
-            audio.enabled = !audio.enabled;
+            Settings.allowSound = !Settings.allowSound;
+            audio.enabled = Settings.allowSound;
         }
 
         public void Rules() { }

@@ -1,5 +1,5 @@
 using System.Collections;
-
+using Taluva.Model;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Utils;
@@ -36,11 +36,12 @@ public class CameraMgr : MonoBehaviourMgr<CameraMgr>
 
     private bool _rotation;
 
-    public bool allowMove = false;
+    public bool allowMove;
 
     // Start is called before the first frame update
     private void Start()
     {
+        allowMove = Settings.allowMove;
         Cursor.lockState = CursorLockMode.Confined;
         _cam = Camera.main;
 
@@ -102,7 +103,8 @@ public class CameraMgr : MonoBehaviourMgr<CameraMgr>
 
     public void AllowMove()
     {
-        allowMove = !allowMove;
+        Settings.allowMove = !Settings.allowMove;
+        allowMove = Settings.allowMove;
     }
 
     private Vector3 ScreenToHorizontalPlane(Vector3 origin, Vector3 direction)
