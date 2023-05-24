@@ -2,6 +2,7 @@ using System.Collections;
 using Taluva.Model;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using Utils;
 
 public class CameraMgr : MonoBehaviourMgr<CameraMgr>
@@ -36,12 +37,13 @@ public class CameraMgr : MonoBehaviourMgr<CameraMgr>
 
     private bool _rotation;
 
-    public bool allowMove;
+    [SerializeField]
+    private Toggle allowMove;
 
     // Start is called before the first frame update
     private void Start()
     {
-        allowMove = Settings.allowMove;
+        allowMove.isOn = Settings.allowMove;
         Cursor.lockState = CursorLockMode.Confined;
         _cam = Camera.main;
 
@@ -97,14 +99,13 @@ public class CameraMgr : MonoBehaviourMgr<CameraMgr>
         if (Input.GetMouseButton(1))
             RightClickMove(mouseMove);
         else
-            if(allowMove && SceneManager.GetActiveScene().name != "MainMenu")
+            if(allowMove.isOn && SceneManager.GetActiveScene().name != "MainMenu")
                 OutsideWindowMove(mouseMove);
     }
 
     public void AllowMove()
     {
-        Settings.allowMove = !Settings.allowMove;
-        allowMove = Settings.allowMove;
+        Settings.allowMove = allowMove.isOn;
     }
 
     private Vector3 ScreenToHorizontalPlane(Vector3 origin, Vector3 direction)

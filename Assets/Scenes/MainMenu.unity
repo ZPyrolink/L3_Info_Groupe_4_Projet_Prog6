@@ -3006,7 +3006,6 @@ GameObject:
   - component: {fileID: 920804360}
   - component: {fileID: 920804363}
   - component: {fileID: 920804364}
-  - component: {fileID: 920804365}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -3128,7 +3127,7 @@ AudioSource:
   m_Volume: 1
   m_Pitch: 1
   Loop: 1
-  Mute: 0
+  Mute: 1
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
@@ -3209,20 +3208,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &920804365
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 920804359}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 960b542bd1a92d64a9ed596d97befb87, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  audio: {fileID: 1241910117}
-  audioSource: {fileID: 920804364}
 --- !u!1 &924726490
 GameObject:
   m_ObjectHideFlags: 0
@@ -4662,10 +4647,10 @@ MonoBehaviour:
       - m_Target: {fileID: 1269956852}
         m_TargetAssemblyTypeName: UI.MainMenu.MainMenuMgr, Assembly-CSharp
         m_MethodName: AllowSound
-        m_Mode: 2
+        m_Mode: 1
         m_Arguments:
-          m_ObjectArgument: {fileID: 920804364}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.AudioSource, UnityEngine
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -4895,6 +4880,8 @@ MonoBehaviour:
   play: {fileID: 1822928130}
   load: {fileID: 1184839854}
   settings: {fileID: 977168511}
+  audioToggle: {fileID: 1241910117}
+  audioSource: {fileID: 920804364}
 --- !u!114 &1269956853
 MonoBehaviour:
   m_ObjectHideFlags: 0
