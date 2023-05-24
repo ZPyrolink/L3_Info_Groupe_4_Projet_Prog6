@@ -216,7 +216,7 @@ namespace Taluva.Model
             if (leftCell.ParentChunk.Level != level || rightCell.ParentChunk.Level != level)
                 return false;
 
-            if (WorldMap[pt].ParentChunk.rotation == r)
+            if (WorldMap[pt].ParentChunk.Rotation == r)
                 return false;
 
 
@@ -382,7 +382,7 @@ namespace Taluva.Model
             else if (p.rotations[(int) Rotation.NW] && r == Rotation.NW)
                 AddCell(c, p, neighbors[5], neighbors[4]);
 
-            c.rotation = r;
+            c.Rotation = r;
             return true;
         }
 

@@ -7,7 +7,7 @@ namespace Taluva.Model
     {
         public Cell[] Coords { get; }
         public Rotation Rotation { get; set; }
-        [Obsolete("Use Rotation instead")]
+        [Obsolete("Use Rotation instead", true)]
         public Rotation rotation
         {
             get => Rotation;

@@ -285,7 +285,7 @@ namespace Taluva.Controller
                                 writer.Write((int)historic[i].chunk.Coords[j].Owner);
                         }
 
-                        writer.Write((int)historic[i].chunk.rotation);
+                        writer.Write((int)historic[i].chunk.Rotation);
                         writer.Write((int)historic[i].chunk.Level);
                         writer.Write(historic[i].cells[0] != null);
                         if (historic[i].cells[0] != null)
@@ -414,7 +414,7 @@ namespace Taluva.Controller
                         Rotation chunkRotation = (Rotation)reader.ReadInt32();
                         int chunkLevel = reader.ReadInt32();
                         chunk = new(chunkLevel, cells[0], cells[1]);
-                        chunk.rotation = chunkRotation;
+                        chunk.Rotation = chunkRotation;
 
                         boolean = reader.ReadBoolean();
                         buildings = new Building[3];
