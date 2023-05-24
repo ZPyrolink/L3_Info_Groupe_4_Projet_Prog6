@@ -20,7 +20,7 @@ namespace Taluva.Model
             Point = point;
             Rotations = new bool[6];
             for (int i = 0; i < Rotations.Length; i++)
-                this.Rotations[i] = false;
+                Rotations[i] = false;
         }
 
         public PointRotation(Vector2Int point, bool[] rot) : this(point)
@@ -33,7 +33,7 @@ namespace Taluva.Model
             Rotations[(int) rot] = true;
         }
 
-        public bool RotationEquals(PointRotation rotations) => !this.Rotations
+        public bool RotationEquals(PointRotation rotations) => !Rotations
             // On ne garde que les rotations qui sont différentes
             .Where((t, i) => t != rotations.Rotations[i])
             // On regardes s'il en existe un

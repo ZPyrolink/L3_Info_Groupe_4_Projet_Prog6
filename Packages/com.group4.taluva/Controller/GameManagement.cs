@@ -115,14 +115,14 @@ namespace Taluva.Controller
 
         public GameManagment(GameManagment original)
         {
-            this.NbPlayers = original.NbPlayers;
-            this.gameBoard = new(original.gameBoard);
-            this.historic = new(original.historic);
-            this.Pile = new(original.Pile);
-            this.Players = new Player[NbPlayers];
-            this.CurrentPlayerIndex = original.CurrentPlayerIndex;
-            this.KeepingTiles = original.KeepingTiles;
-            this.CurrentChunk = original.CurrentChunk;
+            NbPlayers = original.NbPlayers;
+            gameBoard = new(original.gameBoard);
+            historic = new(original.historic);
+            Pile = new(original.Pile);
+            Players = new Player[NbPlayers];
+            CurrentPlayerIndex = original.CurrentPlayerIndex;
+            KeepingTiles = original.KeepingTiles;
+            CurrentChunk = original.CurrentChunk;
             for (int i = 0; i < NbPlayers; i++)
             {
                 Players[i] = original.Players[i].Clone();
@@ -133,11 +133,11 @@ namespace Taluva.Controller
             historic = new();
             Pile = ListeChunk.Pile;
             ListeChunk.ResetChunk(Pile);
-            this.Players = new Player[nbPlayers];
-            this.CurrentPlayerIndex = -1;
-            this.gameBoard = new();
-            this.NbPlayers = nbPlayers;
-            this.KeepingTiles = 12 * nbPlayers;
+            Players = new Player[nbPlayers];
+            CurrentPlayerIndex = -1;
+            gameBoard = new();
+            NbPlayers = nbPlayers;
+            KeepingTiles = 12 * nbPlayers;
 
             Player.Color[] pc = (Player.Color[])Enum.GetValues(typeof(Player.Color));
 
@@ -189,7 +189,7 @@ namespace Taluva.Controller
                 rotation, playerIndex)
             {
                 this.chunk = chunk;
-                this.cells = new Cell[1];
+                cells = new Cell[1];
                 cells[0] = null;
             }
 
@@ -338,11 +338,11 @@ namespace Taluva.Controller
             using (BinaryReader reader = new(file))
             {
                 int intIndex = reader.ReadInt32();
-                this.NbPlayers = reader.ReadInt32();
-                this.KeepingTiles = 12 * NbPlayers;
-                this.CurrentPlayerIndex = -1;
-                this.gameBoard = new();
-                this.Players = new Player[this.NbPlayers];
+                NbPlayers = reader.ReadInt32();
+                KeepingTiles = 12 * NbPlayers;
+                CurrentPlayerIndex = -1;
+                gameBoard = new();
+                Players = new Player[NbPlayers];
                 for (int i = 0; i < NbPlayers; i++)
                 {
                     Player.Color id = (Player.Color)reader.ReadInt32();
@@ -915,7 +915,7 @@ namespace Taluva.Controller
             {
                 AddHistoric(pr.Point, r, c);
                 NextPhase(false,true);
-                this.KeepingTiles--;
+                KeepingTiles--;
             }
         }
         public void Phase2IA(PointRotation pr, Building b)
@@ -957,7 +957,7 @@ namespace Taluva.Controller
         {
             if (ValidateTile(pr, r))
             {
-                this.KeepingTiles--;
+                KeepingTiles--;
                 if (!ia)
                     NextPhase();
             }

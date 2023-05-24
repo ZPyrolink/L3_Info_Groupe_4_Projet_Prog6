@@ -24,7 +24,7 @@ namespace Taluva.Model.AI
         public override PointRotation PlayChunk()
         {
             int rand;
-            PointRotation[] possible = this.Gm.gameBoard.GetChunkSlots();
+            PointRotation[] possible = Gm.gameBoard.GetChunkSlots();
             int max = possible.SelectMany(p => p.Rotations).Count(rot => rot);
 
             rand = Random.Range(1, max + 1);

@@ -10,16 +10,16 @@ namespace Taluva.Model.AI
 
         public AI(Color id, GameManagment gm) : base(id)
         {
-            this.Gm = gm;
+            Gm = gm;
         }
 
         public AI(AI original) :base(original.ID)
         {
-            this.Gm = original.Gm;
-            this.LastChunk = original.LastChunk;
-            this.NbTowers = original.NbTowers;
-            this.NbTemple = original.NbTemple;
-            this.NbBarrack = original.NbBarrack;
+            Gm = original.Gm;
+            LastChunk = original.LastChunk;
+            NbTowers = original.NbTowers;
+            NbTemple = original.NbTemple;
+            NbBarrack = original.NbBarrack;
         }
 
         public abstract Player Clone();
