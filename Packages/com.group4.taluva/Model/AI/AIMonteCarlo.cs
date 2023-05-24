@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using System.Linq;
 using Taluva.Controller;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -8,6 +8,7 @@ namespace Taluva.Model.AI
 {
     public class AIMonteCarlo : AITree
     {
+        private Player virtualPawn = null;
         public AIMonteCarlo(Color id, GameManagment gm) : base(id, gm)
         {
             this.Difficulty = Difficulty.SkillIssue;
@@ -23,96 +24,115 @@ namespace Taluva.Model.AI
             return new AIMonteCarlo(this);
         }
         
-
-        protected override int Heuristic(GameManagment AI_gm, Player previousPlayer)
+        protected override void ComputeBestMove()
         {
-        int val = 0;
-                GameManagment virtualGM = new(Gm);
+            GameManagment AI_gm = new(Gm);
+            List<Chunk> possibleChunk = new List<Chunk>(){AI_gm.CurrentChunk};
+            AITurn = TreeExplore(AI_gm,possibleChunk,2,AI_gm.CurrentPlayer).Item1;
+        }
+
+        protected override int[] Heuristic(GameManagment AI_gm)
+        {
+                int[] val = new int[AI_gm.NbPlayers];
+                GameManagment virtualGm = new(AI_gm);
                 for (int i = 0; i < 100; i++)
                 {
-                    while (false) //TODO condition go on till the games end.
+                    Player winner = AI_gm.CheckWinner();
+                    while (winner == null)
                     {
-                        //AIPlayChunk(PlayRandomChunk(gm.gameBoard));
-                        //AIPlayBuilding(PlayRandomBuild(gm.gameBoard));
+                        (PointRotation chunkPos,Rotation chunkRot) = PlayRandomChunk();
+                        virtualGm.Phase1(chunkPos,chunkRot,false,true);
+                        (Building buildType,Vector2Int buildPos) = PlayRandomBuild();
+                        virtualGm.Phase2(buildPos,buildType,true,true);
 
                     }
-                    if (true) // Si l'IA gagne;
+
+                    for (int j = 0; j < AI_gm.NbPlayers; j++)
                     {
-                        val++;
+                        if (winner == AI_gm.Players[i])
+                        {
+                            val[i]++;
+                        }
                     }
                 }
                 return val;
         }
-        
-        protected virtual (Turn, int) GetBest(Dictionary<Turn, int> possible)
-        {
-            KeyValuePair<Turn, int> max = new KeyValuePair<Turn, int>(null,0);
-            foreach (var set in possible)
-            {
-                if (set.Value > max.Value)
-                {
-                    max = set;
-                }
-            }
-            return (max.Key,max.Value);
-        }
-        
-        
-        public PointRotation PlayRandomChunk(Board board)
+
+
+        public (PointRotation,Rotation) PlayRandomChunk()
         {
             int rand;
-            int max = 0;
-            PointRotation[] possible = board.GetChunkSlots();
-            foreach (PointRotation p in possible)
+            PointRotation[] possible = Gm.gameBoard.GetChunkSlots();
+            
+            List<PointRotation> possibleOcean = new List<PointRotation>();
+            List<PointRotation> possibleVolcano =  new List<PointRotation>();
+            foreach (var pr in possible)
             {
-                foreach (bool rot in p.Rotations)
-                {
-                    if (rot)
-                    {
-                        max++;
-                    }
-                }
+                if (Gm.gameBoard.WorldMap.IsVoid(pr.Point))
+                    possibleOcean.Add(pr);
+                else
+                    possibleVolcano.Add(pr);
             }
 
-            rand = Random.Range(0, max);
-            foreach (PointRotation p in possible)
+            int max = 0;
+            List<PointRotation> possiblePointRotations;
+            if (possibleVolcano.Count > 0)
             {
-                for (int i = 0; i<6;i++)
+                possiblePointRotations = possibleVolcano;
+            }
+            else
+            {
+                possiblePointRotations = possibleOcean;
+            }
+            max = possiblePointRotations.SelectMany(p => p.Rotations).Count(rot => rot);
+
+
+            rand = Random.Range(1, max + 1);
+            foreach (PointRotation p in possiblePointRotations)
+                for (int i = 0; i < 6; i++)
                 {
                     if (p.Rotations[i])
-                    {
                         rand--;
-                    }
 
                     if (rand == 0)
-                    {
-                        return new(p.Point, (Rotation)i);
-                    }
+                        return (new(p.Point, (Rotation) i),(Rotation)i);
                 }
-            }
-            
-            return null;}
 
-        public (Building buil, Vector2Int pos) PlayRandomBuild(Board board)
+            return (null,0);
+        }
+
+        public (Building buil, Vector2Int pos) PlayRandomBuild()
         {
-            int rand = Random.Range(0,1000);
-            Vector2Int[] temples = board.GetTempleSlots(this);
+            int rand;
+            Vector2Int[] temples = Gm.gameBoard.GetTempleSlots(this);
             if(temples.Length>0)
             {
                 rand = Random.Range(0, temples.Length);
-                return (Building.Barrack,temples[rand]);
+                return (Building.Temple,temples[rand]);
             } 
-            Vector2Int[] towers = board.GetTowerSlots(this);
+            Vector2Int[] towers = Gm.gameBoard.GetTowerSlots(this);
             if(towers.Length>0)
             {
                 rand = Random.Range(0, towers.Length);
                 return (Building.Tower,towers[rand]);
             }
-            Vector2Int[] barracks = board.GetBarrackSlots(this);
-            rand = Random.Range(0, barracks.Length);
-            return (Building.Barrack,barracks[rand]);
+            Vector2Int[] barracks = Gm.gameBoard.GetBarrackSlots(this);
+            int maxlevel = 0;
+            List<Vector2Int> barracksAtMaxLevel = new List<Vector2Int>();
+            foreach (var pos in barracks)
+            {
+                if (Gm.gameBoard.WorldMap[pos].ParentChunk.Level > maxlevel)
+                    maxlevel = Gm.gameBoard.WorldMap[pos].ParentChunk.Level;
+                barracksAtMaxLevel.Clear();
+                if(Gm.gameBoard.WorldMap[pos].ParentChunk.Level==maxlevel)
+                    barracksAtMaxLevel.Add(pos);
+            }
+                
+            rand = Random.Range(0, barracksAtMaxLevel.Count);
+            return (Building.Barrack,barracksAtMaxLevel[rand]);
         }
     }
+    
     
     
     
