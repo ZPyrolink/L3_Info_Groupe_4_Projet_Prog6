@@ -9,6 +9,8 @@ using UI;
 
 using UnityEngine;
 
+using UnityUtils;
+
 using Utils;
 
 using Wrapper;
@@ -57,6 +59,9 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     [SerializeField]
     private List<KeyValueS<Biomes, Material>> transparentMaterials;
+
+    [SerializeField]
+    private EditableDictionary<Biomes, GameObject> biomeProps;
 
     private void Update()
     {
@@ -146,13 +151,28 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
         ChangeTileColor(GameMgr.Instance.CurrentChunk, _currentPreviews[0].GetComponent<MeshRenderer>(), materials);
 
         Rotation rot = RotationExt.Of(Mathf.Round(_currentPreviews[0].transform.rotation.eulerAngles.y));
+        
+        Vector2Int volcanoPos = _gos[_currentFf].Point;
 
-        if (!GameMgr.Instance.IsVoid(_gos[_currentFf].Point))
-            ClearInformations(_gos[_currentFf].Point, rot);
-
+        if (!GameMgr.Instance.IsVoid(volcanoPos))
+            ClearInformations(volcanoPos, rot);
+        
         _currentPreviews = null;
+
         if (sendToLogic)
             GameMgr.Instance.Phase1(new(_gos[_currentFf].Point, rot), rot);
+        
+        foreach (Cell c in GameMgr.Instance.gameBoard.WorldMap[volcanoPos].ParentChunk.Coords)
+        {
+            if (!biomeProps.ContainsKey(c.CurrentBiome))
+                continue;
+            
+            Vector2Int coord = GameMgr.Instance.gameBoard.GetCellCoord(c);
+            Vector3 propsPos = V2IToV3(coord);
+            Vector3 propsRot = V2IToEul(coord);
+            
+            Instantiate(biomeProps[c.CurrentBiome], propsPos, Quaternion.Euler(propsRot), boardParent);
+        }
     }
 
     public static void ChangeTileColor(Chunk chunk, MeshRenderer mr, List<KeyValueS<Biomes, Material>> mats)
@@ -188,7 +208,7 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
             foreach (Vector2Int positionCell in positionChunk)
             {
                 Chunk tile = GameMgr.Instance.gameBoard.WorldMap[positionCell].ParentChunk;
-                Vector2Int posVolcano = GameMgr.Instance.gameBoard.GetCellCoord(tile.Coords[0]);
+                Vector2Int posVolcano = tile.Coords[0].position;
                 Vector2Int[] positions = GameMgr.Instance.gameBoard.GetChunksCoords(posVolcano, tile.Rotation);
                 if (!chunkRecouvert.Contains(positions))
                     chunkRecouvert.Add(positions);
@@ -489,23 +509,14 @@ public class TilesMgr : MonoBehaviourMgr<TilesMgr>
 
     private void ClearHouseAndBiomes(Vector2Int[] posChunk, int cell)
     {
-        if (cell == 0)
+        Transform c = FindObject(posChunk[cell]);
+        Destroy(c.gameObject);
+        if (cell != 0)
         {
-            ClearVolcano(posChunk[0]);
-        }
-        else
-        {
-            Transform c = FindObject(posChunk[cell]);
+            c = FindObject(posChunk[cell]);
             if (c != null)
                 Destroy(c.gameObject);
         }
-    }
-
-    private void ClearVolcano(Vector2Int pos)
-    {
-        Transform chunk = FindObject(pos);
-        // TODO
-        //A finir quand les mesh seront implementer
     }
 
     public void SetFeedForwards1()
