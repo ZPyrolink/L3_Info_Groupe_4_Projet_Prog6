@@ -4809,7 +4809,7 @@ MonoBehaviour:
   zoomIn: 270
   zoomOut: 269
   rotationSpeed: 1
-  allowMove: 0
+  allowMove: {fileID: 490820129}
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6730,7 +6730,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   menuCanva: {fileID: 1694325169}
-  move: {fileID: 490820129}
 --- !u!1 &1499728010
 GameObject:
   m_ObjectHideFlags: 0

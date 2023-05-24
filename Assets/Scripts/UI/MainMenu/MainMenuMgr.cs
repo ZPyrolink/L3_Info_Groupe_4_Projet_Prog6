@@ -1,7 +1,8 @@
 using Taluva.Model;
 using UnityEngine;
+using UnityEngine.UI;
 
- namespace UI.MainMenu
+namespace UI.MainMenu
 {
     public class MainMenuMgr : MonoBehaviour
     {
@@ -16,7 +17,18 @@ using UnityEngine;
             play,
             load,
             settings;
-        
+
+        [SerializeField]
+        private Toggle audioToggle;
+        [SerializeField]
+        private AudioSource audioSource;
+
+        public void Start()
+        {
+            audioToggle.isOn = Settings.allowSound;
+            audioSource.mute = !Settings.allowSound;
+        }
+
         public void OpenSettings() { }
 
         public void TogglePlay()
@@ -37,10 +49,10 @@ using UnityEngine;
             Toggle(settings);
         }
 
-        public void AllowSound(AudioSource audio)
+        public void AllowSound()
         {
-            Settings.allowSound = !Settings.allowSound;
-            audio.enabled = Settings.allowSound;
+            audioSource.mute = !audioToggle.isOn;
+            Settings.allowSound = audioToggle.isOn;
         }
 
         public void Rules() { }

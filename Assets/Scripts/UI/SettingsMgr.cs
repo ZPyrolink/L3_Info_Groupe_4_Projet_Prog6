@@ -15,13 +15,10 @@ namespace UI
         [SerializeField]
         private GameObject menuCanva;
 
-        [SerializeField]
-        private Toggle move;
 
         public void Start()
         {
             this.gameObject.SetActive(false);
-            move.isOn = Settings.allowMove;
         }
 
         public void Quit() => ToggleMenu();

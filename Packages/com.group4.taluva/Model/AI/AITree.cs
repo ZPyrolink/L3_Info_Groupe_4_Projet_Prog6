@@ -107,7 +107,7 @@ namespace Taluva.Model.AI
             GameManagment AI_gm = new(Gm);
             List<Chunk> possibleChunk = AI_gm.Pile.Content.ToList();
             possibleChunk.Add(AI_gm.CurrentChunk);
-            AITurn = TreeExplore(AI_gm,possibleChunk,3,AI_gm.CurrentPlayer).Item1;
+            AITurn = TreeExplore(AI_gm,possibleChunk,1,AI_gm.CurrentPlayer).Item1;
         }
 
         public override Player Clone()
