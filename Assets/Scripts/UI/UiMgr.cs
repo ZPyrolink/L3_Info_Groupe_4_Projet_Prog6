@@ -28,7 +28,7 @@ namespace UI
 
         private int NbTiles
         {
-            get => GameMgr.Instance.maxTurn;
+            get => GameMgr.Instance.KeepingTiles;
             set => uiNbTiles.text = NB_TILES_PLACEHOLDER.Replace("%nb%", value.ToString());
         }
 

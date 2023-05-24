@@ -51,14 +51,14 @@ namespace Taluva.Controller
 
         public TurnPhase actualPhase { get; private set; } = TurnPhase.NextPlayer;
 
-        [Obsolete("Use MaxTurn instead")]
+        [Obsolete("Use KeepingTiles instead", true)]
         public int maxTurn
         {
-            get => MaxTurn;
-            private set => MaxTurn = value;
+            get => KeepingTiles;
+            private set => KeepingTiles = value;
         }
 
-        public int MaxTurn { get; private set; }
+        public int KeepingTiles { get; private set; }
 
         [Obsolete("Use ActualChunk Instead")]
         public Chunk actualChunk
@@ -113,7 +113,7 @@ namespace Taluva.Controller
             this.Pile = new Pile<Chunk>(original.Pile);
             this.Players = new Player[NbPlayers];
             this.ActualPlayerIndex = original.ActualPlayerIndex;
-            this.maxTurn = original.MaxTurn;
+            this.KeepingTiles = original.KeepingTiles;
             this.ActualChunk = original.ActualChunk;
             for (int i = 0; i < NbPlayers; i++)
             {
@@ -129,7 +129,7 @@ namespace Taluva.Controller
             this.ActualPlayerIndex = -1;
             this.gameBoard = new();
             this.NbPlayers = nbPlayers;
-            this.maxTurn = 12 * nbPlayers;
+            this.KeepingTiles = 12 * nbPlayers;
 
             PlayerColor[] pc = (PlayerColor[])Enum.GetValues(typeof(PlayerColor));
 
@@ -331,7 +331,7 @@ namespace Taluva.Controller
             {
                 int intIndex = reader.ReadInt32();
                 this.NbPlayers = reader.ReadInt32();
-                this.maxTurn = 12 * NbPlayers;
+                this.KeepingTiles = 12 * NbPlayers;
                 this.ActualPlayerIndex = -1;
                 this.gameBoard = new();
                 this.Players = new Player[this.NbPlayers];
@@ -609,7 +609,7 @@ namespace Taluva.Controller
             Coup c = historic.Undo();
             if (c.chunk != null)
             {
-                maxTurn++;
+                KeepingTiles++;
                 gameBoard.RemoveChunk(gameBoard.GetChunksCoords(c.positions[0], (Rotation)c.rotation));
                 if (c.cells[0] != null)
                 {
@@ -683,7 +683,7 @@ namespace Taluva.Controller
             }
             else
             {
-                MaxTurn--;
+                KeepingTiles--;
                 gameBoard.AddChunk(actualChunk, Players[c.playerIndex], new(c.positions[0], (Rotation)c.rotation),
                     (Rotation)c.rotation);
                 c.chunk = actualChunk;
@@ -707,7 +707,7 @@ namespace Taluva.Controller
         public Player CheckWinner()
         {
             Player p = null;
-            if (maxTurn == 0)
+            if (KeepingTiles == 0)
             {
                 p = NormalEnd;
                 OnEndGame(p, GameEnd.NormalEnd);
@@ -899,7 +899,7 @@ namespace Taluva.Controller
             {
                 AddHistoric(pr.point, r, c);
                 NextPhase(false,true);
-                this.maxTurn--;
+                this.KeepingTiles--;
             }
         }
         public void Phase2IA(PointRotation pr, Building b)
@@ -941,7 +941,7 @@ namespace Taluva.Controller
         {
             if (ValidateTile(pr, r))
             {
-                this.maxTurn--;
+                this.KeepingTiles--;
                 if (!ia)
                     NextPhase();
             }
