@@ -36,11 +36,13 @@ namespace Taluva.Model
 
         public Player(Player original) : this(original.ID)
         {
-            Player clone = new(ID);
-            clone.LastChunk = LastChunk;
-            clone.NbTowers = NbTowers;
-            clone.NbTemple = NbTemple;
-            clone.NbBarrack = NbBarrack;
+            Player clone = new(ID)
+            {
+                LastChunk = LastChunk,
+                NbTowers = NbTowers,
+                NbTemple = NbTemple,
+                NbBarrack = NbBarrack
+            };
         }
 
         public void Eliminate() => Eliminated = true;

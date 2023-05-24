@@ -19,7 +19,7 @@ namespace Taluva.Model
 
         public Board(Board b)
         {
-            WorldMap = new DynamicMatrix<Cell>(b.WorldMap);
+            WorldMap = new(b.WorldMap);
         }
 
         /// <summary>

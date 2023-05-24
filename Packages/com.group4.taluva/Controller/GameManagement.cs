@@ -116,9 +116,9 @@ namespace Taluva.Controller
         public GameManagment(GameManagment original)
         {
             this.NbPlayers = original.NbPlayers;
-            this.gameBoard = new Board(original.gameBoard);
-            this.historic = new Historic<Coup>(original.historic);
-            this.Pile = new Pile<Chunk>(original.Pile);
+            this.gameBoard = new(original.gameBoard);
+            this.historic = new(original.historic);
+            this.Pile = new(original.Pile);
             this.Players = new Player[NbPlayers];
             this.CurrentPlayerIndex = original.CurrentPlayerIndex;
             this.KeepingTiles = original.KeepingTiles;
@@ -212,14 +212,14 @@ namespace Taluva.Controller
                 rotation = original.rotation;
                 cells = original.cells.ToArray();
                 if(original.chunk != null)
-                    chunk = new Chunk(original.chunk);
+                    chunk = new(original.chunk);
                 playerIndex = original.playerIndex;
                 if(original.building != null)
                     building = original.building.ToArray();
                 
             }    
             
-            public System.Object Clone()
+            public object Clone()
             {
                 return new Coup(this);
             }
@@ -411,8 +411,10 @@ namespace Taluva.Controller
                         Cell[] cells = new Cell[2];
                         for (int j = 1; j < 3; j++)
                         {
-                            cells[j - 1] = new((Biomes)reader.ReadInt32());
-                            cells[j - 1].CurrentBuildings = (Building)reader.ReadInt32();
+                            cells[j - 1] = new((Biomes)reader.ReadInt32())
+                            {
+                                CurrentBuildings = (Building)reader.ReadInt32()
+                            };
                             if (cells[j - 1].CurrentBuildings != Building.None)
                             {
                                 cells[j - 1].Owner = (Player.Color)reader.ReadInt32();
@@ -421,8 +423,10 @@ namespace Taluva.Controller
 
                         Rotation chunkRotation = (Rotation)reader.ReadInt32();
                         int chunkLevel = reader.ReadInt32();
-                        chunk = new(chunkLevel, cells[0], cells[1]);
-                        chunk.Rotation = chunkRotation;
+                        chunk = new(chunkLevel, cells[0], cells[1])
+                        {
+                            Rotation = chunkRotation
+                        };
 
                         boolean = reader.ReadBoolean();
                         buildings = new Building[3];
@@ -431,8 +435,10 @@ namespace Taluva.Controller
                         {
                             for (int j = 0; j < 3; j++)
                             {
-                                newCells[j] = new((Biomes)reader.ReadInt32());
-                                newCells[j].CurrentBuildings = (Building)reader.ReadInt32();
+                                newCells[j] = new((Biomes)reader.ReadInt32())
+                                {
+                                    CurrentBuildings = (Building)reader.ReadInt32()
+                                };
                                 if (newCells[j].CurrentBuildings != Building.None)
                                     newCells[j].Owner = (Player.Color)reader.ReadInt32();
                                 buildings[j] = (Building)reader.ReadInt32();
@@ -453,8 +459,10 @@ namespace Taluva.Controller
                         newCells = new Cell[nbTiles];
                         for (int j = 0; j < nbTiles; j++)
                         {
-                            newCells[j] = new((Biomes)reader.ReadInt32());
-                            newCells[j].CurrentBuildings = (Building)reader.ReadInt32();
+                            newCells[j] = new((Biomes)reader.ReadInt32())
+                            {
+                                CurrentBuildings = (Building)reader.ReadInt32()
+                            };
                             if (newCells[j].CurrentBuildings != Building.None)
                                 newCells[j].Owner = (Player.Color)reader.ReadInt32();
                             buildings[j] = (Building)reader.ReadInt32();
@@ -1010,9 +1018,9 @@ namespace Taluva.Controller
             var oldRT = RenderTexture.active;
             // Vector2Int center = CalculateCenter(gameBoard.GetChunksCoords(coord, r));
 
-            Material mat = new Material(Shader.Find("MatTest"));
+            Material mat = new(Shader.Find("MatTest"));
             var tex = new Texture2D(1024, 1024);
-            tex.ReadPixels(new Rect(0, 0, 1024, 1024), 0, 0);
+            tex.ReadPixels(new(0, 0, 1024, 1024), 0, 0);
             RenderTexture.active = crt;
             mat.SetVector(Shader.PropertyToID("_Location"), new Vector2(-2, 0));
             mat.SetTexture(Shader.PropertyToID("_BeachMask"), tex);
