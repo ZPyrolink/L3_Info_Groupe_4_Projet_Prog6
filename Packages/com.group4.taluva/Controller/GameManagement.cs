@@ -25,7 +25,7 @@ namespace Taluva.Controller
         public int CurrentPlayerIndex { get; private set; }
 
         #endregion
-        
+
         public string SavePath { get; } = Directory.GetCurrentDirectory() + "/Save/";
 
         public Pile<Chunk> Pile = ListeChunk.Pile;
@@ -35,46 +35,46 @@ namespace Taluva.Controller
         public int KeepingTiles { get; private set; }
 
         public Chunk CurrentChunk { get; set; }
-        
+
         #region Obsolete
-        
+
         [Obsolete("Use SavePath instead", true)]
         public string savePath => throw new NotImplementedException();
-        
+
         [Obsolete("Use KeepingTiles instead", true)]
         public int maxTurn
         {
             get => KeepingTiles;
             private set => throw new NotImplementedException();
         }
-        
+
         [Obsolete("Use CurrentChunk Instead", true)]
         public Chunk actualChunk
         {
             get => throw new NotImplementedException();
             set => throw new NotImplementedException();
         }
-        
+
         [Obsolete("Use Pile instead", true)]
         public Pile<Chunk> pile
         {
             get => throw new NotImplementedException();
             set => throw new NotImplementedException();
         }
-        
+
         [Obsolete("use CurrentPlayer instead", true)]
         public Player actualPlayer => throw new NotImplementedException();
-        
+
         [Obsolete("Use the Players property instead", true)]
         public Player[] players
         {
             get => throw new NotImplementedException();
             set => throw new NotImplementedException();
         }
-        
+
         [Obsolete("Use CurrentPhase instead", true)]
         public TurnPhase actualPhase { get; private set; } = TurnPhase.NextPlayer;
-        
+
         #endregion
 
         #region Events
@@ -211,14 +211,14 @@ namespace Taluva.Controller
                 positions = original.positions.ToArray();
                 rotation = original.rotation;
                 cells = original.cells.ToArray();
-                if(original.chunk != null)
+                if (original.chunk != null)
                     chunk = new(original.chunk);
                 playerIndex = original.playerIndex;
-                if(original.building != null)
+                if (original.building != null)
                     building = original.building.ToArray();
-                
-            }    
-            
+
+            }
+
             public object Clone()
             {
                 return new Coup(this);
@@ -307,8 +307,7 @@ namespace Taluva.Controller
                                 writer.Write((int)historic[i].building[j]);
                             }
                         }
-                    }
-                    else
+                    } else
                     {
                         writer.Write(historic[i].positions.Length);
                         for (int j = 0; j < historic[i].positions.Length; j++)
@@ -363,8 +362,7 @@ namespace Taluva.Controller
                                 Players[i] = new AIMonteCarlo(id, this);
                                 break;
                         }
-                    }
-                    else
+                    } else
                     {
                         Players[i] = new(id);
                     }
@@ -444,8 +442,7 @@ namespace Taluva.Controller
                                 buildings[j] = (Building)reader.ReadInt32();
                             }
                         }
-                    }
-                    else
+                    } else
                     {
                         int nbTiles = reader.ReadInt32();
                         positions = new Vector2Int[nbTiles];
@@ -477,8 +474,7 @@ namespace Taluva.Controller
                         {
                             Phase1(new(positions[0], r), r);
                             OnReputTile(positions[0], r);
-                        }
-                        else
+                        } else
                         {
                             bool init = i < intIndex;
                             Phase2(positions[0], buildings[0], init);
@@ -486,21 +482,18 @@ namespace Taluva.Controller
                             OnReputBuild(positions[0], buildings[0]);
                             NextPlayer();
                         }
-                    }
-                    else
+                    } else
                     {
                         if (i % 2 == 0)
                         {
                             if (boolean)
                             {
                                 historic.Add(new(positions, r, CurrentPlayerIndex, new(chunk), newCells, buildings));
-                            }
-                            else
+                            } else
                             {
                                 historic.Add(new(positions, r, CurrentPlayerIndex, new(chunk)));
                             }
-                        }
-                        else
+                        } else
                         {
                             historic.Add(new(positions, null, CurrentPlayerIndex, newCells, buildings));
                         }
@@ -531,8 +524,7 @@ namespace Taluva.Controller
 
                 historic.Add(new(gameBoard.GetChunksCoords(position, rotation), rotation, CurrentPlayerIndex, new(chunk, false),
                     newCells, buildings));
-            }
-            else
+            } else
             {
                 historic.Add(new(new[] { position }, rotation, CurrentPlayerIndex, new(chunk, false)));
             }
@@ -560,7 +552,7 @@ namespace Taluva.Controller
 
         public List<Chunk> GetPossibleChunks()
         {
-            List<Chunk> possible =  Pile.Content.ToList();
+            List<Chunk> possible = Pile.Content.ToList();
             possible.Add(CurrentChunk);
             return possible;
         }
@@ -571,18 +563,17 @@ namespace Taluva.Controller
                 int precedantPhaseValue =
                     Math.Abs(((int)CurrentPhase - 1) % (Enum.GetNames(typeof(TurnPhase)).Length - 1));
                 CurrentPhase = (TurnPhase)precedantPhaseValue;
-                if(!AIMode)
+                if (!AIMode)
                     OnChangePhase(CurrentPhase);
-            }
-            else
+            } else
             {
                 CurrentPhase = TurnPhase.NextPlayer; //Change Player ?
-                if(!AIMode)
+                if (!AIMode)
                     OnChangePhase(CurrentPhase);
             }
         }
 
-        public void NextPhase(bool pioche = true,bool AIMode = false)
+        public void NextPhase(bool pioche = true, bool AIMode = false)
         {
             bool b = true;
             if (CurrentPhase != TurnPhase.IAPlays)
@@ -601,22 +592,21 @@ namespace Taluva.Controller
                         InitPlay(b);
                     }
                 }
-                if(!AIMode)
+                if (!AIMode)
                     OnChangePhase(CurrentPhase);
-                if (!b)
-                {
-                    CurrentChunk = Pile.Draw();
-                }
-            }
-            else
+                //if (!b)
+                //{
+                //    CurrentChunk = Pile.Draw();
+                //}
+            } else
             {
                 CurrentPhase = TurnPhase.NextPlayer;
-                if(!AIMode)
+                if (!AIMode)
                     OnChangePhase(CurrentPhase);
             }
         }
 
-        
+
         public Coup Undo(bool AIMode = false)
         {
             if (!historic.CanUndo)
@@ -649,8 +639,7 @@ namespace Taluva.Controller
                 Pile.Stack(chunk);
                 if (!Players[c.playerIndex].Eliminated)
                     CurrentChunk = Pile.Draw();
-            }
-            else
+            } else
             {
                 CurrentPlayerIndex = c.playerIndex;
                 for (int i = 0; i < c.cells.Length; i++)
@@ -678,8 +667,8 @@ namespace Taluva.Controller
             PrecedentPhase(AIMode);
             return c;
         }
-        
-        
+
+
         public Coup Redo(bool AIMode = false)
         {
             if (!historic.CanRedo)
@@ -696,8 +685,7 @@ namespace Taluva.Controller
 
                 CurrentPhase = TurnPhase.NextPlayer;
                 NextPlayer();
-            }
-            else
+            } else
             {
                 KeepingTiles--;
                 gameBoard.AddChunk(CurrentChunk, Players[c.playerIndex], new(c.positions[0], (Rotation)c.rotation),
@@ -713,9 +701,8 @@ namespace Taluva.Controller
             {
                 CurrentPhase = TurnPhase.IAPlays;
                 AiChunk();
-            }
-            else
-                NextPhase(false,AIMode);
+            } else
+                NextPhase(false, AIMode);
 
             return c;
         }
@@ -843,13 +830,11 @@ namespace Taluva.Controller
                         }
 
                         return winner3;
-                    }
-                    else
+                    } else
                     {
                         return winner2;
                     }
-                }
-                else
+                } else
                 {
                     return winner1;
                 }
@@ -866,7 +851,7 @@ namespace Taluva.Controller
             CurrentPlayerIndex = Math.Abs((CurrentPlayerIndex - 1) % NbPlayers);
         }
 
-        public void InitPlay(bool pioche = true, bool nextPlayer = true,bool AIMode = false)
+        public void InitPlay(bool pioche = true, bool nextPlayer = true, bool AIMode = false)
         {
             //MeshRender();
             if (CheckWinner() != null)
@@ -892,29 +877,27 @@ namespace Taluva.Controller
                 if (checkIa)
                 {
                     CurrentPhase = TurnPhase.IAPlays;
-                    if(!AIMode)
+                    if (!AIMode)
                         OnChangePhase(CurrentPhase);
                     AiChunk();
-                }
-                else
+                } else
                 {
-                    NextPhase(true,AIMode);
+                    NextPhase(true, AIMode);
                 }
-            }
-            else
+            } else
             {
-                NextPhase(true,AIMode);
+                NextPhase(true, AIMode);
             }
 
             checkIa = true;
         }
-        
-        public void Phase1IA(Chunk c,PointRotation pr, Rotation r)
+
+        public void Phase1IA(Chunk c, PointRotation pr, Rotation r)
         {
             if (gameBoard.AddChunk(c, CurrentPlayer, pr, r))
             {
                 AddHistoric(pr.Point, r, c);
-                NextPhase(false,true);
+                NextPhase(false, true);
                 KeepingTiles--;
             }
         }
@@ -923,13 +906,13 @@ namespace Taluva.Controller
             Cell c = gameBoard.WorldMap[pr.Point];
             if (ValidateBuilding(c, b))
             {
-                NextPhase(false,true);
+                NextPhase(false, true);
                 InitPlay();
             }
         }
-        
-        
-        
+
+
+
 
         public void PlayerEliminated()
         {
@@ -953,24 +936,24 @@ namespace Taluva.Controller
             return Array.IndexOf(chunk.Coords, c);
         }
 
-        public void Phase1(PointRotation pr, Rotation r, bool ia = false,bool AIMode = false)
+        public void Phase1(PointRotation pr, Rotation r, bool ia = false, bool AIMode = false)
         {
             if (ValidateTile(pr, r))
             {
                 KeepingTiles--;
                 if (!ia)
-                    NextPhase(true,AIMode);
+                    NextPhase(true, AIMode);
             }
         }
 
         //Place building
-        public void Phase2(Vector2Int pr, Building b, bool init = true,bool AIMode = false)
+        public void Phase2(Vector2Int pr, Building b, bool init = true, bool AIMode = false)
         {
             Cell c = gameBoard.WorldMap[pr];
             if (ValidateBuilding(c, b))
             {
-                NextPhase(true,AIMode);
-                InitPlay(init,true,AIMode);
+                NextPhase(true, AIMode);
+                InitPlay(init, true, AIMode);
             }
         }
 
@@ -1005,8 +988,8 @@ namespace Taluva.Controller
             PlayerEliminated();
             if (!CurrentPlayer.Eliminated)
             {
-                List<Vector2Int> build = new(){pos};
-                if(b == Building.Barrack) 
+                List<Vector2Int> build = new() { pos };
+                if (b == Building.Barrack)
                     build = FindBiomesAroundVillage(p.Point);
                 OnAIBuildingPlacement(b, build.ToArray());
                 foreach (Vector2Int v in build)

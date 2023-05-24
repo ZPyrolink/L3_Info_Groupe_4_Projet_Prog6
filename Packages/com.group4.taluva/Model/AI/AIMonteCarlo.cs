@@ -47,9 +47,9 @@ namespace Taluva.Model.AI
 
                     }
 
-                    for (int j = 0; j < AI_gm.NbPlayers; j++)
+                    for (int j = 0; j < virtualGm.NbPlayers; j++)
                     {
-                        if (winner == AI_gm.Players[i])
+                        if (winner == virtualGm.Players[i])
                         {
                             val[i]++;
                         }
