@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Transactions;
 using Taluva.Controller;
 
 using UnityEngine;
@@ -9,9 +10,15 @@ namespace Taluva.Model.AI
 {
     public class AITree : AI
     {
-        public AITree(Color id, GameManagment gm) : base(id, gm){}
+        public AITree(Color id, GameManagment gm) : base(id, gm)
+        {
+            this.Difficulty = Difficulty.Normal;
+        }
 
-        public AITree(AITree orignal) : base(orignal){}
+        public AITree(AITree orignal) : base(orignal)
+        {
+            this.Difficulty = Difficulty.Normal;
+        }
 
 
         protected PointRotation ChunkPos;
@@ -54,24 +61,25 @@ namespace Taluva.Model.AI
 
                     foreach (Chunk c in possibleDraw)
                     {
-                        AI_gm.Phase1IA(c,p, (Rotation)i);
-                        List<Chunk> chunks = AI_gm.Pile.Content.ToList();
-                        chunks.Add(AI_gm.CurrentChunk);
+                        List<Chunk> chunks = AI_gm.GetPossibleChunks();
                         AI_gm.Pile.Content.Clear();
                         foreach (var chunk in chunks)
                         {
                             if(chunk != c)
                                 AI_gm.Pile.Content.Push(chunk);
                         }
-
+                        AI_gm.Phase1(p, (Rotation)i,false,true);
+                        //AI_gm.Phase1IA(c,p,(Rotation)i);
                         AI_gm.Pile.Played.Remove(AI_gm.CurrentChunk);
                         AI_gm.Pile.Played.Add(c);
+                        AI_gm.CurrentChunk = c;
                         
                         
                         Vector2Int[] possibleBarracks = AI_gm.gameBoard.GetBarrackSlots(AI_gm.CurrentPlayer);
                         foreach (Vector2Int pos in possibleBarracks)
                         {
-                            AI_gm.Phase2IA(new(pos), Building.Barrack);
+                            AI_gm.Phase2(pos, Building.Barrack,true,true);
+                            //AI_gm.Phase2IA(new(pos), Building.Barrack);
                             AI_gm.InitPlay(true,true,true);
                             possiblePlay.Add(new(p,(Rotation)i,pos,Building.Barrack), TreeExplore(AI_gm,chunks,depth-1,AI_gm.CurrentPlayer).Item2);
                             AI_gm.Undo(true);
@@ -79,7 +87,8 @@ namespace Taluva.Model.AI
                         Vector2Int[] possibleTower = AI_gm.gameBoard.GetTowerSlots(AI_gm.CurrentPlayer);
                         foreach (Vector2Int pos in possibleTower)
                         {
-                            AI_gm.Phase2IA(new(pos), Building.Tower);
+                            AI_gm.Phase2(pos, Building.Tower,true,true);
+                            //AI_gm.Phase2IA(new(pos), Building.Tower);
                             AI_gm.InitPlay(true,true,true);
                             possiblePlay.Add(new(p,(Rotation)i,pos,Building.Tower), TreeExplore(AI_gm,chunks,depth-1,AI_gm.CurrentPlayer).Item2);
                             AI_gm.Undo(true);
@@ -88,7 +97,8 @@ namespace Taluva.Model.AI
                         Vector2Int[] possibleTemple = AI_gm.gameBoard.GetTempleSlots(AI_gm.CurrentPlayer);
                         foreach (Vector2Int pos in possibleTemple)
                         {
-                            AI_gm.Phase2IA(new(pos), Building.Temple);
+                            AI_gm.Phase2(pos, Building.Temple,true,true);
+                            //AI_gm.Phase2IA(new(pos), Building.Temple);
                             AI_gm.InitPlay(true,true,true);
                             possiblePlay.Add(new(p,(Rotation)i,pos,Building.Temple), TreeExplore(AI_gm,chunks,depth-1,AI_gm.CurrentPlayer).Item2);
                             AI_gm.Undo(true);
@@ -105,8 +115,7 @@ namespace Taluva.Model.AI
         private void ComputeBestMove()
         {
             GameManagment AI_gm = new(Gm);
-            List<Chunk> possibleChunk = AI_gm.Pile.Content.ToList();
-            possibleChunk.Add(AI_gm.CurrentChunk);
+            List<Chunk> possibleChunk = AI_gm.GetPossibleChunks();
             AITurn = TreeExplore(AI_gm,possibleChunk,1,AI_gm.CurrentPlayer).Item1;
         }
 
@@ -130,7 +139,6 @@ namespace Taluva.Model.AI
         {
             return (20-player.NbBarrack) * 2 + (2-player.NbTowers) * 100 + (3-player.NbTemple);
         }
-
         protected virtual (Turn, int) GetBest(Dictionary<Turn, int> possible)
         {
             KeyValuePair<Turn, int> max = new(null,0);

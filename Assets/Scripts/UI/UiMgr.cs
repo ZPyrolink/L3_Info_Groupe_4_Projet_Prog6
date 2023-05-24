@@ -132,6 +132,26 @@ namespace UI
 
                 _guis[i].transform.GetChild(0).GetComponent<Text>().text = $"Player {i}";
                 _guis[i].transform.GetChild(1).GetComponent<Image>().color = GameMgr.Instance.Players[i].ID.GetColor();
+
+                if (GameMgr.Instance.Players[i] is AI)
+                {
+                    _guis[i].transform.GetChild(5).gameObject.SetActive(true);
+                    string s = "AI ";
+                    switch (((AI)GameMgr.Instance.Players[i]).Difficulty)
+                    {
+                        case Difficulty.BadPlayer:
+                            s += "E";
+                            break;
+                        case Difficulty.Normal:
+                            s += "M";
+                            break;
+                        case Difficulty.SkillIssue:
+                            s += "H";
+                            break;
+                    }
+                    _guis[i].transform.GetChild(5).GetComponent<Text>().text = s;
+                }
+
             }
         }
 

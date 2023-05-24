@@ -6,7 +6,7 @@ namespace Taluva.Model.AI
     public abstract class AI : Player
     {
         protected readonly GameManagment Gm;
-        public Difficulty Difficulty { get; }
+        public Difficulty Difficulty { get; set; }
 
         public AI(Color id, GameManagment gm) : base(id)
         {
