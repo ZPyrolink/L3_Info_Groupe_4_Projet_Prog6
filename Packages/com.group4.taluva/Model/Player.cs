@@ -8,7 +8,7 @@ namespace Taluva.Model
     {
         public Chunk LastChunk { get; set; }
 
-        [Obsolete("Use LastChunk instead")]
+        [Obsolete("Use LastChunk instead", true)]
         public Chunk lastChunk
         {
             get => LastChunk;
