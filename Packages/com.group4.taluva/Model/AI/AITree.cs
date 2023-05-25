@@ -147,7 +147,7 @@ namespace Taluva.Model.AI
         }
         protected virtual (Turn, int[]) GetBest(GameManagment AI_gm,Dictionary<Turn, int[]> possible,Player previousPlayer)
         {
-            KeyValuePair<Turn, int[]> max = new(null,new []{0,0,0,0});
+            KeyValuePair<Turn, int[]> max = new(null,new int[AI_gm.NbPlayers]);
             List<KeyValuePair<Turn,int[]>> possibleMax= new();
             int previousPlayerIndex = -1;
             for(int i = 0; i<AI_gm.NbPlayers;i++)
