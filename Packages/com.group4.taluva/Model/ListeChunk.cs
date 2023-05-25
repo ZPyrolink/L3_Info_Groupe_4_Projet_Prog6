@@ -62,6 +62,7 @@ namespace Taluva.Model
             }
     
             pileChunk.Content.Clear(); // Vider la pile à l'aide de la méthode Clear()
+            pileChunk.Played.Clear();
     
             for (int i = 0; i < nb; i++)
             {
