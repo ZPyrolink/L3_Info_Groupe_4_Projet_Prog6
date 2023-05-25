@@ -58,17 +58,18 @@ namespace Taluva.Model.AI
 
                     foreach (Chunk c in possibleDraw)
                     {
-                        List<Chunk> chunks = possibleDraw;
-                        AI_gm.Pile.Content.Clear();
-                        foreach (var chunk in chunks)
+                        if (c != AI_gm.CurrentChunk)
                         {
-                            if(chunk != c)
-                                AI_gm.Pile.Content.Push(chunk);
+                            AI_gm.Pile.Content.Clear();
+                            foreach (var chunk in possibleDraw)
+                            {
+                                if(chunk != c)
+                                    AI_gm.Pile.Content.Push(chunk);
+                            }
+                            AI_gm.Pile.Played.Remove(AI_gm.CurrentChunk);
+                            AI_gm.Pile.Played.Add(c);
+                            AI_gm.CurrentChunk = c;
                         }
-                        //AI_gm.Phase1IA(c,p,(Rotation)i);
-                        AI_gm.Pile.Played.Remove(AI_gm.CurrentChunk);
-                        AI_gm.Pile.Played.Add(c);
-                        AI_gm.CurrentChunk = c;
                         AI_gm.Phase1(p, (Rotation)i, false, true);
                         
                         Player currentPlayer = AI_gm.CurrentPlayer;
