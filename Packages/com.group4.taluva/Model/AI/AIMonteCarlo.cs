@@ -44,6 +44,7 @@ namespace Taluva.Model.AI
                         virtualGm.Phase1(chunkPos,chunkRot,false,true);
                         (Building buildType,Vector2Int buildPos) = PlayRandomBuild();
                         virtualGm.Phase2(buildPos,buildType,true,true);
+                        winner = AI_gm.CheckWinner();
 
                     }
 
