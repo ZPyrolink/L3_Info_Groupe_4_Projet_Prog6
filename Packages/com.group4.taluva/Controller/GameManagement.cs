@@ -646,7 +646,7 @@ namespace Taluva.Controller
 
                 Chunk chunk = new(c.chunk.Level, new(c.chunk.Coords[1].CurrentBiome),
                     new(c.chunk.Coords[2].CurrentBiome));
-                Pile.Stack(chunk);
+                Pile.Stack(chunk, AIMode);
                 if (!Players[c.playerIndex].Eliminated)
                     CurrentChunk = Pile.Draw();
             } else
@@ -671,7 +671,7 @@ namespace Taluva.Controller
 
                     c.cells[i].CurrentBuildings = Building.None;
                     gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
-                    Pile.Stack(CurrentChunk);
+                    Pile.Stack(CurrentChunk, AIMode);
                 }
             }
             PrecedentPhase(AIMode);

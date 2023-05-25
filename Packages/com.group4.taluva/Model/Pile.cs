@@ -51,10 +51,11 @@ namespace Taluva.Model
         }
         
 
-        public void Stack(T stack)
+        public void Stack(T stack, bool AIMode = false)
         {
             Content.Push(stack);
-            Played.RemoveAt(Played.Count - 1);
+            if(!AIMode)
+                Played.RemoveAt(Played.Count - 1);
         }
 
         public int NbKeeping => Content.Count;
