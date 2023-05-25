@@ -249,6 +249,7 @@ namespace Taluva.Controller
             using (FileStream file = File.Open(SavePath + path, FileMode.OpenOrCreate, FileAccess.Write))
             using (BinaryWriter writer = new(file))
             {
+                writer.Write(Settings.allowMove);
                 writer.Write(historic.Index);
                 writer.Write(NbPlayers);
                 for (int i = 0; i < NbPlayers; i++)
@@ -342,6 +343,7 @@ namespace Taluva.Controller
             using (FileStream file = File.Open(SavePath + path, FileMode.Open, FileAccess.Read))
             using (BinaryReader reader = new(file))
             {
+                Settings.allowMove = reader.ReadBoolean();
                 int intIndex = reader.ReadInt32();
                 NbPlayers = reader.ReadInt32();
                 KeepingTiles = 12 * NbPlayers;
