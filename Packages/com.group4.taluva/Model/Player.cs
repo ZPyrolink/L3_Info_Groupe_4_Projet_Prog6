@@ -27,6 +27,8 @@ namespace Taluva.Model
 
         public bool Eliminated { get; set; }
 
+        public string Name { get; set; }
+
         public Player(Color id)
         {
             ID = id;

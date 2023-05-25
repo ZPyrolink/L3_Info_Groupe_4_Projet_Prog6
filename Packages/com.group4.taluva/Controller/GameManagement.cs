@@ -142,7 +142,10 @@ namespace Taluva.Controller
             Player.Color[] pc = (Player.Color[])Enum.GetValues(typeof(Player.Color));
 
             for (int i = 0; i < nbPlayers - typeAI.Length; i++)
+            {
                 Players[i] = new(pc[i]);
+                Players[i].Name = Settings.Name[i];
+            }
 
             int nbHumanPlayer = nbPlayers - typeAI.Length;
 
@@ -162,6 +165,7 @@ namespace Taluva.Controller
 
         public GameManagment(int nbPlayers) : this(nbPlayers, Array.Empty<Type>())
         {
+            
         }
 
         #endregion
@@ -253,6 +257,8 @@ namespace Taluva.Controller
                     writer.Write(Players[i] is AI);
                     if (Players[i] is AI)
                         writer.Write((int)((AI)Players[i]).Difficulty);
+                    else
+                        writer.Write(Players[i].Name);
                 }
 
                 Chunk[] stackArray = Pile.Content.ToArray();
@@ -365,6 +371,7 @@ namespace Taluva.Controller
                     } else
                     {
                         Players[i] = new(id);
+                        Players[i].Name = reader.ReadString();
                     }
                 }
 
@@ -709,29 +716,25 @@ namespace Taluva.Controller
 
         public Player CheckWinner()
         {
-            Player p = null;
-            if (KeepingTiles == 0)
+            Player p;
+            Player[] eliminated;
+            if (KeepingTiles <= 0)
             {
                 p = NormalEnd;
                 OnEndGame(p, GameEnd.NormalEnd);
-            }
-
-            Player tmp = EarlyEnd;
-            if (tmp != null)
+                return p;
+            }else if ((p = EarlyEnd) != null)
             {
-                p = tmp;
                 OnEndGame(p, GameEnd.EarlyEnd);
-            }
-
-            var tmp2 = Players.Where(p => !p.Eliminated);
-
-            if (tmp2.Count() == 1)
+                return p;
+            }else if ((eliminated = Players.Where(p => !p.Eliminated).ToArray()).Length == 1)
             {
-                p = tmp2.First();
-                OnEndGame(tmp2.First(), GameEnd.LastPlayerStanding);
+                p = eliminated[0];
+                OnEndGame(p, GameEnd.LastPlayerStanding);
+                return p;
             }
 
-            return p;
+            return null;
         }
 
         private Player EarlyEnd

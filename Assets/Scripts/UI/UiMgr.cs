@@ -130,7 +130,11 @@ namespace UI
                     mr.materials[TilesMgr.BuildOwnerMatIndex[b]].color = GameMgr.Instance.Players[i].IdColor;
                 }
 
-                _guis[i].transform.GetChild(0).GetComponent<Text>().text = $"Player {i}";
+                if (GameMgr.Instance.Players[i] is AI)
+                    _guis[i].transform.GetChild(0).GetComponent<Text>().text = $"Player {i}";
+                else
+                    _guis[i].transform.GetChild(0).GetComponent<Text>().text = GameMgr.Instance.Players[i].Name;
+
                 _guis[i].transform.GetChild(1).GetComponent<Image>().color = GameMgr.Instance.Players[i].ID.GetColor();
 
                 if (GameMgr.Instance.Players[i] is AI)
@@ -171,6 +175,9 @@ namespace UI
                     GameMgr.Instance.Players[i].Eliminated ?
                         new(1, 0, 0, .25f) :
                         new(.75f, .75f, .75f);
+
+                if (!(GameMgr.Instance.Players[i] is AI))
+                    _guis[i].transform.GetChild(0).gameObject.GetComponent<Text>().text = GameMgr.Instance.Players[i].Name;
 
                 foreach (Animator anim in _guis[i].GetComponentsInChildren<Animator>())
                     if (GameMgr.Instance.CurrentPlayerIndex == i)

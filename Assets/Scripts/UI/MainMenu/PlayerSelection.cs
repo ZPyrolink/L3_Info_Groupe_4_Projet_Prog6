@@ -17,9 +17,12 @@ namespace UI.MainMenu
         private Button removeButton;
 
         [SerializeField]
-        private Dropdown playerType;
+        public Dropdown playerType;
 
         private Image _background;
+
+        [SerializeField]
+        public InputField PlayerName;
 
         public bool Enabled
         {
@@ -33,9 +36,21 @@ namespace UI.MainMenu
         private void Start()
         {
             _background = GetComponent<Image>();
+            playerType.options.Add(new Dropdown.OptionData("Ai Easy"));
+            playerType.options.Add(new Dropdown.OptionData("Ai Medium"));
+            playerType.options.Add(new Dropdown.OptionData("Ai Hard"));
+        }
 
-            Difficulty[] difficulties = (Difficulty[]) Enum.GetValues(typeof(Difficulty));
-            playerType.options.AddRange(difficulties.Select(d => new Dropdown.OptionData(d.ToString())));
+        private void Update()
+        {
+            if(playerType.value == 0)
+            {
+                PlayerName.gameObject.SetActive(true);
+            }
+            else
+            {
+                PlayerName.gameObject.SetActive(false);
+            }
         }
 
         public void AddPlayer()

@@ -12,5 +12,7 @@ namespace Taluva.Model
         public static bool allowSound = false;
         public static bool allowMove = false;
 
+        public static string[] Name = new[] {"","","",""};
+
     }
 }
