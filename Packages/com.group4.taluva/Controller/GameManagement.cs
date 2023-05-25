@@ -122,7 +122,8 @@ namespace Taluva.Controller
             Players = new Player[NbPlayers];
             CurrentPlayerIndex = original.CurrentPlayerIndex;
             KeepingTiles = original.KeepingTiles;
-            CurrentChunk = new(original.CurrentChunk);
+            if(original.CurrentChunk != null)
+                CurrentChunk = new(original.CurrentChunk);
             for (int i = 0; i < NbPlayers; i++)
             {
                 Players[i] = original.Players[i].Clone();
