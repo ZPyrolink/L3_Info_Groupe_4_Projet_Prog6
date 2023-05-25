@@ -443,15 +443,18 @@ namespace UI
 
         public void ToggleVictory()
         {
-            EnableScript();
+            EnableScript(true);
             victoryCanva.SetActive(true);
         }
 
-        public void EnableScript()
+        public void EnableScript(bool enableEscape = false)
         {
             CameraMgr.Instance.enabled = !CameraMgr.Instance.enabled;
             inMenu = !inMenu;
             TilesMgr.Instance.enabled = !TilesMgr.Instance.enabled;
+
+            if(enableEscape)
+                Instance.enabled = !Instance.enabled;
         }
 
         public void UpBuild(int i)

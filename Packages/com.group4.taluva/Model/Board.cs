@@ -474,12 +474,30 @@ namespace Taluva.Model
         /// Find all the slots for the barrack
         /// </summary>
         /// <returns>Return the possible possition for the barrack</returns>
-        public Vector2Int[] GetBarrackSlots(Player player) => WorldMap
-            .Select(GetCellCoord)
-            .Where(p => !WorldMap.IsVoid(p) && (WorldMap[p].ParentChunk.Level == 1 || IsAdjacentToCity(p, player)) 
-                        && WorldMap[p].CurrentBuildings == Building.None &&
-                        WorldMap[p].CurrentBiome != Biomes.Volcano && WorldMap[p].ParentChunk.Level <= player.NbBarrack)
-            .ToArray();
+        public Vector2Int[] GetBarrackSlots(Player player)
+        {
+            List<Vector2Int> possibleBarrack = new();
+            foreach(Cell cell in WorldMap)
+            {
+                if (!cell.IsBuildable)
+                    continue;
+
+                if (cell.ParentChunk.Level != 1 && !IsAdjacentToCity(cell.position, player))
+                    continue;
+
+                int barrack = 0;
+                List<Vector2Int> biomes = FindBiomesAroundVillage(cell.position, player);
+                foreach(Vector2Int biome in biomes)
+                {
+                    barrack += WorldMap[biome].ParentChunk.Level;
+                }
+                if (barrack > player.NbBarrack)
+                    continue;
+
+                possibleBarrack.Add(cell.position);
+            }
+            return possibleBarrack.ToArray();
+        }
 
         /// <summary>
         /// Find all the slots for the tower

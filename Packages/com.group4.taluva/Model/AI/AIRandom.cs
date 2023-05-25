@@ -85,8 +85,10 @@ namespace Taluva.Model.AI
             foreach (var pos in barracks)
             {
                 if (Gm.gameBoard.WorldMap[pos].ParentChunk.Level > maxlevel)
+                {
                     maxlevel = Gm.gameBoard.WorldMap[pos].ParentChunk.Level;
                     barracksAtMaxLevel.Clear();
+                }
                 if(Gm.gameBoard.WorldMap[pos].ParentChunk.Level==maxlevel)
                     barracksAtMaxLevel.Add(pos);
             }
