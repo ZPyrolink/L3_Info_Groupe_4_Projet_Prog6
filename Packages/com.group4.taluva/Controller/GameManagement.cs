@@ -916,9 +916,9 @@ namespace Taluva.Controller
                 InitPlay();
             }
         }
-
-
-
+        
+        
+        
 
         public void PlayerEliminated()
         {
