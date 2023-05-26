@@ -11,7 +11,7 @@ namespace Taluva.Model
 
         public Chunk ParentChunk { get; set; }
 
-        public Vector2Int position;
+        public Vector2Int position { get; set; }
 
         public Cell(Biomes biome, Chunk c) : this(biome)
         {

@@ -77,6 +77,11 @@ namespace Taluva.Model
             return villagePositions;
         }
 
+        public void ClearBuilding(Vector2Int pos)
+        {
+            WorldMap[pos].CurrentBuildings = Building.None;
+        }
+
         /// <summary>
         /// Find all the village around a position.
         /// </summary>
@@ -349,6 +354,12 @@ namespace Taluva.Model
             c.Coords[2].position = right;
         }
 
+        public void AddCell(Cell c, Vector2Int position)
+        {
+            WorldMap.Add(c, position);
+            c.position = position;
+        }
+
         /// <summary>
         /// Add the chunk to the worldmap
         /// </summary>
@@ -482,11 +493,11 @@ namespace Taluva.Model
                 if (!cell.IsBuildable)
                     continue;
 
-                if (cell.ParentChunk.Level != 1 && !IsAdjacentToCity(cell.position, player))
+                if (cell.ParentChunk.Level != 1 && !IsAdjacentToCity(GetCellCoord(cell), player))
                     continue;
 
                 int barrack = 0;
-                List<Vector2Int> biomes = FindBiomesAroundVillage(cell.position, player);
+                List<Vector2Int> biomes = FindBiomesAroundVillage(GetCellCoord(cell), player);
                 foreach(Vector2Int biome in biomes)
                 {
                     barrack += WorldMap[biome].ParentChunk.Level;
@@ -494,7 +505,7 @@ namespace Taluva.Model
                 if (barrack > player.NbBarrack)
                     continue;
 
-                possibleBarrack.Add(cell.position);
+                possibleBarrack.Add(GetCellCoord(cell));
             }
             return possibleBarrack.ToArray();
         }

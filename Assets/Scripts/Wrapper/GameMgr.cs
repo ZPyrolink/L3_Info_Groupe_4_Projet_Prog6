@@ -74,6 +74,8 @@ namespace Wrapper
             {
                 Instance.LoadGame(StartSettings.LoadedFile);
                 UiMgr.Instance.UnloadSetUp();
+                load = false;
+                StartSettings.LoadedFile = path;
             }
             
             if (Instance.gameBoard.WorldMap.Empty)
@@ -116,6 +118,11 @@ namespace Wrapper
                 {
                     TilesMgr.Instance.ReputBuild(pos, b, Instance.CurrentPlayer);
                 }
+            };
+
+            Instance.NotifyAIClearInformations = pr =>
+            {
+                TilesMgr.Instance.ClearInformations(pr.Point, (Rotation)Array.IndexOf(pr.Rotations, true));
             };
 
             Instance.NotifyAIChunkPlacement = pr =>

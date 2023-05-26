@@ -141,7 +141,7 @@ namespace Taluva.Model.AI
             for(int i = 0; i<AI_gm.NbPlayers;i++)
             {
                 player = AI_gm.Players[i];
-                playerValues[i] = (20 - player.NbBarrack) * 2 + (2 - player.NbTowers) * 100 + (3 - player.NbTemple);
+                playerValues[i] = (20 - player.NbBarrack) * 2 + (2 - player.NbTowers) * 100 + (3 - player.NbTemple) * 1000;
             }
             return playerValues;
         }

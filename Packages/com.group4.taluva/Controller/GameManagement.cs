@@ -94,6 +94,10 @@ namespace Taluva.Controller
         public Action<Player, GameEnd> NotifyEndGame { get; set; }
         private void OnEndGame(Player winner, GameEnd victory) => NotifyEndGame?.Invoke(winner, victory);
 
+        public Action<PointRotation> NotifyAIClearInformations { get; set; }
+
+        private void OnAIClearInformations(PointRotation pr) => NotifyAIClearInformations?.Invoke(pr);
+
         //Notify where the AI places the chunk
         public Action<PointRotation> NotifyAIChunkPlacement { get; set; }
 
@@ -631,7 +635,7 @@ namespace Taluva.Controller
                 {
                     for (int i = 0; i < c.cells.Length; i++)
                     {
-                        gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
+                        gameBoard.AddCell(c.cells[i], c.positions[i]);
                         gameBoard.PlaceBuilding(c.cells[i], c.building[i], CurrentPlayer, false);
                     }
                 }
@@ -668,9 +672,7 @@ namespace Taluva.Controller
                             CurrentPlayer.NbBarrack += gameBoard.WorldMap[c.positions[i]].ParentChunk.Level;
                             break;
                     }
-
-                    c.cells[i].CurrentBuildings = Building.None;
-                    gameBoard.WorldMap.Add(c.cells[i], c.positions[i]);
+                    gameBoard.ClearBuilding(c.positions[i]);
                     Pile.Stack(CurrentChunk, AIMode);
                 }
             }
@@ -975,8 +977,8 @@ namespace Taluva.Controller
                 if (pr.Rotations[i])
                     r = (Rotation)i;
             }
-
             OnAIChunkPlacement(pr);
+            OnAIClearInformations(pr);
             Phase1(pr, r, true);
         }
 
