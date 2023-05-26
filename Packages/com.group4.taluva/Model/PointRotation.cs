@@ -58,16 +58,17 @@ namespace Taluva.Model
         public override string ToString()
         {
             StringBuilder sb = new();
+            sb.Append("X: " + Point.x + " Y: " +  Point.y).Append(" | ");
             for (int i = 0; i < Rotations.Length; i++)
                 if (Rotations[i])
                     sb.Append((Rotation) i switch
                     {
-                        Rotation.N => sb.Append("N"),
-                        Rotation.S => sb.Append("S"),
-                        Rotation.NE => sb.Append("NE"),
-                        Rotation.NW => sb.Append("NW"),
-                        Rotation.SE => sb.Append("SE"),
-                        Rotation.SW => sb.Append("SW")
+                        Rotation.N => "N",
+                        Rotation.S => "S",
+                        Rotation.NE => "NE",
+                        Rotation.NW => "NW",
+                        Rotation.SE => "SE",
+                        Rotation.SW => "SW"
                     }).Append(' ');
 
             return sb.ToString();

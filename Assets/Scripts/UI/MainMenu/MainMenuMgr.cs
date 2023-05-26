@@ -16,7 +16,8 @@ namespace UI.MainMenu
             main,
             play,
             load,
-            settings;
+            settings,
+            rules;
 
         [SerializeField]
         private Toggle audioToggle;
@@ -47,6 +48,12 @@ namespace UI.MainMenu
         {
             ToggleMain();
             Toggle(settings);
+        }
+
+        public void ToggleRules()
+        {
+            ToggleMain();
+            Toggle(rules);
         }
 
         public void AllowSound()
